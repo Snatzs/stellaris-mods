@@ -67,5 +67,7 @@ stellaris-mods/
 
 ## Developers
 
-- **Snatzs** — and 2 friends (update names here)
+- **Snatzs**
+- **AttiiK**
+- **manzano5**
 - **AI agents** — Claude Code, Codex (primary development)
