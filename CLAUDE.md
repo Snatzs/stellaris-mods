@@ -6,7 +6,7 @@ This is a monorepo containing multiple Stellaris mods for a 7-player multiplayer
 
 ## Game Version
 
-**Target:** Stellaris 3.x (update to exact version + DLCs owned)
+**Target:** Stellaris 4.3
 
 ## Repository Layout
 
@@ -77,7 +77,7 @@ mods/<mod-name>/
 ```
 name = "Mod Display Name"
 path = "mod/<mod-folder-name>"
-supported_version = "3.x.*"
+supported_version = "4.3.*"
 tags = {
 	"Gameplay"
 }
