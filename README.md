@@ -16,6 +16,9 @@ This repository contains multiple Stellaris mods designed to work together. The 
 stellaris-mods/
 ├── CLAUDE.md              # AI agent instructions and conventions
 ├── docs/                  # Shared research, references, and design docs
+│   ├── design-vision.md   # Design goals and planned changes (read first)
+│   ├── ROADMAP.md         # What's done, in progress, and still to do
+│   ├── wiki/              # Local Stellaris wiki modding references
 │   ├── modding-reference.md
 │   ├── multiplayer-balance.md
 │   └── compatibility.md
@@ -61,8 +64,8 @@ stellaris-mods/
 ## Contributing
 
 - Create a feature branch for your work (`feature/mod-name-description`).
-- Open a PR for review before merging to `main`.
-- `main` branch should always be playable — test before merging.
+- Open a PR for review before merging to `master`.
+- `master` branch should always be playable — test before merging.
 - Update `docs/compatibility.md` if your mod overrides vanilla files.
 
 ## Developers

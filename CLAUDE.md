@@ -8,10 +8,22 @@ This is a monorepo containing multiple Stellaris mods for a 7-player multiplayer
 
 **Target:** Stellaris 4.3
 
+## Design Vision
+
+**Read `docs/design-vision.md` before starting any mod work.** It defines the project's goals, design pillars, and specific changes the player group wants. This is a living document — it evolves as the group discusses. All mod decisions should align with its pillars:
+
+1. Geography matters — territory worth fighting over
+2. Scarcity drives strategy — resources force trade-offs and conflict
+3. Wide > tall — more planets/pops/systems should always be good
+4. Kill the "build" meta — no exploitable civic/origin/trait combos
+5. Diplomacy with teeth — borders, federations, diplomacy have strategic weight
+
 ## Repository Layout
 
 - `mods/<mod-name>/` — each mod is a self-contained Stellaris mod
 - `docs/` — shared research, modding references, balance notes
+- `docs/design-vision.md` — **design goals and specific changes** (read first)
+- `docs/ROADMAP.md` — what's done, in progress, and still to do
 - `tools/` — helper scripts (deploy, validation)
 
 ## Stellaris Mod Structure
@@ -99,10 +111,42 @@ tags = {
 - Do NOT create circular event chains without exit conditions
 - Ensure every `if` block has proper bracket closure — Stellaris parser errors are cryptic
 
+## Reference Documentation
+
+Local wiki references are stored in `docs/wiki/`. Use these instead of web-fetching common modding topics.
+
+### When to Consult References
+
+| You're doing... | Read first |
+|-----------------|-----------|
+| Writing any script logic | `docs/wiki/scopes.md`, `docs/wiki/effects.md`, `docs/wiki/conditions.md` |
+| Adding modifiers to anything | `docs/wiki/modifiers.md` |
+| Creating or modifying events | `docs/wiki/event_modding.md`, `docs/wiki/on_actions.md` |
+| Adding technologies | `docs/wiki/technology_modding.md` |
+| Adding buildings | `docs/wiki/building_modding.md` |
+| Working with variables/counters | `docs/wiki/variables.md` |
+| Writing reusable script blocks | `docs/wiki/dynamic_modding.md` |
+| Adding player-visible text | `docs/wiki/localisation_modding.md` |
+| Overriding vanilla files | `docs/compatibility.md` first |
+
+### Version Caveat
+
+The wiki references cover versions 3.1–3.7. Core scripting (effects, conditions, scopes, modifiers) is stable, but **v4.0+ features** (Phoenix update zones, district rework, pop groups) may not be fully covered. For 4.0+ specifics, cross-reference against vanilla game files in `<Steam>/Stellaris/common/` or web-fetch the latest wiki page.
+
+### When to Web Fetch
+
+Only web-fetch for content guides **not** stored locally (ship, district, government, ethics, empire, army, war, diplomacy, portrait, interface, music modding) or when working with v4.0+ features not covered in local docs. URL pattern: `https://stellaris.paradoxwikis.com/<Topic>_modding`
+
+See `docs/modding-reference.md` for a full index with cross-references.
+
 ## When Working on This Project
 
-1. **Read the mod's README** before modifying it
-2. **Check `docs/compatibility.md`** before overriding any vanilla game file
-3. **Update `docs/compatibility.md`** after adding vanilla file overrides
-4. **Test changes** by describing what manual testing steps are needed
-5. **Keep mods independent** where possible — minimize cross-mod dependencies
+1. **Read `docs/design-vision.md`** to understand what we're building and why
+2. **Check `docs/ROADMAP.md`** to see what's done, in progress, and planned
+3. **Read the mod's README** before modifying it
+4. **Consult `docs/wiki/`** for scripting syntax — don't guess at effect/trigger names
+5. **Check `docs/compatibility.md`** before overriding any vanilla game file
+6. **Update `docs/compatibility.md`** after adding vanilla file overrides
+7. **Log balance decisions** in `docs/multiplayer-balance.md`
+8. **Test changes** by describing what manual testing steps are needed
+9. **Keep mods independent** where possible — minimize cross-mod dependencies

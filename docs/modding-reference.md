@@ -1,65 +1,53 @@
 # Stellaris Modding Reference
 
-A quick-reference guide for Stellaris mod development. This is a living document — update as we learn more.
+Quick-reference index for Stellaris mod development. Detailed references are in `docs/wiki/`.
+
+For **what** to build, see [design-vision.md](design-vision.md). For **status**, see [ROADMAP.md](ROADMAP.md).
+
+## Local Wiki References
+
+### Core Scripting — consult these when writing any mod logic
+- [Effects](wiki/effects.md) — all effects that modify game state (creating objects, setting flags, adding modifiers)
+- [Conditions](wiki/conditions.md) — triggers for logic checks (has_technology, is_at_war, num_pops, etc.)
+- [Scopes](wiki/scopes.md) — scope system, THIS/FROM/ROOT/PREV, dot notation, event targets
+- [Modifiers](wiki/modifiers.md) — modifier types (add/mult/reduction), formula, all modifier keys by category
+- [Variables](wiki/variables.md) — set/check/copy variables, arithmetic, export operations
+- [On Actions](wiki/on_actions.md) — all vanilla on_actions with scope documentation
+- [Dynamic Modding](wiki/dynamic_modding.md) — scripted effects/triggers, inline scripts, script values, flags
+
+### Content Guides — consult these when building specific features
+- [Event Modding](wiki/event_modding.md) — event types, structure, options, chaining, pre-triggers, performance
+- [Technology Modding](wiki/technology_modding.md) — tech costs/weights/tiers, categories, weight modifiers
+- [Building Modding](wiki/building_modding.md) — building properties, jobs, resources, upgrades, v4.0 zones
+- [Localisation Modding](wiki/localisation_modding.md) — file format, UTF-8 BOM, bracket commands, color codes, icons
+
+### Not stored locally — fetch on demand via WebFetch
+Ship, District, Government, Ethics, Empire, Army, War, Diplomacy, Portrait, Interface, Music modding.
+Base URL: `https://stellaris.paradoxwikis.com/<Topic>_modding`
+
+## When to Use Which Reference
+
+| Task | Consult |
+|------|---------|
+| Writing event logic (if/else, effects) | Effects, Conditions, Scopes |
+| Adding modifiers to buildings/techs/traits | Modifiers |
+| Creating events | Event Modding, On Actions |
+| Adding technologies | Technology Modding |
+| Adding buildings | Building Modding |
+| Working with variables or counters | Variables |
+| Creating reusable script blocks | Dynamic Modding |
+| Adding player-visible text | Localisation Modding |
+| Overriding vanilla files | [Compatibility Tracker](compatibility.md) first, then relevant content guide |
 
 ## Key Concepts
 
 ### How Stellaris Loads Mods
-
-- Mods override vanilla files by matching the same path. If your mod has `common/buildings/my_buildings.txt`, it **adds** to the buildings list.
-- If your mod has a file with the **same name** as a vanilla file (e.g., `common/buildings/00_capital_buildings.txt`), it **replaces** the vanilla file entirely.
+- Mods override vanilla files by matching the same path. A new file **adds** to the game.
+- A file with the **same name** as a vanilla file **replaces** it entirely.
 - Load order matters — later mods override earlier ones for same-name files.
+- **Events** are the exception: they use "First In Only Serve" — prefix override files with `!` or `!!`.
 
-### Scopes
-
-Stellaris scripting uses a scope system. Common scopes:
-
-| Scope | Description |
-|-------|-------------|
-| `country` | An empire |
-| `planet` | A planet |
-| `pop` | A population unit |
-| `leader` | A leader |
-| `fleet` | A fleet |
-| `ship` | A ship |
-| `galactic_object` | A star system |
-| `sector` | A sector |
-| `federation` | A federation |
-| `species` | A species |
-
-### Common Scripted Conditions
-
-```
-is_ai = yes/no
-has_technology = <tech_key>
-has_building = <building_key>
-has_modifier = <modifier_key>
-has_civic = <civic_key>
-has_trait = <trait_key>
-num_pops > X
-is_at_war = yes/no
-```
-
-### Common Effects
-
-```
-add_modifier = { modifier = <key> days = X }
-add_resource = { minerals = X energy = X }
-remove_building = <key>
-set_planet_flag = <flag>
-create_pop = { species = owner_main_species }
-```
-
-## Useful Resources
-
-- [Stellaris Wiki — Modding](https://stellaris.paradoxwikis.com/Modding) — official modding docs
-- [Stellaris Wiki — Conditions](https://stellaris.paradoxwikis.com/Conditions) — full conditions list
-- [Stellaris Wiki — Effects](https://stellaris.paradoxwikis.com/Effects) — full effects list
-- [Stellaris Wiki — Scopes](https://stellaris.paradoxwikis.com/Scopes) — scope documentation
-- Vanilla game files (best reference) — typically at `<Steam>/Stellaris/common/`
-
-## Tips
-
-- When in doubt, look at how vanilla does it. Copy a vanilla file and modify it.
+### Debugging
 - Use `error.log` in `Documents/Paradox Interactive/Stellaris/logs/` for debugging.
-- The game console (`~` key) is essential for testing: `event <event_id>`, `research_all_technologies`, `cash 10000`, etc.
+- Game console (`~` key): `event <id>`, `research_all_technologies`, `cash 10000`, `debugtooltip`
+- When in doubt, look at how vanilla does it in `<Steam>/Stellaris/common/`.
