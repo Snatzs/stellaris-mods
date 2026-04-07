@@ -19,10 +19,10 @@ Track what needs to be done, what's in progress, and what's done.
 - [x] Design vision document (`docs/design-vision.md`)
 - [x] Roadmap (`docs/ROADMAP.md`)
 - [x] Cross-references between all docs
-- [ ] Validation script — bracket matching, missing localisation keys (`tools/validate.sh`)
-- [ ] Mod scaffold script — generate boilerplate for new mods (`tools/new-mod.sh`)
-- [ ] Document vanilla game files location in CLAUDE.md
-- [ ] Document branching convention in CLAUDE.md
+- [x] Validation script — bracket matching, missing localisation keys (`tools/validate.sh`)
+- [x] Mod scaffold script — generate boilerplate for new mods (`tools/new-mod.sh`)
+- [x] Document vanilla game files location in CLAUDE.md
+- [x] Document branching convention in CLAUDE.md
 
 ## Mods — Economy & Resources
 

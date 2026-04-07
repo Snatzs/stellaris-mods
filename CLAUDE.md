@@ -24,7 +24,35 @@ This is a monorepo containing multiple Stellaris mods for a 7-player multiplayer
 - `docs/` — shared research, modding references, balance notes
 - `docs/design-vision.md` — **design goals and specific changes** (read first)
 - `docs/ROADMAP.md` — what's done, in progress, and still to do
-- `tools/` — helper scripts (deploy, validation)
+- `tools/` — helper scripts (see **Tools** section below)
+
+## Tools
+
+### `tools/new-mod.sh` — Scaffold a new mod
+**Use this whenever creating a new mod.** Do not manually create mod directories.
+```bash
+bash tools/new-mod.sh <mod-name> ["Display Name"]
+# Example: bash tools/new-mod.sh economy_overhaul "Economy Overhaul"
+```
+Creates the full directory structure, `descriptor.mod`, localisation stub (UTF-8 with BOM), and README template under `mods/<mod-name>/`.
+
+### `tools/validate.sh` — Validate mod files
+**Run this before every commit.** Checks for:
+- Mismatched brackets `{}` in `.txt` and `.mod` files
+- Localisation keys referenced in scripts but not defined in `localisation/`
+- Missing or malformed `descriptor.mod`
+```bash
+bash tools/validate.sh              # validate all mods
+bash tools/validate.sh economy_overhaul  # validate one mod
+```
+Exit code 1 on errors, 0 on success (warnings don't fail).
+
+### `tools/deploy.sh` — Deploy mods to Stellaris
+Creates symlinks from the Stellaris mod directory to each mod in this repo, so changes are immediately reflected in-game.
+```bash
+bash tools/deploy.sh
+```
+Requires admin/Developer Mode on Windows.
 
 ## Stellaris Mod Structure
 
@@ -139,6 +167,31 @@ Only web-fetch for content guides **not** stored locally (ship, district, govern
 
 See `docs/modding-reference.md` for a full index with cross-references.
 
+## Vanilla Game Files
+
+When you need to reference vanilla Stellaris files (to understand default values, override behavior, or check 4.0+ features), they are located in the Steam installation directory:
+
+| Platform | Path |
+|----------|------|
+| Windows | `C:\Program Files (x86)\Steam\steamapps\common\Stellaris\` |
+| macOS | `~/Library/Application Support/Steam/steamapps/common/Stellaris/` |
+| Linux | `~/.steam/steam/steamapps/common/Stellaris/` |
+
+Key subdirectories mirror the mod structure: `common/`, `events/`, `localisation/`, etc. Always check vanilla files before overriding — understand the default before changing it.
+
+## Branching Convention
+
+- **`master`** — stable, tested, ready-to-play state
+- **`mod/<mod-name>`** — feature branch for developing a specific mod (e.g. `mod/economy-overhaul`)
+- **`fix/<description>`** — quick fix branches (e.g. `fix/bracket-mismatch-economy`)
+- **`docs/<description>`** — documentation-only changes
+
+**Workflow:**
+1. Branch from `master` using the appropriate prefix
+2. Make changes, run `bash tools/validate.sh` before committing
+3. Merge back to `master` when the mod/fix is tested and ready
+4. Delete the branch after merge
+
 ## When Working on This Project
 
 1. **Read `docs/design-vision.md`** to understand what we're building and why
@@ -148,5 +201,7 @@ See `docs/modding-reference.md` for a full index with cross-references.
 5. **Check `docs/compatibility.md`** before overriding any vanilla game file
 6. **Update `docs/compatibility.md`** after adding vanilla file overrides
 7. **Log balance decisions** in `docs/multiplayer-balance.md`
-8. **Test changes** by describing what manual testing steps are needed
-9. **Keep mods independent** where possible — minimize cross-mod dependencies
+8. **Run `bash tools/validate.sh`** before committing — fix all errors
+9. **Use `bash tools/new-mod.sh`** to create new mods — don't create mod directories manually
+10. **Test changes** by describing what manual testing steps are needed
+11. **Keep mods independent** where possible — minimize cross-mod dependencies
