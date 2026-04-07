@@ -59,6 +59,7 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## Mods — Borders & Geopolitics
 
+- [ ] Re-explore feasibility of sensor, trade route, and enclave blocking through closed borders (initial assessment may be incomplete — check hyper-relay route detection, intel system, trade route manipulation, enclave action gating)
 - [ ] Border restrictions (commerce, contacts, sensors, migration, enclave access)
 - [ ] Chokepoint and hyperlane strategic value
 - [ ] L-Gate/Wormhole logistics question (design TBD)

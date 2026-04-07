@@ -177,12 +177,23 @@ Border closure is controlled per-country-type in `common/country_types/`.
 - **Enclave contact** — enclave interactions are hardcoded diplomatic actions, not affected by border status
 - **Intel/information** — no border-based intel blocking
 
-### Workarounds
+### Workarounds (Known)
 
 - Increase piracy modifiers near hostile borders (via `starbase_trade_protection_add` and related)
 - Add opinion penalties for closed borders
 - Use event-based trade value reduction when bordering hostile empires
-- **Cannot truly restrict** sensors, trade routes, or enclave access
+
+### Workarounds (To Be Explored)
+
+The initial feasibility assessment concluded sensor range, trade routes, and enclave access are hardcoded. **This needs re-exploration** — there may be indirect or "artificial" implementation paths not yet considered:
+
+- **Hyper-relay route detection**: The game calculates direct hyper-relay connectivity between empires. If the engine exposes this as a trigger/condition, it could be leveraged to determine whether trade, sensors, or contact should be blocked (e.g., "no relay route through friendly space = no trade").
+- **Sensor range suppression**: Could a negative `ship_sensor_range_add` or system-level modifier effectively blind empires to systems behind closed borders? Explore `intel` system modifiers (4.0+ intel/espionage rework may have added new levers).
+- **Trade route manipulation**: Explore whether `trade_routes_available` or similar triggers exist. Could we destroy/block trade routes via scripted effects? Or apply a 100% piracy modifier to systems behind closed borders to effectively zero out trade?
+- **Enclave access blocking**: Could enclave diplomatic actions be gated with a scripted trigger that checks border status between the empire and the enclave's system? Explore `diplomatic_actions` possible blocks for enclave-specific actions.
+- **Custom implementation**: If no vanilla levers exist, explore whether event-driven systems could simulate these restrictions (e.g., periodic events that detect trade flowing through closed borders and apply compensating penalties).
+
+**Status: Requires dedicated research session against vanilla 4.3 files before concluding these are truly impossible.**
 
 ---
 
