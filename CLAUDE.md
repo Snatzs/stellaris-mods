@@ -147,6 +147,10 @@ Local wiki references are stored in `docs/wiki/`. Use these instead of web-fetch
 
 | You're doing... | Read first |
 |-----------------|-----------|
+| Working on economy/resources/districts | `docs/vanilla/economy.md`, then `docs/wiki/modifiers.md` |
+| Working on war goals/claims/combat | `docs/vanilla/warfare.md`, then `docs/wiki/effects.md` |
+| Working on diplomacy/federations/ethics | `docs/vanilla/diplomacy.md`, then `docs/wiki/conditions.md` |
+| Working on slavery/pops/migration | `docs/vanilla/population.md`, then `docs/wiki/scopes.md` |
 | Writing any script logic | `docs/wiki/scopes.md`, `docs/wiki/effects.md`, `docs/wiki/conditions.md` |
 | Adding modifiers to anything | `docs/wiki/modifiers.md` |
 | Creating or modifying events | `docs/wiki/event_modding.md`, `docs/wiki/on_actions.md` |
@@ -156,6 +160,10 @@ Local wiki references are stored in `docs/wiki/`. Use these instead of web-fetch
 | Writing reusable script blocks | `docs/wiki/dynamic_modding.md` |
 | Adding player-visible text | `docs/wiki/localisation_modding.md` |
 | Overriding vanilla files | `docs/compatibility.md` first |
+
+### Vanilla 4.3 Architecture Docs
+
+`docs/vanilla/` contains verified architecture references for vanilla game systems — key file paths, modifier names, on_actions, modding levers, and known engine limitations. **Read the relevant file before starting work on any mod.** These save significant research time. See `docs/vanilla/README.md` for the full index.
 
 ### Version Caveat
 
@@ -173,7 +181,8 @@ When you need to reference vanilla Stellaris files (to understand default values
 
 | Platform | Path |
 |----------|------|
-| Windows | `C:\Program Files (x86)\Steam\steamapps\common\Stellaris\` |
+| Windows (this machine) | `D:\Stellaris\` |
+| Windows (default Steam) | `C:\Program Files (x86)\Steam\steamapps\common\Stellaris\` |
 | macOS | `~/Library/Application Support/Steam/steamapps/common/Stellaris/` |
 | Linux | `~/.steam/steam/steamapps/common/Stellaris/` |
 
@@ -196,12 +205,14 @@ Key subdirectories mirror the mod structure: `common/`, `events/`, `localisation
 
 1. **Read `docs/design-vision.md`** to understand what we're building and why
 2. **Check `docs/ROADMAP.md`** to see what's done, in progress, and planned
-3. **Read the mod's README** before modifying it
-4. **Consult `docs/wiki/`** for scripting syntax — don't guess at effect/trigger names
-5. **Check `docs/compatibility.md`** before overriding any vanilla game file
-6. **Update `docs/compatibility.md`** after adding vanilla file overrides
-7. **Log balance decisions** in `docs/multiplayer-balance.md`
-8. **Run `bash tools/validate.sh`** before committing — fix all errors
-9. **Use `bash tools/new-mod.sh`** to create new mods — don't create mod directories manually
-10. **Test changes** by describing what manual testing steps are needed
-11. **Keep mods independent** where possible — minimize cross-mod dependencies
+3. **Read `docs/vanilla/<system>.md`** for the system you're modifying — understand vanilla architecture before changing it
+4. **Read the mod's README** before modifying it
+5. **Consult `docs/wiki/`** for scripting syntax — don't guess at effect/trigger names
+6. **Check `docs/compatibility.md`** before overriding any vanilla game file
+7. **Update `docs/compatibility.md`** after adding vanilla file overrides
+8. **Update `docs/vanilla/`** if you discover new modifiers, on_actions, limitations, or workarounds not yet documented (see `docs/vanilla/README.md` for guidelines)
+9. **Log balance decisions** in `docs/multiplayer-balance.md`
+10. **Run `bash tools/validate.sh`** before committing — fix all errors
+11. **Use `bash tools/new-mod.sh`** to create new mods — don't create mod directories manually
+12. **Test changes** by describing what manual testing steps are needed
+13. **Keep mods independent** where possible — minimize cross-mod dependencies

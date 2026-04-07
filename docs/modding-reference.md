@@ -1,8 +1,11 @@
 # Stellaris Modding Reference
 
-Quick-reference index for Stellaris mod development. Detailed references are in `docs/wiki/`.
+Quick-reference index for Stellaris mod development.
 
-For **what** to build, see [design-vision.md](design-vision.md). For **status**, see [ROADMAP.md](ROADMAP.md).
+- **How vanilla systems work** (file paths, modifiers, on_actions, limitations): `docs/vanilla/`
+- **Modding syntax and scripting** (effects, conditions, scopes): `docs/wiki/`
+- **What to build**: [design-vision.md](design-vision.md)
+- **Status**: [ROADMAP.md](ROADMAP.md)
 
 ## Local Wiki References
 
@@ -14,6 +17,12 @@ For **what** to build, see [design-vision.md](design-vision.md). For **status**,
 - [Variables](wiki/variables.md) — set/check/copy variables, arithmetic, export operations
 - [On Actions](wiki/on_actions.md) — all vanilla on_actions with scope documentation
 - [Dynamic Modding](wiki/dynamic_modding.md) — scripted effects/triggers, inline scripts, script values, flags
+
+### Vanilla 4.3 Architecture — consult these FIRST before working on a system
+- [Economy](vanilla/economy.md) — deposits, districts, economic categories, planet size, strategic resources
+- [Warfare](vanilla/warfare.md) — claims, war goals, casus belli, war exhaustion, occupation mechanics
+- [Diplomacy](vanilla/diplomacy.md) — opinion modifiers, ethics, federations, diplomatic actions, borders
+- [Population](vanilla/population.md) — slavery types, species rights, pop categories, jobs, migration
 
 ### Content Guides — consult these when building specific features
 - [Event Modding](wiki/event_modding.md) — event types, structure, options, chaining, pre-triggers, performance
@@ -29,6 +38,10 @@ Base URL: `https://stellaris.paradoxwikis.com/<Topic>_modding`
 
 | Task | Consult |
 |------|---------|
+| Modifying economy/resources/districts | [Vanilla Economy](vanilla/economy.md) first, then Modifiers |
+| Modifying war/claims/combat | [Vanilla Warfare](vanilla/warfare.md) first, then Effects |
+| Modifying diplomacy/federations/ethics | [Vanilla Diplomacy](vanilla/diplomacy.md) first, then Conditions |
+| Modifying slavery/pops/migration | [Vanilla Population](vanilla/population.md) first, then Scopes |
 | Writing event logic (if/else, effects) | Effects, Conditions, Scopes |
 | Adding modifiers to buildings/techs/traits | Modifiers |
 | Creating events | Event Modding, On Actions |
