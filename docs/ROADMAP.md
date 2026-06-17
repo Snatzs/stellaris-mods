@@ -7,6 +7,7 @@ Track what needs to be done, what's in progress, and what's done.
 - **[ ]** — Not started
 - **[~]** — In progress
 - **[x]** — Done
+- **[!]** — Affected by Stellaris 4.4 — re-evaluate before starting (see [`docs/vanilla/patch-4.4-changes.md`](vanilla/patch-4.4-changes.md))
 
 ---
 
@@ -33,7 +34,7 @@ Track what needs to be done, what's in progress, and what's done.
 - [ ] Space resource scaling (yield increases with game progression)
 - [ ] Strategic resource rebalance (less frequent, more concentrated)
 - [ ] Planetary resource efficiency nerf (less output per pop/district)
-- [ ] Planet size cap (max 16–18) and size distribution shift (more 12–14)
+- [!] Planet size cap (max 16–18) and size distribution shift (more 12–14) — use `planet_max_districts_add`/`_mult` + new 4.4 `planet_artificial_max_districts_add` (habitats/ringworlds/arkships count separately)
 - [ ] Reduce jobs per district
 - [ ] Increase housing/amenities deficit penalties
 - [ ] Hyper-specialized mega-planet penalties
@@ -47,8 +48,8 @@ Track what needs to be done, what's in progress, and what's done.
 ## Mods — War & Conflict
 
 - [ ] More casus belli types with distinct conditions and effects
-- [ ] Claim limits proportional to defender empire size
-- [ ] War exhaustion / status quo rework (partial occupation → partial results)
+- [!] Claim limits proportional to defender empire size — 4.4 added the `num_claims_on_system` trigger (helps); Nomad war goals are a partial-outcome template
+- [!] War exhaustion / status quo rework (partial occupation → partial results) — 4.4 added mid-war join/leave + escalating WE/attrition when all colonies occupied; rebase on the new baseline
 - [ ] New war goals: force ethics shift, impose trade deals, demilitarize, liberate species, vassalize sectors
 
 ## Mods — Diplomacy
@@ -66,21 +67,21 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## Mods — Slavery & Labor
 
-- [ ] New slavery type(s) allowing specialist jobs (override `can_fill_specialist_job_trigger`)
+- [!] New slavery type(s) allowing specialist jobs (override `can_fill_specialist_job_trigger`) — gate still exists, but 4.4 removed the unemployment-job tier (pops fall to stratum fallback); rebase any demotion/unemployment hooks (see patch-4.4-changes.md §2)
 - [ ] Slave output modifiers tuned for wide play (volume over per-pop efficiency)
 - [ ] Stability/happiness trade-offs (manageable, not crippling)
 - [ ] Authoritarian/xenophobe ethics synergies with slavery economy
 
 ## Mods — Population & Migration
 
-- [ ] Timed resettlement (not instant)
-- [ ] Pop movement restrictions (habitability, species clustering)
+- [!] Timed resettlement (not instant) — ⚠️ 4.4 moved the OPPOSITE way (removed habitability resettle defines; AI resettles regardless of habitability). Re-imposing friction now fights the base AI — group decision needed (see patch-4.4-changes.md §4)
+- [!] Pop movement restrictions (habitability, species clustering) — ⚠️ same conflict as above
 - [ ] Species-type diplomacy modifiers (phenotype-based trust/distrust)
 - [ ] Xenophile/xenophobe ethics amplify/reduce species-type effects
 
 ## Mods — Meta & Balance
 
-- [ ] Evaluate/disable exploitable origins (Knights of The Toxic Gods, etc.)
+- [!] Evaluate/disable exploitable origins (Knights of The Toxic Gods, etc.) — 4.4 added a new optimization surface: 4 nomadic origins, nomad civics (Void Reavers etc.), Defender of the Galaxy Ambition, reworked Commander traits. Open question: are nomadic empires allowed in our campaign at all? (see patch-4.4-changes.md §6)
 - [ ] Kill "build" meta synergies (approach TBD)
 
 ## Open Design Questions

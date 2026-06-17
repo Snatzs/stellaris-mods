@@ -17,6 +17,7 @@ These docs capture **how vanilla Stellaris 4.4 systems work at the modding level
 | Claims, war goals, casus belli, war exhaustion, occupation | [warfare.md](warfare.md) |
 | Opinion modifiers, ethics, federations, diplomatic actions | [diplomacy.md](diplomacy.md) |
 | Slavery, species rights, pop categories, jobs, migration | [population.md](population.md) |
+| **What changed in 4.4 (new modding levers, balance shifts, vision alignment/conflicts)** | [patch-4.4-changes.md](patch-4.4-changes.md) |
 
 ## Vanilla Game Files Location
 
