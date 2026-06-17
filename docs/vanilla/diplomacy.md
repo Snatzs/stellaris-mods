@@ -1,9 +1,9 @@
-# Vanilla 4.3 — Diplomacy Architecture
+# Vanilla 4.4 — Diplomacy Architecture
 
 ## Opinion Modifiers
 
 ### File Location
-`common/opinion_modifiers/00_opinion_modifiers.txt`
+`common/opinion_modifiers/00_opinion_modifiers.txt` (core). 4.4 splits DLC opinion modifiers into many sibling files in the same dir: `00_opinion_modifiers_federation.txt`, `..._nemesis.txt`, `..._megacorp.txt`, `..._machine_age.txt`, `..._nomads_dlc.txt`, etc., plus `01_personality_opinions.txt`. `opinion_claims_on_us` still lives in the core file.
 
 ### Structure
 
@@ -124,19 +124,27 @@ Fully moddable. Each law has `potential`/`allow` conditions, `modifier` blocks, 
 - Ethics differences already penalize cohesion: -0.15 per different ethic, -0.5 per opposed pair
 - These values can be amplified
 
+### Vote Weight
+
+Weighted voting DOES exist as a federation law (`common/federation_laws/07_vote_weight.txt`):
+- `vote_weight_equal` — one-member-one-vote (`set_equal_voting_power = yes`)
+- `vote_weight_diplomatic` — weighted by diplomatic weight (`set_equal_voting_power = no`; requires Federations DLC + centralization 3)
+
+The engine effect `set_equal_voting_power = yes/no` is the only lever — weighting is by diplomatic weight, NOT freely scriptable by fleet power or economy directly. The `law_category_voting_weight` category gates which laws are available.
+
 ### Limitations
 
-- **Voting is one-member-one-vote** — no weighted voting by diplomatic weight, fleet power, or economy. Options are: unanimous, majority, leader decides.
+- **No fully custom vote weighting** — only the two engine modes above (`set_equal_voting_power` on/off). You can't define an arbitrary per-member weight formula.
 - **No internal factions/coalitions** — no subgroups, opposition blocs, or voting blocs within a federation
 - **No tiered membership** — all members have the same status (president vs. member is the only distinction). Can simulate tiers with flags and conditional law effects, but UI won't reflect it.
-- **Succession types** are limited to: strongest, diplomatic_weight, rotation, challenge, random
+- **Succession types** are limited to engine values: strongest, diplomatic_weight, rotation, challenge, random (see `common/federation_laws/03_succession_type.txt`, set via `set_federation_succession_type`)
 
 ---
 
 ## Diplomatic Actions
 
 ### File Location
-`common/diplomatic_actions/00_actions.txt`
+`common/diplomatic_actions/00_actions.txt` (single file; all vanilla + DLC actions live here in 4.4)
 
 ### Structure
 
@@ -147,13 +155,15 @@ Each diplomatic action has:
 
 ### Modding Scope
 
-You **CANNOT add entirely new diplomatic actions** — the available actions are engine-defined. But you CAN modify `possible` conditions on existing actions (defensive pact, federation invite, non-aggression pact, etc.) to require ethics compatibility, species alignment, etc.
+You **CANNOT add entirely new diplomatic-action TYPES from script alone** — each action ID is bound to engine/DLC code (the Nomads `action_form_waystation_pact` shipped with DLC code, not pure script). But you CAN modify `potential`/`possible` conditions on existing actions to require ethics compatibility, species alignment, etc.
 
-### Key Actions for Our Purposes
+### Key Actions for Our Purposes (verified 4.4)
 
-- `action_make_claims_diplomacy_view` — claim-related
-- Defensive pact, federation, non-aggression pact — all have `possible` blocks that can be gated with ethic/species triggers
-- Migration treaty, commercial pact — can be similarly restricted
+- `action_make_claims_diplomacy_view` (line ~536) — claim-related
+- `action_form_defensive_pact` / `action_form_non_aggression_pact` / `action_form_commercial_pact` / `action_form_research_agreement` / `action_form_migration_pact` — each has a `possible` block gateable with ethic/species triggers
+- `action_invite_to_federation`, `action_offer_federation_association_status` — federation gating
+- `action_open_borders` / `action_close_borders` (lines ~3788 / ~3877) — the actual border-toggle diplomatic actions
+- `action_form_waystation_pact` / `action_break_waystation_pact` (Nomads DLC, lines ~1390 / ~1870) — see Nomads section under Borders
 
 ---
 
@@ -161,9 +171,10 @@ You **CANNOT add entirely new diplomatic actions** — the available actions are
 
 ### How Borders Work
 
-Border closure is controlled per-country-type in `common/country_types/`.
-- `enforces_borders` — binary toggle: empire respects borders or doesn't
+Border closure is controlled per-country-type in `common/country_types/` and per-pair via the `action_open_borders` / `action_close_borders` diplomatic actions (`common/diplomatic_actions/00_actions.txt`).
+- `enforces_borders` — country_type binary toggle (default `yes`; if `no`, others are "always free to enter" per the in-file comment). Many special country types (line ~519 onward in `00_country_types.txt`) set `enforces_borders = no`.
 - Border status is **binary**: open or closed. No granularity (can't allow civilian but block military).
+- See the Nomads section below for the one place vanilla 4.4 expresses border access as scriptable policy flags + pacts.
 
 ### What Closed Borders Actually Block
 
@@ -193,7 +204,20 @@ The initial feasibility assessment concluded sensor range, trade routes, and enc
 - **Enclave access blocking**: Could enclave diplomatic actions be gated with a scripted trigger that checks border status between the empire and the enclave's system? Explore `diplomatic_actions` possible blocks for enclave-specific actions.
 - **Custom implementation**: If no vanilla levers exist, explore whether event-driven systems could simulate these restrictions (e.g., periodic events that detect trade flowing through closed borders and apply compensating penalties).
 
-**Status: Requires dedicated research session against vanilla 4.3 files before concluding these are truly impossible.**
+**Status (updated 4.4):** The 4.4 Nomads DLC ships real, working examples of access-gating through borders and intel — see the Nomads section directly below. This demonstrates **partial feasibility**: border *policy flags*, pact-based access grants, a trespassing country_flag, and intel-gated construction all exist as patterns. These are precedents to copy, though several rely on Nomads-DLC engine hooks (`is_nomadic`, `is_waystation_starbase`) that don't generalize to ordinary empires. Full sensor/trade-route blocking between arbitrary empires still appears to require event-driven simulation rather than a native border lever. A dedicated research session should now study the Nomads files as the template before concluding any restriction is impossible.
+
+---
+
+### Nomads DLC — Working Border/Access Mechanics (Nomads-DLC-gated)
+
+The Nomads DLC implements access-through-borders patterns directly relevant to the border-restriction goals above. **All gated behind `has_nomads_dlc = yes` / `is_nomadic`** — copy the patterns, but they won't apply to non-nomad empires without reimplementation. Dense pointers:
+
+- **Open/closed nomad border policy** — `common/policies/05_policies_nomads.txt`, policy `nomad_border_policy` with options setting `policy_flags = { nomad_border_policy_open }` / `{ nomad_border_policy_closed }`. A scriptable per-empire flag controlling whether nomads may enter — a genuine binary access toggle expressed as a policy flag (checkable via `has_policy_flag`). Closed-AI weighting backs off when `num_waystation_pacts > 0`.
+- **Waystation pact diplomatic actions** — `common/diplomatic_actions/00_actions.txt`: `action_form_waystation_pact` (~line 1390) and `action_break_waystation_pact` (~line 1870). Pact establishes access/cooperation; gated by `has_waystation_pact = from`, `is_nomadic`, and adjacency checks (`is_waystation_starbase`, `has_neighboring_waystation`). Diplo phrases in `common/diplo_phrases/00_diplo_phrases_nomads.txt`. Proves a pact can be the mechanism that grants/revokes a border-access state.
+- **Trespassing country_flag** — `nomad_trespassing@<scope>` (scoped/targeted country flag). Set in `events/nomads_events_1.txt` (`flag = nomad_trespassing@root.owner`) and consumed as a casus belli trigger in `common/casus_belli/07_nomads_casus_belli.txt` (`has_country_flag = nomad_trespassing@from`). Demonstrates representing "X violated Y's borders" as a per-pair flag that downstream systems (CB, opinion, events) react to — exactly the indirect lever the workarounds section was looking for.
+- **Intel-gated construction** — the nomad waystation megastructure `common/megastructures/30_nomad_waystation.txt` gates placement on intel: `possible` block with `fail_text = "requires_intel_waystation"` requiring `has_intel = { intel = intel_economy_systems_high }` on the target system (intel category `common/intel_categories/05_intel_diplo_pacts.txt`). Confirms construction CAN be gated on diplomatic/economic intel level — a viable pattern for "no intel = no presence behind borders."
+
+These collectively show access-gating via borders is *partially* achievable with vanilla 4.4 patterns (policy flags, pact actions, scoped flags, intel checks), even if no single native "block sensors/trade at the border" switch exists.
 
 ---
 

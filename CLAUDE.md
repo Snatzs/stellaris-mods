@@ -6,7 +6,7 @@ This is a monorepo containing multiple Stellaris mods for a 7-player multiplayer
 
 ## Game Version
 
-**Target:** Stellaris 4.3
+**Target:** Stellaris 4.4 (installed: Pegasus v4.4.3, with the Nomads DLC)
 
 ## Design Vision
 
@@ -117,7 +117,7 @@ mods/<mod-name>/
 ```
 name = "Mod Display Name"
 path = "mod/<mod-folder-name>"
-supported_version = "4.3.*"
+supported_version = "4.4.*"
 tags = {
 	"Gameplay"
 }
@@ -161,7 +161,7 @@ Local wiki references are stored in `docs/wiki/`. Use these instead of web-fetch
 | Adding player-visible text | `docs/wiki/localisation_modding.md` |
 | Overriding vanilla files | `docs/compatibility.md` first |
 
-### Vanilla 4.3 Architecture Docs
+### Vanilla 4.4 Architecture Docs
 
 `docs/vanilla/` contains verified architecture references for vanilla game systems — key file paths, modifier names, on_actions, modding levers, and known engine limitations. **Read the relevant file before starting work on any mod.** These save significant research time. See `docs/vanilla/README.md` for the full index.
 

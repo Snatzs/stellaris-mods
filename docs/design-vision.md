@@ -149,4 +149,4 @@ Turn Stellaris into a **genuine geopolitical simulator in space** — a real 4X 
 - [multiplayer-balance.md](multiplayer-balance.md) — logs specific balance decisions and their rationale
 - [compatibility.md](compatibility.md) — tracks vanilla file overrides across mods
 - [modding-reference.md](modding-reference.md) — index of local wiki references for implementation
-- [Vanilla 4.3 architecture references](vanilla/README.md) — file paths, modifiers, levers, and limitations per system
+- [Vanilla 4.4 architecture references](vanilla/README.md) — file paths, modifiers, levers, and limitations per system

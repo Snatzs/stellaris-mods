@@ -1,6 +1,6 @@
-# Vanilla 4.3 Game Architecture Reference
+# Vanilla 4.4 Game Architecture Reference
 
-These docs capture **how vanilla Stellaris 4.3 systems work at the modding level** — file locations, key modifiers/triggers/on_actions, how systems connect, and what's hardcoded.
+These docs capture **how vanilla Stellaris 4.4 systems work at the modding level** — file locations, key modifiers/triggers/on_actions, how systems connect, and what's hardcoded.
 
 **Purpose:** Save agents from re-researching the same vanilla files every session. Read the relevant file before starting work on a mod.
 
@@ -45,4 +45,4 @@ Key directories mirror mod structure: `common/`, `events/`, `localisation/`, etc
 
 ## Version Note
 
-All file paths, line numbers, and identifiers verified against Stellaris 4.3. If the game updates, re-verify against the new files.
+All file paths, line numbers, and identifiers verified against Stellaris 4.4 (Pegasus v4.4.3, with the Nomads DLC). If the game updates, re-verify against the new files.

@@ -1,16 +1,18 @@
-# Vanilla 4.3 — Population & Slavery Architecture
+# Vanilla 4.4 — Population & Slavery Architecture
+
+> Verified against Stellaris 4.4.3 (Pegasus). 4.0+ pop-GROUP model confirmed: pops are organized into pop groups; modifiers use `pop_group_modifier` / `triggered_pop_group_modifier` and group flags use `has_pop_group_flag`. The strata/category model below still holds.
 
 ## Pop Categories (Strata)
 
-Defined in `common/pop_categories/00_social_classes.txt`.
+Defined in `common/pop_categories/00_social_classes.txt`. (Gestalt drones in `01_gestalt_drones.txt`; other categories — incl. Nomads cruise-passenger — in `02_other_categories.txt`.)
 
-| Category | Rank | Change Job Threshold |
-|----------|------|---------------------|
-| `ruler` | 4 | 2.0 |
-| `specialist` | 3 | 1.25 |
-| `worker` | 2 | 1.15 |
+| Category | Rank | Change Job Threshold | Reshuffle Interval |
+|----------|------|---------------------|--------------------|
+| `ruler` | 4 | 1.14 | 13 |
+| `specialist` | 3 | 1.07 | 7 |
+| `worker` | 2 | 1.03 | 3 |
 
-Each category has: `pop_group_modifier` (housing/amenity usage), `resources` (upkeep/production per category), `triggered_planet_modifier`, and inline scripts for living standard production.
+Each category has: `pop_group_modifier` (housing/amenity usage, e.g. `pop_housing_usage_base`/`pop_amenities_usage_base`), `automation_resources`, `resources` (upkeep/production per category), `triggered_planet_modifier`, `allow_resettlement`, and inline scripts for resettlement cost and living-standard production (`pop_categories/living_standard_<cat>_production`, `pop_categories/social_classes_triggered_modifiers`, `pop_categories/indentured_assets_slave_produce`).
 
 ---
 
@@ -22,14 +24,16 @@ Defined in `common/species_rights/slavery_types/00_slavery_types.txt`.
 
 | Type | Key | Specialist Access | Pop Group Modifier | Notes |
 |------|-----|-------------------|-------------------|-------|
-| Chattel Slavery | `slavery_normal` | NO | `pop_bonus_workforce_mult = 0.10`, happiness -0.30 | Default slave type |
-| Domestic Servitude | `slavery_domestic` | NO | happiness -0.20 | No production bonus |
-| Battle Thralls | `slavery_military` | NO | `army_damage_mult = 0.2`, `soldier_jobs_bonus_workforce_mult = 0.05`, happiness -0.20 | Military focus |
-| Indentured Servitude | `slavery_indentured` | YES | happiness -0.20, `pop_political_power = 0.50` | Only type allowing specialist jobs |
-| Livestock | `slavery_livestock` | NO | happiness -0.40 | Requires xenophobe/gestalt |
-| Matrix | `slavery_matrix` | NO | happiness -0.40 | Machine empire only |
-| Guided Matrix | `slavery_matrix_guided_sapience` | NO | happiness +0.10 | Machine DLC |
-| Orderly | `slavery_orderly` | NO | — | Twisted experimenters only |
+All happiness modifiers below are the `pop_happiness` key inside `pop_group_modifier`. Military/army modifiers are in `modifier` (country-scope), not `pop_group_modifier`.
+
+| Chattel Slavery | `slavery_normal` | NO | `pop_bonus_workforce_mult = 0.10`, `pop_happiness` neg | Default slave type |
+| Domestic Servitude | `slavery_domestic` | NO | `pop_happiness` neg | No production bonus |
+| Battle Thralls | `slavery_military` | NO | `modifier`: `army_damage_mult`, `soldier_jobs_bonus_workforce_mult`; `pop_group_modifier`: `pop_happiness` neg | Military focus |
+| Indentured Servitude | `slavery_indentured` | YES | `pop_happiness` neg, `pop_political_power = 0.50` | Only type allowing specialist jobs (see gate below) |
+| Livestock | `slavery_livestock` | NO | `pop_happiness` neg | Requires xenophobe/gestalt (or guided-sapience machine) |
+| Matrix | `slavery_matrix` | NO | `pop_happiness` neg | Machine empire only (non-guided-sapience) |
+| Guided Matrix | `slavery_matrix_guided_sapience` | NO | `pop_happiness` pos | `potential` gated on `has_machine_age_dlc = yes` (Machine Age DLC) |
+| Orderly | `slavery_orderly` | NO | — (no `pop_group_modifier`) | Twisted experimenters only |
 
 ### Slavery Type Structure
 
@@ -48,20 +52,35 @@ New entries in `common/species_rights/slavery_types/` ARE loaded by the game. Pr
 
 ## Specialist Job Access Gate
 
-**Critical file:** `common/scripted_triggers/01_scripted_triggers_jobs.txt:261`
+**Critical file:** `common/scripted_triggers/01_scripted_triggers_jobs.txt` — `can_fill_specialist_job_trigger` (4.4.3: starts at line ~273; the old line 261 reference is stale).
+
+The trigger is now wrapped in `custom_tooltip = SPECIALIST_JOB_TRIGGER` + `hidden_trigger`, and the slavery OR is only one of several conditions:
 
 ```
 can_fill_specialist_job_trigger = {
-    OR = {
-        is_enslaved = no
-        has_slavery_type = { type = slavery_indentured }
+    custom_tooltip = SPECIALIST_JOB_TRIGGER
+    hidden_trigger = {
+        NOT = { has_ethic = ethic_gestalt_consciousness }
+        exists = owner
+        OR = {
+            is_enslaved = no
+            has_slavery_type = { type = slavery_indentured }
+        }
+        is_being_purged = no
+        is_being_assimilated = no
+        NOT = { has_trait = trait_syncretic_proles }
+        can_think = yes
+        NOT = { has_pop_group_flag = cant_work }     # 4.0+ pop-group flag
+        has_disconnected_drone_citizenship_type = no
+        # ... + trait_mechanical/tech_droid_workers, organic_trophy /
+        #       cruise_passenger (Nomads) citizenship exclusions, divinity right-to-work
     }
 }
 ```
 
-This is THE gate controlling whether slaves can work specialist jobs. To enable a new slavery type for specialist work, add it to this OR block. This requires overriding this vanilla file — **track in `docs/compatibility.md`**.
+This OR is still THE gate for whether slaves can work specialist jobs. To enable a new slavery type for specialist work, add it to that OR block. Note the surrounding conditions have grown (pop-group flags, more citizenship-type exclusions) — when overriding, copy the *current* full trigger, not just the OR. Overriding this vanilla file — **track in `docs/compatibility.md`**.
 
-Some individual specialist jobs may also have `is_enslaved = no` in their `possible_pre_triggers` — these would need separate overrides in `common/pop_jobs/`.
+Some individual specialist jobs also have `is_enslaved = no` in their `possible_pre_triggers` (and many specialist jobs ship slave-variant definitions guarded by `is_enslaved = yes`) — enabling a new slavery type at specialist tier may need per-job overrides in `common/pop_jobs/`.
 
 ---
 
@@ -73,16 +92,12 @@ Some individual specialist jobs may also have `is_enslaved = no` in their `possi
 - Per-job variants: `planet_jobs_researcher_produces_mult`, `planet_jobs_metallurgist_produces_mult`, etc.
 
 ### Cost Advantages (Built-In for Slaves)
-- Housing usage: 0.75 per slave pop (vs 1.0 for free)
-- Amenity usage: 0.75 per slave pop (vs 1.0 for free)
-- Consumer goods upkeep: lower than free specialists
-- Resettlement cost: 50 energy (vs 100 energy + 10 unity for free pops)
+- Slaves generally use less housing/amenities and less consumer-goods upkeep than free specialists (exact multipliers not copied — verify in living-standards / pop-category inline scripts). Base `pop_group_modifier` for ruler/specialist/worker categories is `pop_housing_usage_base = 1` / `pop_amenities_usage_base = 1`; slave reductions come from living standards + slavery-type modifiers, not the base category. (UNVERIFIED 4.4 — was 4.3: prior doc cited 0.75 housing/amenity and 50-energy resettlement; not re-confirmed.)
 
 ### Stability & Happiness
-- `pop_cat_slave_political_power` — vanilla: -75% (reducible further by Slave Processing Facility)
-- `pop_cat_slave_happiness` — slave happiness modifiers
-- Slaves cannot join factions
-- Low stability with slaves triggers dangerous events below 40 stability (vs 25 for non-slave planets)
+- Slave political power / happiness are controlled via `pop_cat_*_political_power` and `pop_happiness`-family modifiers (e.g. indentured: `pop_political_power = 0.50`). Exact slave political-power percentage not copied. (UNVERIFIED 4.4 — was 4.3: prior doc cited a `pop_cat_slave_political_power` of -75%; modifier name/value not re-confirmed in 4.4.3.)
+- Slaves cannot join factions.
+- Low stability with slaves triggers dangerous events at a lower stability threshold than non-slave planets. (UNVERIFIED 4.4 — was 4.3: specific 40 vs 25 thresholds not re-confirmed.)
 
 ---
 
@@ -115,6 +130,16 @@ Located in `common/species_rights/` with subdirectories:
 
 Each has `potential`/`allow` conditions, modifiers, and AI weights. All are moddable — new entries can be added.
 
+Living standards are split across files: `00_living_standards.txt` (core: `living_standard_normal`, `_good`, `_utopian`, `_academic_privilege`, `_shared_burden`, `_chemical_bliss`, `_stratified`, `_subsistence`, `_servitude`, `_decadent`, `_worker_ownership`, `_dystopian_society`, `_organic_trophy`, `_hive_mind`, `_protected`, `_none`), plus `00_biogenesis_living_standards.txt` and `01_assimilation_living_standards.txt`.
+
+### Nomads DLC additions (Nomads-DLC-gated)
+
+> All gated on `has_nomads_dlc = yes` + `origin_forever_cruise`.
+
+- **Living standards:** `common/species_rights/living_standards/00_nomads_living_standards.txt` — `living_standard_cruise_passenger`, `living_standard_cruise_economy_passenger`. Use a `pop_cat_cruise_passenger_*` political-power family and tie to `citizenship_cruise_passenger`.
+- **Jobs:** `common/pop_jobs/17_nomads_jobs.txt` — `cruise_passenger`, `cruise_passenger_unemployment`, `cruise_crew_overseer`(+`_drone`), `ark_waystation_trader`(+`_gestalt`), `ark_harvester`(+`_gestalt`), `ark_deep_sleep`.
+- **Deep-sleep / cryo:** `ark_deep_sleep` job uses `category = deep_sleep` (pops held in cryo/stasis rather than working). The `can_fill_specialist_job_trigger` and several jobs explicitly exclude `citizenship_cruise_passenger` pops.
+
 ---
 
 ## Migration & Resettlement
@@ -144,10 +169,11 @@ Each has `potential`/`allow` conditions, modifiers, and AI weights. All are modd
 
 | System | Path |
 |--------|------|
-| Pop categories | `common/pop_categories/00_social_classes.txt` |
+| Pop categories | `common/pop_categories/00_social_classes.txt` (+ `01_gestalt_drones.txt`, `02_other_categories.txt`) |
 | Slavery types | `common/species_rights/slavery_types/00_slavery_types.txt` |
-| Specialist job gate | `common/scripted_triggers/01_scripted_triggers_jobs.txt:261` |
-| Living standards | `common/species_rights/living_standards/00_living_standards.txt` |
+| Specialist job gate | `common/scripted_triggers/01_scripted_triggers_jobs.txt` → `can_fill_specialist_job_trigger` (~line 273) |
+| Living standards | `common/species_rights/living_standards/00_living_standards.txt` (+ nomads/biogenesis/assimilation files) |
+| Nomads living standards / jobs (DLC) | `.../living_standards/00_nomads_living_standards.txt`, `common/pop_jobs/17_nomads_jobs.txt` |
 | Species rights (all) | `common/species_rights/` |
 | Pop jobs | `common/pop_jobs/` |
 | Economic categories | `common/economic_categories/` |

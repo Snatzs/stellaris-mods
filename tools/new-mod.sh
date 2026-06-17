@@ -13,7 +13,7 @@ set -e
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MODS_DIR="$REPO_ROOT/mods"
-GAME_VERSION="4.3"
+GAME_VERSION="4.4"
 
 if [ -z "$1" ]; then
 	echo "Usage: bash tools/new-mod.sh <mod-name> [display-name]"

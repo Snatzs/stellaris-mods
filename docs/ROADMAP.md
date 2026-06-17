@@ -23,7 +23,7 @@ Track what needs to be done, what's in progress, and what's done.
 - [x] Mod scaffold script — generate boilerplate for new mods (`tools/new-mod.sh`)
 - [x] Document vanilla game files location in CLAUDE.md
 - [x] Document branching convention in CLAUDE.md
-- [x] Vanilla 4.3 architecture reference docs (`docs/vanilla/`)
+- [x] Vanilla 4.4 architecture reference docs (`docs/vanilla/`)
 
 ## Mods — Economy & Resources
 

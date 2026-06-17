@@ -1,11 +1,13 @@
-# Vanilla 4.3 — Economy Architecture
+# Vanilla 4.4 — Economy Architecture
+
+> Verified against Stellaris 4.4.3 (Pegasus). Nomads DLC notes are marked **(Nomads DLC)**.
 
 ## Orbital Deposits (Space Resources)
 
 ### File Location
 `common/deposits/01_orbital_deposits.txt` — primary orbital deposits (minerals, energy, research, strategic resources)
 
-Also: `02_sr_deposits.txt` (strategic resources), `03_leviathans_deposits.txt`, `04_distant_stars_deposits.txt`, and DLC-specific deposit files.
+Also: `02_sr_deposits.txt` (strategic resources), `03_leviathans_deposits.txt`, `04_distant_stars_deposits.txt`, and many DLC-specific deposit files (now `05`–`17`, including `17_nomads_deposits.txt` — see Nomads note below).
 
 ### Structure
 
@@ -24,13 +26,14 @@ Orbital deposits use `orbital_mining_deposits` and `orbital_research_deposits` c
 **Category hierarchy** (from `common/economic_categories/00_common_categories.txt`):
 ```
 stations
-  └─ station_gatherers          (line 594 — generates produces_mult, cost_mult)
-  │    └─ orbital_mining_deposits   (line 887)
-  │         └─ hab_mining_deposits  (line 895)
-  └─ station_researchers        (line 604 — generates produces_mult)
-       └─ orbital_research_deposits (line 891)
-            └─ hab_research_deposits (line 899)
+  └─ station_gatherers          (line 684 — generates produces_mult, cost_mult)
+  │    └─ orbital_mining_deposits   (line 1026, parent = station_gatherers)
+  │         └─ hab_mining_deposits  (line 1034, parent = orbital_mining_deposits)
+  └─ station_researchers        (line 694 — generates produces_mult)
+       ├─ orbital_research_deposits (line 1030, parent = station_researchers)
+       └─ hab_research_deposits     (line 1038, parent = station_researchers — NOT orbital_research_deposits)
 ```
+Line numbers per 4.4.3 (the whole file shifted down vs 4.3). Note `hab_research_deposits` hangs directly off `station_researchers`, not off `orbital_research_deposits`.
 
 ### Key Modifier for Scaling Space Resources
 
@@ -40,12 +43,15 @@ Similarly: `station_researchers_produces_mult` for research stations.
 
 These are the **cleanest levers** for globally scaling space resource production.
 
-### Vanilla Orbital Yield Range
+### Vanilla Orbital Yield Tiers (4.4.3)
 
-Minerals: `d_minerals_1` (1) through `d_minerals_5` (5)
-Energy: `d_energy_1` (1) through `d_energy_5` (5)
-Physics/Society/Engineering: similar 1-5 range
-Strategic resources: typically 1-3 per deposit
+Deposit IDs are tiered `d_<resource>_<N>` where higher N = richer:
+- Minerals: `d_minerals_1` … `d_minerals_10`
+- Energy: `d_energy_1` … `d_energy_10`
+- Research: `d_physics_1`…`d_physics_10`, `d_society_1`…`d_society_15`, `d_engineering_1`…`d_engineering_10` (note: research deposits are `d_physics_N` / `d_society_N` / `d_engineering_N`, NOT `d_*_research_N`)
+- Strategic resources (in `02_sr_deposits.txt`): tiered `d_exotic_gases_1…5`, `d_rare_crystals_1…5`, `d_volatile_motes_1…5`, etc.
+
+(Tier counts verified 4.4.3; per-deposit yield numbers omitted per doc policy. The high tiers already exist — see Scaling note.)
 
 ### Scaling Approach
 
@@ -53,14 +59,23 @@ To make space resources outproduce planets:
 1. **Buff deposit yields** — edit `01_orbital_deposits.txt` to increase base production
 2. **Tech scaling** — create technologies that apply `station_gatherers_produces_mult`
 3. **Era-based scaling** — use `on_yearly_pulse` events with game-year checks to upgrade deposits or apply modifiers
-4. **New rich deposits** — create new deposit types (e.g., `d_minerals_10`) with higher yields and appropriate spawn weights
+4. **New rich deposits** — vanilla already ships tiers up to `d_minerals_10` / `d_society_15`; reuse/buff those before adding new IDs, or add `d_minerals_11+` with higher yields and appropriate spawn weights
+
+### Nomads DLC — space/waystation economy (**Nomads DLC**)
+
+The Nomads DLC (4.4.x) adds a mobile, space-based economy layer that intersects this doc's scope:
+- `common/deposits/17_nomads_deposits.txt` — nomad/cruise deposits (e.g. `d_protostar`, `d_compact_modules`, `d_dark_matter_monolith`, deep-sleep cryo-pod deposits).
+- `common/pop_jobs/17_nomads_jobs.txt` — nomad jobs (e.g. `cruise_passenger`), gated on `has_origin = origin_forever_cruise` / cruise living standards.
+
+DLC-gated — only present/active with the Nomads DLC. Treat any mod hooks here as optional and guard them so non-DLC players are unaffected.
 
 ---
 
 ## Districts
 
 ### File Location
-`common/districts/00_urban_districts.txt` and related files in `common/districts/`
+`common/districts/00_urban_districts.txt` and related files in `common/districts/`:
+`00_special_districts.txt`, `01_arcology_districts.txt`, `02_rural_districts.txt`, `03_habitat_districts.txt`, `04_ringworld_districts.txt`, `05_wilderness_districts.txt`, `06_swap_districts.txt`, `07_ark_districts.txt`. See `00_DOCUMENTATION.txt` in that folder.
 
 ### Structure
 
@@ -76,7 +91,7 @@ Each district has:
 
 1. **Reduce jobs per district** — change `job_X_add` values
 2. **Increase district upkeep** — modify `resources.upkeep` block
-3. **Cap district slots** — `planet_max_districts` modifier, also `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` in defines (line 1599)
+3. **Cap district slots** — `planet_max_districts_add` / `planet_max_districts_mult` modifiers, also `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` in defines (line 1632 in 4.4.3)
 4. **Reduce job output** — modify individual jobs in `common/pop_jobs/`
 
 ---
@@ -84,7 +99,7 @@ Each district has:
 ## Planet Size
 
 ### Defines (`common/defines/00_defines.txt`)
-- `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` (line 1599)
+- `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` (line 1632 in 4.4.3)
 
 ### How Planet Size Affects Districts
 Planet size determines base district slots. Modifiable via:
@@ -110,14 +125,19 @@ Economic categories form a hierarchy. Each category can `generate_mult_modifiers
 
 ### Key Categories for Our Mods
 
+Line numbers are 4.4.3.
+
 | Category | Line | Parent | Generated Modifier |
 |----------|------|--------|-------------------|
-| `station_gatherers` | 594 | `stations` | `station_gatherers_produces_mult` |
-| `station_researchers` | 604 | `stations` | `station_researchers_produces_mult` |
-| `orbital_mining_deposits` | 887 | `station_gatherers` | inherits parent modifiers |
-| `orbital_research_deposits` | 891 | `station_researchers` | inherits parent modifiers |
-| `planet_jobs` | — | `planets` | `planet_jobs_produces_mult` |
-| `planet_deposits` | — | `planets` | `planet_deposits_produces_mult` |
+| `station_gatherers` | 684 | `stations` | `station_gatherers_produces_mult`, `_cost_mult` |
+| `station_researchers` | 694 | `stations` | `station_researchers_produces_mult` |
+| `orbital_mining_deposits` | 1026 | `station_gatherers` | inherits parent modifiers |
+| `orbital_research_deposits` | 1030 | `station_researchers` | inherits parent modifiers |
+| `planet_structures` | 854 | `planets` | `planet_structures_cost_mult`, `_upkeep_mult` |
+| `planet_buildings` | 864 | `planet_structures` | `planet_buildings_produces_mult`, `_cost_mult`, `_upkeep_mult` |
+| `planet_deposits` | 1014 | `planets` | `planet_deposits_produces_mult` |
+
+Note: there is **no** `planet_jobs` economic category in 4.4.3 — pop-job production scales via the job-tier categories in `common/economic_categories/01_job_categories.txt` and via `planet_buildings`/`planet_structures`, not a `planet_jobs_produces_mult`.
 
 Child categories inherit parent modifiers. Buffing `station_gatherers_produces_mult` affects all mining stations including habitats.
 
@@ -130,7 +150,8 @@ Child categories inherit parent modifiers. Buffing `station_gatherers_produces_m
 - Planetary strategic modifiers in `common/deposits/01_planetary_deposits.txt`
 
 ### Strategic Resource Types
-Volatile Motes, Exotic Gases, Rare Crystals, Zro, Dark Matter, Living Metal, Nanites
+Volatile Motes, Exotic Gases, Rare Crystals, Zro, Dark Matter, Living Metal, Nanites.
+In `02_sr_deposits.txt`: motes/gases/crystals (`d_*_1…5`), `d_zro_deposit_1…5`, `d_dark_matter_deposit_*`, `d_living_metal_deposit`. Nanites deposits live in `04_distant_stars_deposits.txt` and `13_machine_age_deposits.txt`, not `02_sr_deposits.txt`.
 
 ### Approach: More Concentrated, Less Frequent
 - Reduce `drop_weight` for strategic deposits across most systems
@@ -173,3 +194,6 @@ Modify the static modifiers that define what happens at various deficit levels t
 | Planet classes | `common/planet_classes/` |
 | Defines (economy) | `common/defines/00_defines.txt` |
 | Static modifiers | `common/static_modifiers/` |
+| Job categories | `common/economic_categories/01_job_categories.txt` |
+| Nomad deposits (**Nomads DLC**) | `common/deposits/17_nomads_deposits.txt` |
+| Nomad jobs (**Nomads DLC**) | `common/pop_jobs/17_nomads_jobs.txt` |

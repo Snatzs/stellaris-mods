@@ -18,7 +18,7 @@ Quick-reference index for Stellaris mod development.
 - [On Actions](wiki/on_actions.md) — all vanilla on_actions with scope documentation
 - [Dynamic Modding](wiki/dynamic_modding.md) — scripted effects/triggers, inline scripts, script values, flags
 
-### Vanilla 4.3 Architecture — consult these FIRST before working on a system
+### Vanilla 4.4 Architecture — consult these FIRST before working on a system
 - [Economy](vanilla/economy.md) — deposits, districts, economic categories, planet size, strategic resources
 - [Warfare](vanilla/warfare.md) — claims, war goals, casus belli, war exhaustion, occupation mechanics
 - [Diplomacy](vanilla/diplomacy.md) — opinion modifiers, ethics, federations, diplomatic actions, borders
