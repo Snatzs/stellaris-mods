@@ -21,7 +21,11 @@ Document balance decisions here as mods are developed. Include the rationale so 
 - **Reason:** +20% was too strong compared to vanilla equivalents
 -->
 
-(No entries yet — update as mods are developed.)
+### Nomadic empires (Nomads DLC) — banned from the campaign
+- **Decision:** Nomadic empires are **not allowed** in our 7-player MP match. Nomadic origins should be removed from empire selection (and AI use should be prevented — see open sub-question below).
+- **Reason:** Judged both **overpowered** and **game-concept-breaking** — the arkship/waystation/wayline model is a separate, asymmetric ruleset (no territory, space-only economy, partial-outcome war goals) that doesn't balance cleanly against settled empires.
+- **Scope note:** This is a *ban*, not a balance pass. We still intend to **mine** Nomads mechanics as reference implementations for our own mods (space>planets economy, border access-gating, partial war goals) — see [vanilla/patch-4.4-changes.md](vanilla/patch-4.4-changes.md).
+- **Open sub-question:** does "ban" cover only player selection, or also AI-controlled empires (filler AIs could still roll nomadic)? Decide before building the ban mod.
 
 ## Known Vanilla Balance Issues
 

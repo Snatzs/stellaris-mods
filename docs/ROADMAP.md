@@ -74,14 +74,15 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## Mods — Population & Migration
 
-- [!] Timed resettlement (not instant) — ⚠️ 4.4 moved the OPPOSITE way (removed habitability resettle defines; AI resettles regardless of habitability). Re-imposing friction now fights the base AI — group decision needed (see patch-4.4-changes.md §4)
-- [!] Pop movement restrictions (habitability, species clustering) — ⚠️ same conflict as above
+- [ ] Timed resettlement (not instant) — ✅ APPROVED (group, 2026-06-18) despite 4.4 conflict. Note: 4.4 removed habitability resettle defines & AI resettles regardless of habitability, so this mod must counter the base AI (see patch-4.4-changes.md §4)
+- [ ] Pop movement restrictions (habitability, species clustering) — ✅ APPROVED; same base-AI conflict to overcome
 - [ ] Species-type diplomacy modifiers (phenotype-based trust/distrust)
 - [ ] Xenophile/xenophobe ethics amplify/reduce species-type effects
 
 ## Mods — Meta & Balance
 
-- [!] Evaluate/disable exploitable origins (Knights of The Toxic Gods, etc.) — 4.4 added a new optimization surface: 4 nomadic origins, nomad civics (Void Reavers etc.), Defender of the Galaxy Ambition, reworked Commander traits. Open question: are nomadic empires allowed in our campaign at all? (see patch-4.4-changes.md §6)
+- [ ] Disable nomadic empires for MP — ✅ DECIDED (group, 2026-06-18): nomads banned as OP + concept-breaking. Remove the 4 nomadic origins from selection; resolve player-only vs. AI-too sub-question before building (see multiplayer-balance.md). We still mine their mechanics (patch-4.4-changes.md §6).
+- [!] Evaluate/disable other exploitable origins (Knights of The Toxic Gods, etc.) — 4.4 also added Defender of the Galaxy Ambition + reworked Commander traits to audit (see patch-4.4-changes.md §6)
 - [ ] Kill "build" meta synergies (approach TBD)
 
 ## Open Design Questions
