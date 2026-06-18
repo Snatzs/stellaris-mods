@@ -1,0 +1,93 @@
+# Timed forced resettlement. See docs/ROADMAP.md (Population & Migration) + the mod README.
+#
+# Vanilla resettlement is instant and nearly free, which the design vision wants to discourage
+# (forced/manual pop-shuffling should be a deliberate, costly choice). The engine exposes no
+# native travel-time mechanic and the cost is defined inside vanilla pop_categories files, so we
+# do BOTH levers event-side instead of overriding anything:
+#
+#   1. RESOURCE SURCHARGE — an extra energy/unity cost charged when pops are resettled, scaled by
+#      the number of pops moved AND by how mobility-oriented the empire/species is (gestalt,
+#      civic_corvee_system, Adaptability, trait_nomadic/sedentary). This is what makes the cost
+#      "scale up and down by civics/traits" without touching the vanilla cost files. Vanilla's own
+#      flat cost (already scaled by pop_resettlement_cost_mult) still applies up-front; this adds on top.
+#
+#   2. SETTLING-IN TIME PENALTY — a timed "Recent Relocation" debuff (happiness + bonus workforce)
+#      on the moved pops, simulating travel/adjustment time. Pops move instantly (engine) but are
+#      unhappy + underproductive for ~5 years afterward, so resettlement "takes time" in effect.
+#
+# Runs only from on_pop_group_resettled (no polling -> negligible performance cost). Restricted to
+# INTRA-empire resettlement (from.owner == owner) so cross-empire refugee/migration inflows are not
+# taxed. Tuning in migr_resettlement_variables.txt.
+#
+# Scope on entry: pop group (= the resettled group, now on the destination planet).
+#   from           = previous colony (planet)
+#   local_pop_amount = engine-set variable: how many pops were resettled
+
+migr_apply_resettlement_cost_effect = {
+	if = {
+		limit = {
+			exists = owner
+			is_variable_set = local_pop_amount
+			# Intra-empire (manual/forced) resettlement only — skip refugees fleeing FROM another empire.
+			from = { exists = owner owner = { is_same_value = root.owner } }
+		}
+
+		# --- 1. Disruption factor: empire tier, then species mobility multiplier, then pop count. ---
+		owner = { set_variable = { which = migr_resettle_factor value = @migr_resettle_factor_base } }
+
+		if = {
+			limit = { owner = { has_ethic = ethic_gestalt_consciousness } }
+			owner = { set_variable = { which = migr_resettle_factor value = @migr_resettle_factor_gestalt } }
+		}
+		else_if = {
+			limit = {
+				owner = {
+					OR = {
+						has_valid_civic = civic_corvee_system
+						has_tradition = tr_adaptability_finish
+					}
+				}
+			}
+			owner = { set_variable = { which = migr_resettle_factor value = @migr_resettle_factor_corvee } }
+		}
+
+		if = {
+			limit = { species = { has_trait = trait_nomadic } }
+			owner = { multiply_variable = { which = migr_resettle_factor value = @migr_resettle_factor_nomadic } }
+		}
+		else_if = {
+			limit = { species = { has_trait = trait_sedentary } }
+			owner = { multiply_variable = { which = migr_resettle_factor value = @migr_resettle_factor_sedentary } }
+		}
+
+		# Scale by pops moved, charge the surcharge (negative base resources), then clean up.
+		owner = {
+			multiply_variable = { which = migr_resettle_factor value = root.local_pop_amount }
+			add_resource = {
+				energy = @migr_resettle_surcharge_energy
+				unity  = @migr_resettle_surcharge_unity
+				mult   = migr_resettle_factor
+			}
+			remove_variable = migr_resettle_factor
+		}
+
+		# --- 2. Settling-in time penalty on the resettled pops. Waived for gestalt empires and
+		#        nomadic species (minimal disruption). No bare pop_group add_modifier exists, so we
+		#        flag this group and apply via the planet's pop-group iteration (set->use->remove,
+		#        same proven pattern as the clustering recompute). ---
+		if = {
+			limit = {
+				owner = { NOT = { has_ethic = ethic_gestalt_consciousness } }
+				species = { NOT = { has_trait = trait_nomadic } }
+			}
+			set_pop_group_flag = migr_just_resettled
+			planet = {
+				every_owned_pop_group = {
+					limit = { has_pop_group_flag = migr_just_resettled }
+					add_modifier = { modifier = migr_recent_relocation days = @migr_resettle_penalty_days }
+					remove_pop_group_flag = migr_just_resettled
+				}
+			}
+		}
+	}
+}

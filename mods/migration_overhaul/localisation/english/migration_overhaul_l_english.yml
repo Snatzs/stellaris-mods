@@ -10,3 +10,7 @@
  # Species-clustering minority penalties (see migr_clustering_effects.txt)
  migr_local_minority_minor:0 "Few of Our Kind"
  migr_local_minority_severe:0 "Stranded Among Aliens"
+
+ # Timed forced resettlement (see migr_resettlement_effects.txt)
+ migr_recent_relocation:0 "Recent Relocation"
+ migr_recent_relocation_desc:0 "Recently resettled here and still adjusting — unsettled and not yet fully productive."

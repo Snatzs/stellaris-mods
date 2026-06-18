@@ -3,8 +3,9 @@
 ## Overview
 
 Reworks population movement and species relations toward the "species relations should matter" and
-"realistic migration" goals. Currently implements **Angle A** of the species-relations system
-(inter-empire phenotype distrust). Timed resettlement, migration restrictions, and Angle B
+"realistic migration" goals. Implements **Angle A** (inter-empire phenotype distrust),
+**species-clustering** (intra-empire minority discomfort), and **timed forced resettlement**
+(cost + settling-in time for manual pop-shuffling). Migration restrictions and Angle B
 (intra-empire cohesion → ethnic secession) are planned — see
 [`docs/species-relations-design.md`](../../docs/species-relations-design.md) and
 [`docs/ROADMAP.md`](../../docs/ROADMAP.md).
@@ -44,6 +45,28 @@ no migration-target weighting (see [population.md](../../docs/vanilla/population
 - **v1 scope notes:** gestalt empires skipped; penalty is flat per tier (not yet graded by Angle A
   phenotype distance). This recompute is the shared composition engine **Angle B** will reuse.
 
+### Timed forced resettlement — cost + time for manual pop-shuffling
+Vanilla resettlement is instant and nearly free. This makes **intra-empire (manual/forced)**
+resettlement a deliberate, costly choice, addressing the "realistic migration" goal. Both levers are
+applied **event-side** from `on_pop_group_resettled` — no polling (negligible performance), **no
+vanilla file overridden** (the cost system lives in vanilla `pop_categories`, so we add cost on top
+rather than editing it).
+
+- **Resource surcharge** (`common/scripted_effects/migr_resettlement_effects.txt`): an extra
+  energy/unity cost charged per resettlement, **scaled by pops moved AND by civics/traits/ethics** —
+  cheaper for gestalts (`×0.4`), `civic_corvee_system` / Adaptability finisher (`×0.6`), and
+  `trait_nomadic` species (`×0.5`); pricier for `trait_sedentary` (`×1.5`). This is what lets the cost
+  scale up/down by faction without touching vanilla cost files. Vanilla's own flat cost (already
+  scaled by the native `pop_resettlement_cost_mult`) still applies up-front; this is additive.
+- **Settling-in time penalty** (`migr_recent_relocation`): since the engine has no native travel
+  time, resettled pops get a timed happiness + bonus-workforce debuff (~5 years) — they move instantly
+  but are unhappy and underproductive while adjusting, so resettlement effectively "takes time."
+  **Waived** for gestalt empires and nomadic species. Applied via the same flag→iterate pattern as
+  clustering (no bare-pop-group `add_modifier` exists).
+- **Scope:** restricted to intra-empire resettlement (`from.owner == owner`) so cross-empire refugee /
+  migration-treaty inflows are **not** taxed. All values tunable in
+  `common/scripted_variables/migr_resettlement_variables.txt`.
+
 ## ⚠️ Runtime-verification checklist (species-clustering)
 
 The clustering system passes bracket validation but is **logic-untested** — these vanilla API points
@@ -56,12 +79,28 @@ were verified by file inspection and need an in-game confirm (watch `error.log`)
 5. `planet = {}` resolves from pop-group scope in the on_actions.
 6. Penalty actually appears on minority pops and clears when they become a majority.
 
+## ⚠️ Runtime-verification checklist (timed resettlement)
+
+Passes bracket validation but logic is **file-inspection-verified only** — confirm in-game (watch `error.log`):
+1. `add_resource = { … mult = migr_resettle_factor }` accepts a **plain country variable** for `mult`
+   (vanilla examples use `mult = trigger:…` / `mult = -1`; the how-to-variables doc says variables work).
+   If it errors, the surcharge won't scale — fall back to a literal-tiered surcharge.
+2. `root.local_pop_amount` reads correctly from inside `owner = {}` scope (cross-scope var reference).
+3. `from = { owner = { is_same_value = root.owner } }` correctly isolates intra-empire resettlement
+   (surcharge/penalty should NOT fire on incoming refugees from another empire).
+4. `pop_bonus_workforce_mult` is valid inside a static modifier applied to a pop group (it's a
+   `pop_group_modifier` key elsewhere; clustering only used `pop_happiness`).
+5. The `migr_just_resettled` flag→iterate applies `migr_recent_relocation` to exactly the moved group.
+6. Surcharge magnitude actually scales: a sedentary-species move costs visibly more than a nomadic one.
+
 ## Compatibility
 
-**No vanilla files overridden** — pure additions to `common/` subfolders (the clustering hooks use
-`on_actions` *merge* semantics, not override). No `docs/compatibility.md` entry required. Angle A
-opinion values stack with the vanilla xeno opinion modifiers by design (revisit if double-counting is
-too strong).
+**No vanilla files overridden** — pure additions to `common/` subfolders. The clustering *and*
+resettlement hooks use `on_actions` *merge* semantics; the resettlement cost is applied event-side
+(additive surcharge) rather than by editing vanilla `pop_categories` cost files. No
+`docs/compatibility.md` entry required. Angle A opinion values stack with the vanilla xeno opinion
+modifiers by design, and the resettlement surcharge stacks on top of vanilla's own resettlement cost
+(revisit if either is too strong).
 
 ## Manual Testing
 
@@ -81,3 +120,15 @@ too strong).
    (within a recompute cycle / by the next yearly sweep).
 8. Conquer a mixed planet and confirm the grace period suppresses penalties for ~10 years.
 9. Check `error.log` for scope/variable errors from the recompute (see Runtime-verification checklist).
+
+### Timed resettlement
+10. Manually resettle a batch of pops within your empire; confirm energy + unity drop by the surcharge
+    (roughly `20 energy × pops × factor`) on top of vanilla's normal resettlement cost.
+11. Confirm the moved pops show "Recent Relocation" as a happiness/output penalty for ~5 years, and
+    that it self-expires.
+12. Compare cost scaling: resettle a **sedentary** species vs. a **nomadic** species (or as a gestalt
+    vs. a normal empire) and confirm the surcharge is larger / smaller accordingly.
+13. Confirm gestalt empires and nomadic species take the surcharge but **no** "Recent Relocation"
+    penalty.
+14. Trigger a cross-empire refugee/migration inflow and confirm it is **not** surcharged or penalized
+    (only intra-empire resettlement is).

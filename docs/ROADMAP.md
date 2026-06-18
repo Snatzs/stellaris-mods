@@ -6,15 +6,17 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## ▶ Current Focus / Session Handoff
 
-**Last session (2026-06-18):** On branch `mod/migration-overhaul`. **Committed:** Angle A (graded phenotype distrust opinion modifiers — `926c83b`) + **species-clustering** (fraction-based minority happiness penalty via on_action recompute, no vanilla override — `b6e596c`). Toolchain works end-to-end. **Decisions:** habitability-migration **left to vanilla** (`HABITABILITY_AUTO_MIGRATION = 0.20` suffices — not touched); species-clustering replaces the "habitability restriction" scope. **Borders/truce investigation:** post-war truce passage **IS moddable** via `end_truce`/`set_truce` (not border access) — logged as a future Borders mod (two levers, see Borders section); NOT built. Documented the **4.0+ pop-group modding API** in [`population.md`](vanilla/population.md) (the primitives used by clustering + needed for timed resettlement).
+**Last session (2026-06-18, cont.):** On branch `mod/migration-overhaul`. **Built TIMED FORCED RESETTLEMENT** — the last migration-mod piece (not yet committed). Two event-side levers on `on_pop_group_resettled`, **zero vanilla overrides, no polling**:
+- **Resource surcharge** — extra energy/unity per resettlement, `add_resource { … mult = <variable> }` scaled by pops moved × empire/species factor (gestalt ×0.4, corvee/Adaptability ×0.6, `trait_nomadic` ×0.5, `trait_sedentary` ×1.5). This is the answer to "cost scales by civics/traits without overriding vanilla cost files" — the cost is added on top of vanilla's flat cost instead of editing `pop_categories`.
+- **Settling-in time penalty** — timed `migr_recent_relocation` debuff (happiness + bonus workforce, ~5 yr) on moved pops, since there's no native travel-time mechanic. Waived for gestalts + nomadic species.
+- **Scoped to intra-empire** resettlement (`from.owner == owner`) so refugee/migration inflows aren't taxed. Files: `migr_resettlement_{variables,modifiers,effects,on_actions}` + loc.
+- ⚠️ **File-inspection-verified only** — see the new "timed resettlement" runtime-verification checklist in the mod README. Key unknown: does `add_resource` `mult` accept a plain country variable (vs. only `trigger:`/literal)? Confirm in-game.
 
-**Next: build TIMED FORCED RESETTLEMENT** — the last migration-mod piece. Everything else in Population & Migration is now done or descoped.
-- **Goal:** forced/manual resettlement should take time + cost, not be instant. (Auto-migration habitability is already handled by vanilla; species-clustering is built. This is the remaining gap.)
-- **⚠️ No native travel-time mechanic** — must event-simulate: intercept/penalize the move (move pop + apply a timed penalty / delay). See [patch-4.4-changes.md](vanilla/patch-4.4-changes.md) §4.
-- **Verified hooks/levers (this session):** `on_pop_group_resettled` on_action (**this = pop group, from = previous colony**, `local_pop_amount` var) is the interception point; `common/inline_scripts/pop_categories/resettlement_costs.txt` / `resettlement_costs_low.txt` set cost; `allow_resettlement` per pop category (`common/pop_categories/`); `RESETTLE_DESTROY_COLONY_COST` define. Timed static modifiers + `set_timed_pop_group_flag` (see population.md pop-group API) are the tools for the "settling-in penalty" timer.
-- **First step:** read [`population.md`](vanilla/population.md) (Migration & Resettlement + the new pop-group API section) before scripting.
+**Earlier this session:** Angle A (phenotype distrust — `926c83b`) + species-clustering (`b6e596c`) committed. Habitability-migration left to vanilla (`HABITABILITY_AUTO_MIGRATION = 0.20`). Borders/truce passage is moddable via `end_truce`/`set_truce` (future Borders mod, not built). Pop-group modding API documented in [`population.md`](vanilla/population.md).
 
-**Pending (task #5):** in-game test of Angle A + species-clustering (see mod README runtime-verification checklist), then merge `mod/migration-overhaul` → master.
+**Next:**
+1. **Commit** the timed-resettlement files + doc updates.
+2. **In-game test pass** (task #5): Angle A + species-clustering + timed resettlement — all three are logic-untested. Run all three runtime-verification checklists in the mod README, watch `error.log`. Then merge `mod/migration-overhaul` → master.
 
 **Deferred (designed, not built):** Angle B (intra-empire cohesion → ethnic secession) — reuses the species-clustering composition recompute; needs revolt-file verification. Truce-borders mod. See [`species-relations-design.md`](species-relations-design.md) + Borders roadmap.
 
@@ -98,7 +100,7 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## Mods — Population & Migration
 
-- [ ] Timed resettlement (not instant) — ✅ APPROVED (group, 2026-06-18). Scope clarified: targets **forced/manual** resettlement (still instant + unrestricted) via `pop_categories` `resettlement_costs` + event-simulated travel time. NOT a fight against the base AI (see corrected [patch-4.4-changes.md](vanilla/patch-4.4-changes.md) §4)
+- [~] Timed resettlement (not instant) — **BUILT** in `migration_overhaul` (logic-untested). Two event-side levers on `on_pop_group_resettled`, **no vanilla override, no polling**: (1) a resource **surcharge** scaled by pops moved × civics/traits/ethics via `add_resource { mult = <variable> }` — added on top of vanilla cost instead of editing `pop_categories`; (2) a timed **settling-in penalty** (`migr_recent_relocation`) simulating travel time. Intra-empire only (refugees excluded). See mod README + runtime-verification checklist.
 - [~] Pop movement restrictions (habitability, species clustering) — ✅ APPROVED. **Habitability half left to vanilla** (`HABITABILITY_AUTO_MIGRATION = 0.20`; decided not to touch). **Species-clustering BUILT** in `migration_overhaul` (fraction-based minority happiness penalty via on_action recompute, no vanilla override; also builds Angle B's composition engine). ⚠️ Logic-untested in-game — see mod README runtime-verification checklist. Design: [species-relations-design.md](species-relations-design.md)
 - [~] Species-type diplomacy modifiers (phenotype-based trust/distrust) — **Angle A in progress** in `mods/migration_overhaul`: graded-by-family opinion modifiers, ethics-laddered, additive over vanilla's mild `triggered_opinion_xenophobes/xenophiles`, auto-applied (pure data, MP-safe). Design + values: [species-relations-design.md](species-relations-design.md)
 - [~] Xenophile/xenophobe ethics amplify/reduce species-type effects — folded into Angle A (the ethics ladder)

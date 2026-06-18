@@ -1,0 +1,29 @@
+# Timed forced resettlement tuning. See docs/ROADMAP.md (Population & Migration) and the
+# mod README. Resettlement is instant + cheap in vanilla; this makes intra-empire (manual/
+# forced) resettlement carry BOTH a time cost (a settling-in productivity penalty on the
+# moved pops) and a resource SURCHARGE that scales by pops moved and by civics/traits/ethics.
+#
+# Everything here is applied event-side from on_pop_group_resettled (no polling, no vanilla
+# override). Vanilla's own flat cost (100 energy + 10 unity, already scaled by the native
+# pop_resettlement_cost_mult modifier) still applies up-front as the gate; this is additive.
+
+# --- Resource surcharge (per pop, NEGATIVE = removed). Scaled by the disruption factor
+#     below, which already folds in the pop count. ---
+@migr_resettle_surcharge_energy	= -20
+@migr_resettle_surcharge_unity	= -5
+
+# --- Disruption factor (multiplies the surcharge). Tiered by how mobility-oriented the
+#     resettling empire / species is. A factor of 1.0 = baseline settled empire. ---
+@migr_resettle_factor_base		= 1.0	# default (non-gestalt, no resettlement civics)
+@migr_resettle_factor_gestalt	= 0.4	# drones reassign with minimal social disruption
+@migr_resettle_factor_corvee	= 0.6	# civic_corvee_system / Adaptability finisher: built for it
+# Species mobility traits scale further (multiplicative over the empire tier above):
+@migr_resettle_factor_nomadic	= 0.5	# trait_nomadic — used to moving (vanilla cost mult -0.35)
+@migr_resettle_factor_sedentary	= 1.5	# trait_sedentary — hates being uprooted (vanilla +0.35)
+
+# --- Settling-in time penalty (the "takes time" half). A timed productivity/happiness
+#     debuff on the resettled pops, simulating travel + adjustment since the engine has no
+#     native travel-time mechanic. Waived for gestalt empires and nomadic species. ---
+@migr_resettle_penalty_days		= 1800	# ~5 years of "Recent Relocation"
+@migr_resettle_happiness		= -0.15
+@migr_resettle_workforce		= -0.15	# reduced bonus workforce = lower output while settling

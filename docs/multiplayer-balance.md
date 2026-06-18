@@ -50,6 +50,29 @@ Document balance decisions here as mods are developed. Include the rationale so 
   on_actions merge). MP-safe: deterministic, event-driven + debounced + yearly sweep. Untested in-game —
   see the mod README runtime-verification checklist.
 
+### Migration — timed forced resettlement (cost + settling-in time)
+- **Decision:** Make **intra-empire manual/forced** resettlement carry real friction. Two event-side
+  levers (no vanilla override, no polling):
+  - **Resource surcharge** on top of vanilla's flat cost. First-pass: **-20 energy + -5 unity per pop**,
+    multiplied by a **disruption factor** that scales by faction: gestalt **×0.4**, `civic_corvee_system`
+    / Adaptability-finisher **×0.6**, `trait_nomadic` species **×0.5**, `trait_sedentary` **×1.5**,
+    baseline **×1.0**.
+  - **Settling-in penalty** `migr_recent_relocation`: **-0.15 happiness + -0.15 bonus workforce for
+    ~5 years** on the moved pops (simulates travel/adjustment; engine has no native travel time).
+    Waived for gestalts + nomadic species.
+- **Reason:** Vanilla resettlement is instant and nearly free, which the vision wants to discourage
+  (forced pop-shuffling should be a deliberate, costly choice — Population & Migration pillar). The
+  group asked specifically that the **cost scale by civics/traits without overriding vanilla cost
+  files** — solved by charging event-side via `add_resource { mult = <variable> }` rather than editing
+  `pop_categories`, so vanilla's own `pop_resettlement_cost_mult` scaling still applies underneath.
+- **Implementation note:** Applied only from `on_pop_group_resettled` → negligible performance, no
+  desync surface (deterministic). **Refugees / cross-empire migration excluded** (`from.owner == owner`
+  gate) so involuntary inflows aren't taxed. All magnitudes tunable in
+  `migr_resettlement_variables.txt` — **starting values, re-tune after playtest** (watch that mass
+  resettlement isn't either trivially cheap or punishingly expensive at 7-player economy scale).
+- **Untested in-game** — see the mod README "timed resettlement" runtime-verification checklist (notably
+  whether `add_resource` `mult` accepts a plain variable).
+
 ### Nomadic empires (Nomads DLC) — banned from the campaign
 - **Decision:** Nomadic empires are **not allowed** in our 7-player MP match. Nomadic origins should be removed from empire selection (and AI use should be prevented — see open sub-question below).
 - **Reason:** Judged both **overpowered** and **game-concept-breaking** — the arkship/waystation/wayline model is a separate, asymmetric ruleset (no territory, space-only economy, partial-outcome war goals) that doesn't balance cleanly against settled empires.

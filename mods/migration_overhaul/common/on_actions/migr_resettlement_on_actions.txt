@@ -1,0 +1,11 @@
+# Timed forced resettlement hook. on_actions MERGE with vanilla (and with this mod's own
+# migr_clustering_on_actions.txt, which also hooks on_pop_group_resettled for the composition
+# recompute) — both effect blocks run; each is self-contained. Scope verified in
+# common/on_actions/00_on_actions.txt: this = resettled pop group, from = previous colony,
+# local_pop_amount = pops moved. See migr_resettlement_effects.txt.
+
+on_pop_group_resettled = {
+	effect = {
+		migr_apply_resettlement_cost_effect = yes
+	}
+}

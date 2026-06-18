@@ -1,0 +1,8 @@
+# Settling-in penalty applied (timed) to pop groups that were just resettled, by
+# migr_apply_resettlement_cost_effect. Pop-group-applicable keys only (same shape as the
+# clustering penalties / vanilla pop_drought). See migr_resettlement_effects.txt.
+
+migr_recent_relocation = {
+	pop_happiness = @migr_resettle_happiness
+	pop_bonus_workforce_mult = @migr_resettle_workforce
+}
