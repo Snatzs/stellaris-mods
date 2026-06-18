@@ -25,14 +25,15 @@
 @migr_resettle_factor_sedentary	= 1.5	# trait_sedentary — hates being uprooted (vanilla +0.35)
 
 # --- Empire-size scaling: keeps the surcharge relevant late-game instead of going flat as
-#     income inflates. Mirrors vanilla tech/tradition cost growth exactly:
+#     income inflates. Same SHAPE as vanilla tech/tradition cost growth:
 #       multiplier = 1 + max(0, empire_size - SIZE_BASE) * SIZE_PENALTY
-#     Defaults match vanilla's EMPIRE_SIZE_BASE (100) and EMPIRE_SIZE_TECH_COST_PENALTY (0.002),
-#     i.e. +0.2% per point of empire size above 100 (size 300 -> x1.4, size 600 -> x2.0).
-#     Vanilla's curve is gentle; raise SIZE_PENALTY if mass resettlement should bite harder for
-#     sprawling empires (re-tune after playtest against 7-player late-game economy).
+#     SIZE_BASE matches vanilla's EMPIRE_SIZE_BASE (100, the no-penalty threshold). SIZE_PENALTY is
+#     OUR OWN variable (independent of vanilla's EMPIRE_SIZE_TECH_COST_PENALTY = 0.002), deliberately
+#     STEEPENED to 0.01 (5x vanilla) because our surcharge has a flat base (unlike tech, whose base
+#     cost itself balloons through the tree). At 0.01: size 300 -> x3, size 600 -> x6 — so bulk
+#     resettlement in a sprawling late-game empire actually bites. Tunable; re-check after playtest.
 @migr_resettle_size_base		= 100
-@migr_resettle_size_penalty		= 0.002
+@migr_resettle_size_penalty		= 0.01
 
 # --- Settling-in time penalty (the "takes time" half). A timed productivity/happiness
 #     debuff on the resettled pops, simulating travel + adjustment since the engine has no

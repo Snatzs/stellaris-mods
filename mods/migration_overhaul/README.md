@@ -56,8 +56,11 @@ rather than editing it).
   energy/unity cost charged per resettlement, **scaled by pops moved, by civics/traits/ethics, and by
   empire size** — cheaper for gestalts (`×0.4`), `civic_corvee_system` / Adaptability finisher (`×0.5`),
   and `trait_nomadic` species (`×0.5`); pricier for `trait_sedentary` (`×1.5`). On top of that, an
-  **empire-size multiplier** mirrors vanilla tech/tradition cost growth (`1 + (empire_size − 100) ×
-  0.002`) so the surcharge stays relevant late-game instead of going flat as income inflates. This is
+  **empire-size multiplier** uses the same *shape* as vanilla tech/tradition cost growth but a steeper
+  slope (`1 + (empire_size − 100) × 0.01`, i.e. 5× vanilla's 0.002 — size 300 → ×3, size 600 → ×6)
+  so the surcharge stays relevant late-game instead of going flat as income inflates. Steeper than
+  vanilla because our surcharge has a flat base, unlike tech whose base cost balloons through the tree.
+  This is
   what lets the cost scale up/down by faction *and* over time without touching vanilla cost files.
   Vanilla's own flat cost (already scaled by the native `pop_resettlement_cost_mult`) still applies
   up-front; this is additive. (Note: `civic_corvee_system` only gives vanilla `−0.1` cost + a unity

@@ -58,6 +58,22 @@ Turn Stellaris into a **genuine geopolitical simulator in space** — a real 4X 
 - Reduce empire size per colony (back to ~10)
 - Increase Naval Cap per anchorage (?)
 - Decrease Federation buffs (and max Naval Cap from Federation Navy?)
+- **Empire-size penalties should be counterable by wide empires — but only through heavy, dedicated
+  investment, not cheap riders on multi-purpose buildings.** Wide play should stay viable (pillar 3),
+  yet offsetting sprawl must be a real opportunity cost (pillars 3 "punish overextension" + 4 "kill the
+  build meta"). Design principles:
+  - Use **flat** empire-size reductions (a dedicated admin job/building gives **−N flat** size), **not
+    percentages.** Flat values force *scale*: meaningfully offsetting a large empire's sprawl requires
+    many admin jobs → entire "administrative worlds" given over to it, so you genuinely sacrifice that
+    world's other output.
+  - Admin infrastructure should be **(near-)single-purpose** — its whole point is administrative
+    capacity, so dedicating a planet to it costs you what that planet could otherwise produce.
+  - **Explicitly reject the percentage-stacking approach** of the "Empire Size Rationalisation" Steam
+    mod (workshop id 3545107040): it bolts −1%/−5%/−15% empire-size reductions onto *existing*
+    multi-purpose buildings (Admin Offices, Temples, Cathedrals), stacking to ~−300%. Those buildings
+    already pay for themselves with other bonuses, so the reduction is a free rider that imposes no
+    trade-off, and percentages compound into nonsense. We want the inverse: a deliberate, costly,
+    dedicated commitment.
 
 ---
 

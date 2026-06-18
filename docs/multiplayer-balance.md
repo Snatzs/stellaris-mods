@@ -56,12 +56,14 @@ Document balance decisions here as mods are developed. Include the rationale so 
   - **Resource surcharge** on top of vanilla's flat cost. First-pass: **-20 energy + -5 unity per pop**,
     multiplied by a **disruption factor** that scales by faction: gestalt **×0.4**, `civic_corvee_system`
     / Adaptability-finisher **×0.5**, `trait_nomadic` species **×0.5**, `trait_sedentary` **×1.5**,
-    baseline **×1.0** — then by an **empire-size multiplier** `1 + (empire_size − 100) × 0.002` (mirrors
-    vanilla `EMPIRE_SIZE_TECH/TRADITION_COST_PENALTY`) so it stays relevant late-game.
+    baseline **×1.0** — then by an **empire-size multiplier** `1 + (empire_size − 100) × 0.01` (same
+    *shape* as vanilla `EMPIRE_SIZE_TECH/TRADITION_COST_PENALTY` but **5× steeper**, on our own variable)
+    so it stays relevant late-game: size 300 → ×3, size 600 → ×6.
     *Corvée note:* vanilla `civic_corvee_system` does **not** zero resettlement cost (only `−0.1` +
-    unity waiver), so we discount it, not waive it. *Tuning open question:* vanilla's `0.002` size curve
-    is gentle (~×2 at size 600); may need steepening so bulk resettlement still bites a sprawling
-    late-game economy — decide after playtest.
+    unity waiver), so we discount it, not waive it. *Why steeper than vanilla:* our surcharge has a flat
+    base (20E/5U), whereas vanilla tech/tradition base costs balloon through the tree, so the gentle
+    `0.002` curve would leave our cost trivial against a late-game economy. **Re-tune after playtest** —
+    `0.01` is a first guess; watch it isn't punishing for legitimately large empires.
   - **Settling-in penalty** `migr_recent_relocation`: **-0.15 happiness + -0.15 bonus workforce for
     ~5 years** on the moved pops (simulates travel/adjustment; engine has no native travel time).
     Waived for gestalts + nomadic species.

@@ -7,7 +7,7 @@ Track what needs to be done, what's in progress, and what's done.
 ## ▶ Current Focus / Session Handoff
 
 **Last session (2026-06-18, cont.):** On branch `mod/migration-overhaul`. **Built TIMED FORCED RESETTLEMENT** — the last migration-mod piece (not yet committed). Two event-side levers on `on_pop_group_resettled`, **zero vanilla overrides, no polling**:
-- **Resource surcharge** — extra energy/unity per resettlement, `add_resource { … mult = <variable> }` scaled by pops moved × empire/species factor (gestalt ×0.4, corvee/Adaptability ×0.5, `trait_nomadic` ×0.5, `trait_sedentary` ×1.5) × an **empire-size multiplier** `1 + (empire_size−100)×0.002` (mirrors vanilla tech/tradition scaling, keeps it relevant late-game). This is the answer to "cost scales by civics/traits without overriding vanilla cost files" — added on top of vanilla's flat cost instead of editing `pop_categories`.
+- **Resource surcharge** — extra energy/unity per resettlement, `add_resource { … mult = <variable> }` scaled by pops moved × empire/species factor (gestalt ×0.4, corvee/Adaptability ×0.5, `trait_nomadic` ×0.5, `trait_sedentary` ×1.5) × an **empire-size multiplier** `1 + (empire_size−100)×0.01` (vanilla tech/tradition *shape*, 5× steeper on our own variable, so it stays relevant late-game: size 600 → ×6). This is the answer to "cost scales by civics/traits without overriding vanilla cost files" — added on top of vanilla's flat cost instead of editing `pop_categories`.
 - **Settling-in time penalty** — timed `migr_recent_relocation` debuff (happiness + bonus workforce, ~5 yr) on moved pops, since there's no native travel-time mechanic. Waived for gestalts + nomadic species.
 - **Scoped to intra-empire** resettlement (`from.owner == owner`) so refugee/migration inflows aren't taxed. Files: `migr_resettlement_{variables,modifiers,effects,on_actions}` + loc.
 - ⚠️ **File-inspection-verified only** — see the new "timed resettlement" runtime-verification checklist in the mod README. Key unknown: does `add_resource` `mult` accept a plain country variable (vs. only `trigger:`/literal)? Confirm in-game.
@@ -66,6 +66,7 @@ Track what needs to be done, what's in progress, and what's done.
 - [ ] Reduce empire size per colony (~10)
 - [ ] Adjust Naval Cap per anchorage
 - [ ] Reduce Federation buffs / Federation Navy cap
+- [ ] **Empire-size counter via dedicated admin worlds** — let wide empires offset sprawl penalties, but only through **flat** empire-size reductions on **single-purpose** admin jobs/buildings (need whole worlds = real opportunity cost). Explicitly NOT the percentage-stacking approach of the "Empire Size Rationalisation" workshop mod (id 3545107040, −1/−5/−15% on multi-purpose buildings → ~−300%). See [design-vision.md](design-vision.md) Empire & Fleet for the rationale.
 
 ## Mods — War & Conflict
 
