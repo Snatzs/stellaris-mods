@@ -1,0 +1,11 @@
+# Species-clustering pop-group penalties, applied (timed) by the recompute effect to
+# pop groups whose species is a local minority. Pop-group-applicable static modifiers
+# (pop_happiness) — same shape as vanilla `pop_drought`. See migr_clustering_effects.txt.
+
+migr_local_minority_minor = {
+	pop_happiness = @migr_clustering_happiness_minor
+}
+
+migr_local_minority_severe = {
+	pop_happiness = @migr_clustering_happiness_severe
+}

@@ -6,3 +6,7 @@
  migr_opinion_phenotype_near:0 "Unfamiliar Phenotype"
  migr_opinion_phenotype_far:0 "Alien Phenotype"
  migr_opinion_phenotype_alien:0 "Wholly Alien Biology"
+
+ # Species-clustering minority penalties (see migr_clustering_effects.txt)
+ migr_local_minority_minor:0 "Few of Our Kind"
+ migr_local_minority_severe:0 "Stranded Among Aliens"

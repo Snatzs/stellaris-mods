@@ -1,0 +1,95 @@
+# Species-clustering recompute (Angle B foundation / migration "species clustering").
+# See docs/species-relations-design.md.
+#
+# Soft discouragement: pops who are a small minority of their OWN species on a planet
+# get a happiness penalty, so empires are nudged to keep species clustered. The engine
+# exposes no migration-target weighting, so this is the realistic lever (verified in
+# docs/vanilla/population.md).
+#
+# Fraction-based: a species is a minority when its pop count is below 1/INV of the
+# planet total (see migr_clustering_variables.txt). The same per-planet composition
+# signal will later drive Angle B's instability -> ethnic secession.
+#
+# Architecture: applies a TIMED static modifier directly to minority pop groups during
+# iteration (vanilla `every_owned_pop_group { add_modifier days=N }` pattern). No vanilla
+# file is overridden. Penalties self-expire and are refreshed each recompute.
+#
+# NB: species flags are GLOBAL to a species (not per-planet), so `migr_cluster_current`
+# is set -> used -> removed synchronously within a single species iteration. Effects run
+# synchronously, so no other planet's recompute can interleave and see a stale flag.
+
+# Recompute one planet unconditionally. Scope: planet.
+migr_recompute_planet_clustering_effect = {
+	if = {
+		limit = {
+			is_colony = yes
+			exists = owner
+			owner = { NOT = { has_ethic = ethic_gestalt_consciousness } }	# v1: skip gestalts
+			NOT = { has_planet_flag = migr_clustering_grace }				# post-conquest exemption
+		}
+
+		save_event_target_as = migr_cluster_planet
+
+		# Total pops on the planet.
+		export_trigger_value_to_variable = {
+			trigger = count_owned_pop_amount
+			parameters = { limit = { always = yes } }
+			variable = migr_total_pops
+		}
+
+		# Clear last cycle's penalties so re-evaluation is authoritative.
+		every_owned_pop_group = {
+			remove_modifier = migr_local_minority_minor
+			remove_modifier = migr_local_minority_severe
+		}
+
+		every_owned_species = {
+			set_species_flag = migr_cluster_current		# temp, used + cleared synchronously below
+
+			event_target:migr_cluster_planet = {
+				# Pops of THIS species on THIS planet.
+				export_trigger_value_to_variable = {
+					trigger = count_owned_pop_amount
+					parameters = { limit = { species = { has_species_flag = migr_cluster_current } } }
+					variable = migr_species_pops
+				}
+
+				# severe test: species * SEVERE_INV - total < 0  (i.e. species < total/SEVERE_INV)
+				set_variable = { which = migr_test value = migr_species_pops }
+				multiply_variable = { which = migr_test value = @migr_minority_severe_inv }
+				subtract_variable = { which = migr_test value = migr_total_pops }
+				if = {
+					limit = { check_variable = { which = migr_test value < 0 } }
+					every_owned_pop_group = {
+						limit = { species = { has_species_flag = migr_cluster_current } }
+						add_modifier = { modifier = migr_local_minority_severe days = @migr_clustering_modifier_days }
+					}
+				}
+				else = {
+					# minor test: species * MINOR_INV - total < 0
+					set_variable = { which = migr_test value = migr_species_pops }
+					multiply_variable = { which = migr_test value = @migr_minority_minor_inv }
+					subtract_variable = { which = migr_test value = migr_total_pops }
+					if = {
+						limit = { check_variable = { which = migr_test value < 0 } }
+						every_owned_pop_group = {
+							limit = { species = { has_species_flag = migr_cluster_current } }
+							add_modifier = { modifier = migr_local_minority_minor days = @migr_clustering_modifier_days }
+						}
+					}
+				}
+			}
+
+			remove_species_flag = migr_cluster_current
+		}
+	}
+}
+
+# Debounced entry point for composition-change events. Scope: planet.
+migr_try_recompute_clustering_effect = {
+	if = {
+		limit = { NOT = { has_planet_flag = migr_clustering_cooldown } }
+		set_timed_planet_flag = { flag = migr_clustering_cooldown days = @migr_clustering_cooldown_days }
+		migr_recompute_planet_clustering_effect = yes
+	}
+}

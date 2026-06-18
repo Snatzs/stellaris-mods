@@ -1,0 +1,41 @@
+# Species-clustering recompute hooks. on_actions MERGE with vanilla (these append to,
+# not override, the vanilla definitions). Scopes verified in common/on_actions/00_on_actions.txt.
+# See migr_clustering_effects.txt and docs/species-relations-design.md.
+
+# this = the new pop group. Recompute its planet (debounced).
+on_pop_group_added = {
+	effect = {
+		planet = { migr_try_recompute_clustering_effect = yes }
+	}
+}
+
+# this = pop group, from = previous colony. Recompute destination AND origin.
+on_pop_group_resettled = {
+	effect = {
+		planet = { migr_try_recompute_clustering_effect = yes }
+		from = { migr_try_recompute_clustering_effect = yes }
+	}
+}
+
+# this = colony (planet), from = new owner, fromfrom = former owner.
+# Grant a grace period and clear any inherited penalties.
+on_colony_conquer = {
+	effect = {
+		set_timed_planet_flag = { flag = migr_clustering_grace days = @migr_clustering_grace_days }
+		every_owned_pop_group = {
+			remove_modifier = migr_local_minority_minor
+			remove_modifier = migr_local_minority_severe
+		}
+	}
+}
+
+# this = country. Yearly full refresh catches gradual composition drift (growth within
+# existing pop groups does not fire on_pop_group_added). Bypasses the event debounce.
+on_yearly_pulse_country = {
+	effect = {
+		every_owned_planet = {
+			limit = { is_colony = yes }
+			migr_recompute_planet_clustering_effect = yes
+		}
+	}
+}

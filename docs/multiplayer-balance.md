@@ -37,6 +37,19 @@ Document balance decisions here as mods are developed. Include the rationale so 
   → instability → ethnic secession, with slaves/purged excluded) is **designed but deferred** to a
   follow-up mod — see [species-relations-design.md](species-relations-design.md).
 
+### Species relations — species-clustering (minority discomfort)
+- **Decision:** Pops who are a fraction-minority of their **own species** on a planet take a happiness
+  penalty: **< 25%** of planet → minor (**-0.10** pop_happiness), **< 10%** → severe (**-0.20**). Soft
+  discouragement only (engine can't hard-block migration). Gestalts exempt (v1); conquered planets get
+  a 10-year grace.
+- **Reason:** Serves "pops shouldn't freely move where few of their kind exist" (design-vision →
+  Population). Vanilla handles the *habitability* half already (see [patch-4.4-changes.md](vanilla/patch-4.4-changes.md) §4),
+  so clustering is the genuinely new restriction. Magnitudes referenced against vanilla Noxious
+  (~-0.05/pop) — start mild, tune after playtest.
+- **Implementation note:** No vanilla override (timed static modifiers applied via on_action recompute;
+  on_actions merge). MP-safe: deterministic, event-driven + debounced + yearly sweep. Untested in-game —
+  see the mod README runtime-verification checklist.
+
 ### Nomadic empires (Nomads DLC) — banned from the campaign
 - **Decision:** Nomadic empires are **not allowed** in our 7-player MP match. Nomadic origins should be removed from empire selection (and AI use should be prevented — see open sub-question below).
 - **Reason:** Judged both **overpowered** and **game-concept-breaking** — the arkship/waystation/wayline model is a separate, asymmetric ruleset (no territory, space-only economy, partial-outcome war goals) that doesn't balance cleanly against settled empires.

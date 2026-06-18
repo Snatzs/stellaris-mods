@@ -1,0 +1,21 @@
+# Species-clustering tuning. See docs/species-relations-design.md.
+# "Minority" is fraction-based: a species is a minority on a planet when its pop
+# count is below 1/INV of the planet's total pops.
+@migr_minority_minor_inv		= 4		# minor  if a species is < 1/4  (25%) of the planet
+@migr_minority_severe_inv		= 10	# severe if a species is < 1/10 (10%) of the planet
+
+# pop_happiness penalties per tier (tunable; Noxious uses ~-0.05/pop as a reference).
+@migr_clustering_happiness_minor	= -0.10
+@migr_clustering_happiness_severe	= -0.20
+
+# Timed-modifier lifetime — MUST exceed the recompute cadence so penalties refresh
+# rather than lapsing. Event-driven recompute is debounced to 90 days; yearly sweep
+# guarantees a refresh. 400 days gives margin.
+@migr_clustering_modifier_days	= 400
+
+# Debounce: a planet recomputes from composition-change events at most this often.
+@migr_clustering_cooldown_days	= 90
+
+# Post-conquest grace: freshly conquered planets are exempt this long (10 years),
+# so conquest doesn't instantly tank a mixed planet.
+@migr_clustering_grace_days		= 3600

@@ -109,6 +109,13 @@ Notes:
 
 A separate mod (working title **"species cohesion / xenophobia at home"**). Designed, not built.
 
+> **Foundation now exists.** The migration mod's **species-clustering** system
+> (`migration_overhaul/common/scripted_effects/migr_clustering_effects.txt`) already builds the
+> per-planet species-composition recompute — the exact signal Angle B needs. Angle B layers an
+> instability → ethnic-secession consequence on top of that same recompute instead of re-deriving
+> composition. The clustering recompute applies a happiness penalty; Angle B would additionally feed
+> planetary stability and trigger the guarded secession event.
+
 ### Mechanism
 
 Free, full-citizen xeno pops sharing a planet with the dominant phenotype reduce **happiness /
