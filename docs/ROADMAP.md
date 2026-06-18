@@ -6,17 +6,18 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## ▶ Current Focus / Session Handoff
 
-**Last session (2026-06-18, cont.):** On branch `mod/migration-overhaul`. **Built TIMED FORCED RESETTLEMENT** — the last migration-mod piece (not yet committed). Two event-side levers on `on_pop_group_resettled`, **zero vanilla overrides, no polling**:
+**Last session (2026-06-18, cont.):** On branch `mod/migration-overhaul`. **Built + committed TIMED FORCED RESETTLEMENT** — the last migration-mod piece. Commits: `3e706b3` (core), `9ae76d5` (empire-size scaling + corvée fix), `7ba0630` (steeper curve + documented admin-world idea). Two event-side levers on `on_pop_group_resettled`, **zero vanilla overrides, no polling**:
 - **Resource surcharge** — extra energy/unity per resettlement, `add_resource { … mult = <variable> }` scaled by pops moved × empire/species factor (gestalt ×0.4, corvee/Adaptability ×0.5, `trait_nomadic` ×0.5, `trait_sedentary` ×1.5) × an **empire-size multiplier** `1 + (empire_size−100)×0.01` (vanilla tech/tradition *shape*, 5× steeper on our own variable, so it stays relevant late-game: size 600 → ×6). This is the answer to "cost scales by civics/traits without overriding vanilla cost files" — added on top of vanilla's flat cost instead of editing `pop_categories`.
 - **Settling-in time penalty** — timed `migr_recent_relocation` debuff (happiness + bonus workforce, ~5 yr) on moved pops, since there's no native travel-time mechanic. Waived for gestalts + nomadic species.
 - **Scoped to intra-empire** resettlement (`from.owner == owner`) so refugee/migration inflows aren't taxed. Files: `migr_resettlement_{variables,modifiers,effects,on_actions}` + loc.
 - ⚠️ **File-inspection-verified only** — see the new "timed resettlement" runtime-verification checklist in the mod README. Key unknown: does `add_resource` `mult` accept a plain country variable (vs. only `trigger:`/literal)? Confirm in-game.
 
-**Earlier this session:** Angle A (phenotype distrust — `926c83b`) + species-clustering (`b6e596c`) committed. Habitability-migration left to vanilla (`HABITABILITY_AUTO_MIGRATION = 0.20`). Borders/truce passage is moddable via `end_truce`/`set_truce` (future Borders mod, not built). Pop-group modding API documented in [`population.md`](vanilla/population.md).
+**Earlier this session:** Angle A (phenotype distrust — `926c83b`) + species-clustering (`b6e596c`) committed. Habitability-migration left to vanilla (`HABITABILITY_AUTO_MIGRATION = 0.20`). Borders/truce passage is moddable via `end_truce`/`set_truce` (future Borders mod, not built). Pop-group modding API documented in [`population.md`](vanilla/population.md). Also **documented a future Empire & Fleet idea**: counter empire-size penalties via dedicated admin worlds (FLAT, single-purpose size reductions — explicitly NOT the percentage-stacking "Empire Size Rationalisation" workshop mod). See [design-vision.md](design-vision.md) Empire & Fleet.
 
-**Next:**
-1. **Commit** the timed-resettlement files + doc updates.
-2. **In-game test pass** (task #5): Angle A + species-clustering + timed resettlement — all three are logic-untested. Run all three runtime-verification checklists in the mod README, watch `error.log`. Then merge `mod/migration-overhaul` → master.
+**▶ START HERE NEXT SESSION — in-game test pass + merge.** The whole `migration_overhaul` mod (Angle A + species-clustering + timed resettlement) is code-complete but **entirely logic-untested in-game**. Next session:
+1. `bash tools/deploy.sh`, enable the mod, start a test game (mixed-phenotype empires + a planet with a clear majority species + a few minority pops).
+2. Work through **all three** runtime-verification checklists in the mod README (Angle A diplomacy view; species-clustering minority penalties; timed-resettlement surcharge + "Recent Relocation"). Watch `error.log` for scope/variable errors — the **top suspect** is `add_resource { mult = <plain variable> }` (may only accept `trigger:`/literal); fallback noted in README.
+3. Fix anything `error.log` surfaces, then **merge `mod/migration-overhaul` → master** and delete the branch.
 
 **Deferred (designed, not built):** Angle B (intra-empire cohesion → ethnic secession) — reuses the species-clustering composition recompute; needs revolt-file verification. Truce-borders mod. See [`species-relations-design.md`](species-relations-design.md) + Borders roadmap.
 
