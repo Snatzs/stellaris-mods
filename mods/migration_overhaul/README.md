@@ -53,11 +53,15 @@ vanilla file overridden** (the cost system lives in vanilla `pop_categories`, so
 rather than editing it).
 
 - **Resource surcharge** (`common/scripted_effects/migr_resettlement_effects.txt`): an extra
-  energy/unity cost charged per resettlement, **scaled by pops moved AND by civics/traits/ethics** —
-  cheaper for gestalts (`×0.4`), `civic_corvee_system` / Adaptability finisher (`×0.6`), and
-  `trait_nomadic` species (`×0.5`); pricier for `trait_sedentary` (`×1.5`). This is what lets the cost
-  scale up/down by faction without touching vanilla cost files. Vanilla's own flat cost (already
-  scaled by the native `pop_resettlement_cost_mult`) still applies up-front; this is additive.
+  energy/unity cost charged per resettlement, **scaled by pops moved, by civics/traits/ethics, and by
+  empire size** — cheaper for gestalts (`×0.4`), `civic_corvee_system` / Adaptability finisher (`×0.5`),
+  and `trait_nomadic` species (`×0.5`); pricier for `trait_sedentary` (`×1.5`). On top of that, an
+  **empire-size multiplier** mirrors vanilla tech/tradition cost growth (`1 + (empire_size − 100) ×
+  0.002`) so the surcharge stays relevant late-game instead of going flat as income inflates. This is
+  what lets the cost scale up/down by faction *and* over time without touching vanilla cost files.
+  Vanilla's own flat cost (already scaled by the native `pop_resettlement_cost_mult`) still applies
+  up-front; this is additive. (Note: `civic_corvee_system` only gives vanilla `−0.1` cost + a unity
+  waiver — it does *not* zero resettlement cost — so we discount it but don't waive our surcharge.)
 - **Settling-in time penalty** (`migr_recent_relocation`): since the engine has no native travel
   time, resettled pops get a timed happiness + bonus-workforce debuff (~5 years) — they move instantly
   but are unhappy and underproductive while adjusting, so resettlement effectively "takes time."
@@ -85,7 +89,8 @@ Passes bracket validation but logic is **file-inspection-verified only** — con
 1. `add_resource = { … mult = migr_resettle_factor }` accepts a **plain country variable** for `mult`
    (vanilla examples use `mult = trigger:…` / `mult = -1`; the how-to-variables doc says variables work).
    If it errors, the surcharge won't scale — fall back to a literal-tiered surcharge.
-2. `root.local_pop_amount` reads correctly from inside `owner = {}` scope (cross-scope var reference).
+2. `root.local_pop_amount` reads correctly from inside `owner = {}` scope (cross-scope var reference),
+   and `export_trigger_value_to_variable = { trigger = empire_size … }` returns the live empire size.
 3. `from = { owner = { is_same_value = root.owner } }` correctly isolates intra-empire resettlement
    (surcharge/penalty should NOT fire on incoming refugees from another empire).
 4. `pop_bonus_workforce_mult` is valid inside a static modifier applied to a pop group (it's a

@@ -55,8 +55,13 @@ Document balance decisions here as mods are developed. Include the rationale so 
   levers (no vanilla override, no polling):
   - **Resource surcharge** on top of vanilla's flat cost. First-pass: **-20 energy + -5 unity per pop**,
     multiplied by a **disruption factor** that scales by faction: gestalt **×0.4**, `civic_corvee_system`
-    / Adaptability-finisher **×0.6**, `trait_nomadic` species **×0.5**, `trait_sedentary` **×1.5**,
-    baseline **×1.0**.
+    / Adaptability-finisher **×0.5**, `trait_nomadic` species **×0.5**, `trait_sedentary` **×1.5**,
+    baseline **×1.0** — then by an **empire-size multiplier** `1 + (empire_size − 100) × 0.002` (mirrors
+    vanilla `EMPIRE_SIZE_TECH/TRADITION_COST_PENALTY`) so it stays relevant late-game.
+    *Corvée note:* vanilla `civic_corvee_system` does **not** zero resettlement cost (only `−0.1` +
+    unity waiver), so we discount it, not waive it. *Tuning open question:* vanilla's `0.002` size curve
+    is gentle (~×2 at size 600); may need steepening so bulk resettlement still bites a sprawling
+    late-game economy — decide after playtest.
   - **Settling-in penalty** `migr_recent_relocation`: **-0.15 happiness + -0.15 bonus workforce for
     ~5 years** on the moved pops (simulates travel/adjustment; engine has no native travel time).
     Waived for gestalts + nomadic species.

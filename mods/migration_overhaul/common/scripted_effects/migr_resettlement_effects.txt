@@ -6,10 +6,11 @@
 # do BOTH levers event-side instead of overriding anything:
 #
 #   1. RESOURCE SURCHARGE — an extra energy/unity cost charged when pops are resettled, scaled by
-#      the number of pops moved AND by how mobility-oriented the empire/species is (gestalt,
-#      civic_corvee_system, Adaptability, trait_nomadic/sedentary). This is what makes the cost
-#      "scale up and down by civics/traits" without touching the vanilla cost files. Vanilla's own
-#      flat cost (already scaled by pop_resettlement_cost_mult) still applies up-front; this adds on top.
+#      the number of pops moved, by how mobility-oriented the empire/species is (gestalt,
+#      civic_corvee_system, Adaptability, trait_nomadic/sedentary), AND by empire size (mirroring
+#      vanilla tech/tradition cost growth, so it stays relevant late-game). This is what makes the
+#      cost "scale up and down by civics/traits" without touching the vanilla cost files. Vanilla's
+#      own flat cost (already scaled by pop_resettlement_cost_mult) still applies up-front; this adds on top.
 #
 #   2. SETTLING-IN TIME PENALTY — a timed "Recent Relocation" debuff (happiness + bonus workforce)
 #      on the moved pops, simulating travel/adjustment time. Pops move instantly (engine) but are
@@ -60,15 +61,30 @@ migr_apply_resettlement_cost_effect = {
 			owner = { multiply_variable = { which = migr_resettle_factor value = @migr_resettle_factor_sedentary } }
 		}
 
-		# Scale by pops moved, charge the surcharge (negative base resources), then clean up.
+		# Scale by pops moved, then by empire size, charge the surcharge, then clean up.
 		owner = {
 			multiply_variable = { which = migr_resettle_factor value = root.local_pop_amount }
+
+			# Empire-size multiplier, mirroring vanilla tech/tradition growth:
+			#   1 + max(0, empire_size - SIZE_BASE) * SIZE_PENALTY
+			# Keeps the surcharge meaningful late-game instead of going flat as income inflates.
+			export_trigger_value_to_variable = { trigger = empire_size variable = migr_resettle_size }
+			subtract_variable = { which = migr_resettle_size value = @migr_resettle_size_base }
+			if = {
+				limit = { check_variable = { which = migr_resettle_size value < 0 } }
+				set_variable = { which = migr_resettle_size value = 0 }	# no penalty at/below base size
+			}
+			multiply_variable = { which = migr_resettle_size value = @migr_resettle_size_penalty }
+			change_variable = { which = migr_resettle_size value = 1 }	# -> the (1 + ...) multiplier
+			multiply_variable = { which = migr_resettle_factor value = migr_resettle_size }
+
 			add_resource = {
 				energy = @migr_resettle_surcharge_energy
 				unity  = @migr_resettle_surcharge_unity
 				mult   = migr_resettle_factor
 			}
 			remove_variable = migr_resettle_factor
+			remove_variable = migr_resettle_size
 		}
 
 		# --- 2. Settling-in time penalty on the resettled pops. Waived for gestalt empires and
