@@ -6,25 +6,17 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## ▶ Current Focus / Session Handoff
 
-**Last session (2026-06-18):** Scaffolded **`mods/migration_overhaul`** (toolchain shaken out end-to-end — `new-mod.sh` + `validate.sh` both work, validation passes). Built **Angle A** of the species-relations system: graded-by-family phenotype distrust opinion modifiers, ethics-laddered, additive over vanilla, auto-applied (pure data, MP-safe). Resolved the carried-over sub-question: phenotype-trust **splits** into Angle A (inter-empire opinion, *shipped*) + Angle B (intra-empire cohesion → ethnic secession, *deferred*). Full design + tunable values: [`species-relations-design.md`](species-relations-design.md). Not yet committed; not yet in-game tested.
+**Last session (2026-06-18):** On branch `mod/migration-overhaul`. **Committed:** Angle A (graded phenotype distrust opinion modifiers — `926c83b`) + **species-clustering** (fraction-based minority happiness penalty via on_action recompute, no vanilla override — `b6e596c`). Toolchain works end-to-end. **Decisions:** habitability-migration **left to vanilla** (`HABITABILITY_AUTO_MIGRATION = 0.20` suffices — not touched); species-clustering replaces the "habitability restriction" scope. **Borders/truce investigation:** post-war truce passage **IS moddable** via `end_truce`/`set_truce` (not border access) — logged as a future Borders mod (two levers, see Borders section); NOT built. Documented the **4.0+ pop-group modding API** in [`population.md`](vanilla/population.md) (the primitives used by clustering + needed for timed resettlement).
 
-**Next session — two open threads, pick up either:**
+**Next: build TIMED FORCED RESETTLEMENT** — the last migration-mod piece. Everything else in Population & Migration is now done or descoped.
+- **Goal:** forced/manual resettlement should take time + cost, not be instant. (Auto-migration habitability is already handled by vanilla; species-clustering is built. This is the remaining gap.)
+- **⚠️ No native travel-time mechanic** — must event-simulate: intercept/penalize the move (move pop + apply a timed penalty / delay). See [patch-4.4-changes.md](vanilla/patch-4.4-changes.md) §4.
+- **Verified hooks/levers (this session):** `on_pop_group_resettled` on_action (**this = pop group, from = previous colony**, `local_pop_amount` var) is the interception point; `common/inline_scripts/pop_categories/resettlement_costs.txt` / `resettlement_costs_low.txt` set cost; `allow_resettlement` per pop category (`common/pop_categories/`); `RESETTLE_DESTROY_COLONY_COST` define. Timed static modifiers + `set_timed_pop_group_flag` (see population.md pop-group API) are the tools for the "settling-in penalty" timer.
+- **First step:** read [`population.md`](vanilla/population.md) (Migration & Resettlement + the new pop-group API section) before scripting.
 
-**(1) Finish the migration mod core — timed resettlement + movement restrictions.** This is the bigger Population & Migration piece, still unbuilt.
-- **Goal:** timed resettlement (not instant) + pop-movement restrictions by habitability & species clustering. See [design-vision.md](design-vision.md) → Population & Migration.
-- **⚠️ Headwind:** vanilla 4.4 *removed* the habitability resettle defines and the AI now resettles regardless of habitability — this mod must actively counter the base AI (see [patch-4.4-changes.md](vanilla/patch-4.4-changes.md) §4). No native travel-time mechanic — timed resettlement needs event simulation (move pop + timed penalty).
-- **Key vanilla 4.4.3 files (verified present):**
-  - `common/species_rights/migration_controls/00_species_controls_migration.txt` — migration access controls
-  - `common/pop_categories/00_social_classes.txt` (+ `01_gestalt_drones`, `02_other_categories`) — `allow_resettlement` per stratum
-  - `common/inline_scripts/pop_categories/resettlement_costs.txt` / `resettlement_costs_low.txt` — resettlement cost (lever for "timed/costly")
-  - `common/game_rules/00_rules.txt` — resettlement-related game rules
-  - `common/federation_laws/11_free_migration.txt` — federation free-migration law
-  - `common/defines/00_defines.txt` — old `AI_RESETTLE_*_HABITABILITY_THRESHOLD` defines are now **gone**
-- **First step:** read `docs/vanilla/population.md` (migration section) before scripting.
+**Pending (task #5):** in-game test of Angle A + species-clustering (see mod README runtime-verification checklist), then merge `mod/migration-overhaul` → master.
 
-**(2) Angle B — intra-empire cohesion → ethnic secession (separate follow-up mod).** Designed in [`species-relations-design.md`](species-relations-design.md). Reuses `migration_overhaul`'s `migr_phenotype_*` scripted triggers. Needs an `on_action` recompute pipeline (NEVER MTTH) + revolt tuning — **verify the 4.4 revolt/secession files first** (not re-verified yet). Decide mod-boundary/dependency at build time.
-
-**Also pending:** in-game test + commit of Angle A; first-pass opinion values are tunable after playtest.
+**Deferred (designed, not built):** Angle B (intra-empire cohesion → ethnic secession) — reuses the species-clustering composition recompute; needs revolt-file verification. Truce-borders mod. See [`species-relations-design.md`](species-relations-design.md) + Borders roadmap.
 
 **Also queued:** nomad-ban mod (small, mostly disabling 4 origins; resolve player-only-vs-AI scope first — see [multiplayer-balance.md](multiplayer-balance.md)).
 
@@ -90,6 +82,10 @@ Track what needs to be done, what's in progress, and what's done.
 
 - [ ] Re-explore feasibility of sensor, trade route, and enclave blocking through closed borders (initial assessment may be incomplete — check hyper-relay route detection, intel system, trade route manipulation, enclave action gating)
 - [ ] Border restrictions (commerce, contacts, sensors, migration, enclave access)
+- [ ] **Truce ≠ free passage.** The 10-year truce grants mutual border passage (confirmed real). **It IS moddable** — via the **truce status** (`end_truce` / `set_truce` effects), not border access directly (no script setter for access); proven by the Steam mod *End Truce & Close Borders* (id 2493028212). See [vanilla/diplomacy.md](vanilla/diplomacy.md). **Two complementary levers — shipping both = the "double-down":**
+  - **(A) End-Truce action/decision:** `end_truce` + scripted opinion/diplo-weight penalties lets a player force borders shut post-war. ⚠️ Truce is a coupled bundle (passage + 10-yr no-re-war), so `end_truce` also drops the war-cooldown → accept re-war exposure; that coupling is why it must carry diplomatic penalties.
+  - **(B) Passive trespass punishment:** *punish* lingering rather than block it — opinion penalty / "trespassing during truce" incident and/or fleet attrition for fleets in your space, WITHOUT touching the truce (keeps the war-cooldown intact). Mimics the Nomads `nomad_trespassing` pattern.
+  - **Event-driven design (build it THIS way — performance verified negligible, lighter than the species-clustering recompute):** hook `on_entering_system_fleet` (scope=fleet, from=system — the *recommended* per-fleet hook, NOT the per-ship `on_entering_system`). Tight short-circuiting trigger: system `exists = owner`, owner ≠ fleet owner, `owner = { has_truce = <fleet owner> }` → set a **timed fleet flag** (grace window). Clear it on `on_leaving_system_fleet`. A country pulse then iterates **only flagged fleets** (tiny set, usually 0) to apply the opinion incident + attrition once past grace. **Do NOT** poll every fleet on a timer, and **do NOT** use the per-ship `on_entering_system` — both are the expensive way. MP-deterministic (no random/MTTH).
 - [ ] Chokepoint and hyperlane strategic value
 - [ ] L-Gate/Wormhole logistics question (design TBD)
 

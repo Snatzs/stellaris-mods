@@ -123,6 +123,7 @@ Turn Stellaris into a **genuine geopolitical simulator in space** — a real 4X 
 ### Specific Mechanisms
 
 - Border restrictions: block trade, sensors, migration, enclave access through closed borders
+- A truce should **not** mean open borders — post-war, allow only a brief window to extract fleets from former-enemy space, then borders close (feasibility uncertain — border access may be engine-hardcoded; see ROADMAP)
 - Chokepoint and hyperlane strategic value (design TBD)
 
 ## Population & Migration

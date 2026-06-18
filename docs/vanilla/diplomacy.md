@@ -187,6 +187,17 @@ Border closure is controlled per-country-type in `common/country_types/` and per
 - **Trade route pathing** — routes calculate through territory regardless; you can increase piracy but can't block the route
 - **Enclave contact** — enclave interactions are hardcoded diplomatic actions, not affected by border status
 - **Intel/information** — no border-based intel blocking
+- **Border *access status* is not script-exposed** (deep-checked 4.4.3, ~90% confident it's unmoddable):
+  - No scriptable **effect** to open/close/set borders exists anywhere in `common/`/`events/` (no `open_borders`/`set_border_access`/`grant_border_access`). Without a border-setting effect, even the war-end hooks below can't change border state.
+  - `needs_border_access` (103 uses) is an **engine trigger** (not in `common/scripted_triggers/`) — it *checks* access (factoring war/treaties), can't be overridden to *set* it.
+  - Nomads `arkship_open_borders` is just a `set_country_flag` for Nomad event logic — **not** a real border-opening effect.
+  - Border state is set ONLY by: `action_open_borders`/`action_close_borders` diplo actions (their `possible`/`potential` blocks ARE moddable — gates *when* players toggle), the `enforces_borders` country-type binary, and hardcoded war status.
+  - **Hooks that DO exist:** `on_war_ended`, `on_status_quo`, `on_truce_end` on_actions — but useless for borders without a border-setting effect to call.
+  - Consequence: **post-war / truce border behavior is not directly moddable.** Could not even confirm a truce auto-opens borders; the "borders feel open after a war" effect is likely hardcoded stranded-fleet safe-passage (also not moddable). Only related define is `TRUCE_YEARS = 10`.
+  - **⚠️ CORRECTION (2026-06-18): the post-war passage IS moddable — via the truce, not border access.** Earlier conclusion ("~unmoddable") was wrong: those searches looked for a *border-access* lever, but the passage is granted by the **truce STATUS**, and truce is scriptable. **`set_truce = { target = X type = war }`** and **`end_truce = X`** are real effects (vanilla: `common/war_goals/00_war_goals.txt`, `common/council_agendas/`). Ending the truce removes the passage override → borders revert to normal/closed. Confirmed by the Steam mod *End Truce & Close Borders* (id 2493028212), which does exactly this.
+  - **Caveat — truce is a coupled bundle:** it grants passage AND blocks re-declaring war (`TRUCE_YEARS = 10`). `end_truce` removes **both** — you can't keep the war-cooldown while closing borders. Hence that mod treats early border-closing as a hostile act with diplomatic penalties (-150 opinion, etc.).
+  - **Two complementary levers (see ROADMAP "Truce ≠ free passage"):** (A) an **End-Truce action/decision** — `end_truce` + scripted opinion/diplo-weight penalties, lets a player force borders shut (accepting re-war exposure); (B) **passive trespass punishment** — event-driven `on_entering_system_fleet` → opinion/attrition for *lingering* fleets, which does NOT touch the truce/war-cooldown (mimics the Nomads `nomad_trespassing@<scope>` pattern).
+  - Still true: there is no *direct* border-access setter, and `needs_border_access`/`can_access_community_territory` are engine-side — but truce manipulation makes the post-war passage addressable regardless.
 
 ### Workarounds (Known)
 

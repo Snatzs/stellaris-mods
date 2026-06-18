@@ -168,6 +168,27 @@ Two **distinct** systems — don't conflate (see [patch-4.4-changes.md](patch-4.
 
 ---
 
+## Pop-group modding API (4.0+) — verified primitives
+
+> Hard-won and verified against 4.4.3 while building `migration_overhaul`'s species-clustering system.
+> These are the practical building blocks for any per-planet pop-composition logic (species-clustering,
+> Angle B cohesion, timed resettlement). See that mod's `scripted_effects/migr_clustering_effects.txt`
+> for a working example.
+
+**Iteration (planet & country scope)**
+- `every_owned_species` / `any_owned_species` / `count_owned_species` / `random_owned_species` — iterate the **distinct species** present (works in planet scope: the planet's species).
+- `every_owned_pop_group` / `any_owned_pop_group` / `count_owned_pop_group` — iterate **pop groups** (works in planet scope: the planet's pop groups).
+
+**Counting pops** — `count_owned_pop_amount = { limit = { <filter> } count >= N }` counts pop *units* by any filter (`is_enslaved`, `species = { … }`, `is_pop_category = …`, etc.). To get the *value* into a variable: `export_trigger_value_to_variable = { trigger = count_owned_pop_amount parameters = { limit = { … } } variable = X }` (vanilla template: `common/scripted_effects/00_scripted_effects.txt` → `count_drones_on_planet`).
+
+**Fraction math** — `set_variable` / `multiply_variable` / `subtract_variable` / `divide_variable` + `check_variable = { which = X value < 0 }`. (Avoid variable-vs-variable compares by reducing to a single var vs a constant.)
+
+**Flags** — pop-group: `set_pop_group_flag` / `set_timed_pop_group_flag` / `has_pop_group_flag` / `remove_pop_group_flag`. Species: `set_species_flag` / `set_timed_species_flag` / `has_species_flag` / `remove_species_flag`. ⚠️ **Species flags are GLOBAL to the species (not per-planet)** — to use one as a per-planet marker, set→use→remove it synchronously within one iteration.
+
+**Applying a modifier to a pop group** — there is **no `add_modifier` effect on a bare pop_group scope**. The working pattern is `add_modifier` *inside* `every_owned_pop_group` iteration (planet scope), with `days = N` for a timed, self-expiring modifier (vanilla example: `pop_drought` in `events/colony_events_1.txt:2413`). The modifier is a `static_modifier` with `pop_*` content. Declarative alternative: `triggered_pop_group_modifier` — but it can only be **hosted** inside `pop_categories` / `living_standards` / `traits` (so a new one requires overriding a vanilla file; the `add_modifier`-in-iteration route avoids that).
+
+**Relevant on_actions** (scopes verified in `common/on_actions/00_on_actions.txt`): `on_pop_group_added` (this = pop group), `on_pop_group_resettled` (this = pop group, from = previous colony, `local_pop_amount` var), `on_colony_conquer` (this = colony, from = new owner, fromfrom = former owner), `on_yearly_pulse_country` (this = country). **on_actions MERGE across files** — adding your own block appends to vanilla rather than overriding.
+
 ## Related Systems
 
 - [Economy](economy.md) — economic categories generate per-job and per-category production modifiers; district jobs feed into pop output
