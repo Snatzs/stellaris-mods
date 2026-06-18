@@ -6,20 +6,25 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## ▶ Current Focus / Session Handoff
 
-**Last session (2026-06-18):** Bumped the whole repo from 4.3 → **4.4.3 "Pegasus" + Nomads**; re-verified all 4 `docs/vanilla/` architecture docs against live game files; mined the 4.4 changelog into [`docs/vanilla/patch-4.4-changes.md`](vanilla/patch-4.4-changes.md); logged two group decisions (nomads **banned**; migration mod **approved**). All merged to `master`. `mods/` is still empty — toolchain (`new-mod.sh`/`validate.sh`/`deploy.sh`) is **untested end-to-end**.
+**Last session (2026-06-18):** Scaffolded **`mods/migration_overhaul`** (toolchain shaken out end-to-end — `new-mod.sh` + `validate.sh` both work, validation passes). Built **Angle A** of the species-relations system: graded-by-family phenotype distrust opinion modifiers, ethics-laddered, additive over vanilla, auto-applied (pure data, MP-safe). Resolved the carried-over sub-question: phenotype-trust **splits** into Angle A (inter-empire opinion, *shipped*) + Angle B (intra-empire cohesion → ethnic secession, *deferred*). Full design + tunable values: [`species-relations-design.md`](species-relations-design.md). Not yet committed; not yet in-game tested.
 
-**Next session — build the migration mod FIRST.** Starting context so you can dive in:
+**Next session — two open threads, pick up either:**
+
+**(1) Finish the migration mod core — timed resettlement + movement restrictions.** This is the bigger Population & Migration piece, still unbuilt.
 - **Goal:** timed resettlement (not instant) + pop-movement restrictions by habitability & species clustering. See [design-vision.md](design-vision.md) → Population & Migration.
-- **⚠️ Headwind:** vanilla 4.4 *removed* the habitability resettle defines and the AI now resettles regardless of habitability — this mod must actively counter the base AI (see [patch-4.4-changes.md](vanilla/patch-4.4-changes.md) §4). Account for this in the design, not just the player-facing rules.
+- **⚠️ Headwind:** vanilla 4.4 *removed* the habitability resettle defines and the AI now resettles regardless of habitability — this mod must actively counter the base AI (see [patch-4.4-changes.md](vanilla/patch-4.4-changes.md) §4). No native travel-time mechanic — timed resettlement needs event simulation (move pop + timed penalty).
 - **Key vanilla 4.4.3 files (verified present):**
   - `common/species_rights/migration_controls/00_species_controls_migration.txt` — migration access controls
   - `common/pop_categories/00_social_classes.txt` (+ `01_gestalt_drones`, `02_other_categories`) — `allow_resettlement` per stratum
   - `common/inline_scripts/pop_categories/resettlement_costs.txt` / `resettlement_costs_low.txt` — resettlement cost (lever for "timed/costly")
   - `common/game_rules/00_rules.txt` — resettlement-related game rules
   - `common/federation_laws/11_free_migration.txt` — federation free-migration law
-  - `common/defines/00_defines.txt` — note: the old `AI_RESETTLE_*_HABITABILITY_THRESHOLD` defines are now **gone**
-- **First step:** `bash tools/new-mod.sh migration_overhaul "Migration Overhaul"`, then read `docs/vanilla/population.md` (migration section) before scripting. This is also the toolchain's first real shakeout — validate `new-mod.sh` output and run `bash tools/validate.sh` early.
-- **Open sub-question (carry over):** migration restrictions are tightly coupled to the species-relations/phenotype-trust goal — decide whether those ship together or as a follow-up.
+  - `common/defines/00_defines.txt` — old `AI_RESETTLE_*_HABITABILITY_THRESHOLD` defines are now **gone**
+- **First step:** read `docs/vanilla/population.md` (migration section) before scripting.
+
+**(2) Angle B — intra-empire cohesion → ethnic secession (separate follow-up mod).** Designed in [`species-relations-design.md`](species-relations-design.md). Reuses `migration_overhaul`'s `migr_phenotype_*` scripted triggers. Needs an `on_action` recompute pipeline (NEVER MTTH) + revolt tuning — **verify the 4.4 revolt/secession files first** (not re-verified yet). Decide mod-boundary/dependency at build time.
+
+**Also pending:** in-game test + commit of Angle A; first-pass opinion values are tunable after playtest.
 
 **Also queued:** nomad-ban mod (small, mostly disabling 4 origins; resolve player-only-vs-AI scope first — see [multiplayer-balance.md](multiplayer-balance.md)).
 
@@ -97,10 +102,11 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## Mods — Population & Migration
 
-- [ ] Timed resettlement (not instant) — ✅ APPROVED (group, 2026-06-18) despite 4.4 conflict. Note: 4.4 removed habitability resettle defines & AI resettles regardless of habitability, so this mod must counter the base AI (see patch-4.4-changes.md §4)
-- [ ] Pop movement restrictions (habitability, species clustering) — ✅ APPROVED; same base-AI conflict to overcome
-- [ ] Species-type diplomacy modifiers (phenotype-based trust/distrust)
-- [ ] Xenophile/xenophobe ethics amplify/reduce species-type effects
+- [ ] Timed resettlement (not instant) — ✅ APPROVED (group, 2026-06-18). Scope clarified: targets **forced/manual** resettlement (still instant + unrestricted) via `pop_categories` `resettlement_costs` + event-simulated travel time. NOT a fight against the base AI (see corrected [patch-4.4-changes.md](vanilla/patch-4.4-changes.md) §4)
+- [ ] Pop movement restrictions (habitability, species clustering) — ✅ APPROVED. **Habitability half is mostly already done by vanilla** — `HABITABILITY_AUTO_MIGRATION = 0.20` define gates auto-migration; raise it (one-line lever). Species-clustering restriction is the genuinely new part
+- [~] Species-type diplomacy modifiers (phenotype-based trust/distrust) — **Angle A in progress** in `mods/migration_overhaul`: graded-by-family opinion modifiers, ethics-laddered, additive over vanilla's mild `triggered_opinion_xenophobes/xenophiles`, auto-applied (pure data, MP-safe). Design + values: [species-relations-design.md](species-relations-design.md)
+- [~] Xenophile/xenophobe ethics amplify/reduce species-type effects — folded into Angle A (the ethics ladder)
+- [ ] **Angle B (deferred follow-up mod):** intra-empire cohesion — cohabiting free xenos → instability → ethnic secession (stability-driven, coexists with vanilla revolts; slaves/purged excluded → slavery-pillar synergy). Designed in [species-relations-design.md](species-relations-design.md); needs an `on_action` recompute pipeline + revolt tuning (verify 4.4 revolt files first)
 
 ## Mods — Meta & Balance
 

@@ -1,0 +1,57 @@
+# Phenotype family groupings for the species-relations system.
+#
+# These classify an empire's FOUNDER species class into broad phenotype families,
+# so distrust can be GRADED by family distance instead of vanilla's binary
+# is_same_species_class. Used at COUNTRY scope (is_species_class checks the
+# country's main/founder species).
+#
+# Deliberately FROM-free so they are reusable by both:
+#   - Angle A (inter-empire opinion modifiers, migr_phenotype_opinion.txt)
+#   - Angle B (future intra-empire cohesion / ethnic secession) — see
+#     docs/species-relations-design.md
+#
+# Class keys verified against D:\Stellaris\common\species_classes\ (4.4.3).
+# Unclassified classes (PRE_*, enclave/event classes, CYBERNETIC) match none of
+# these on purpose -> no phenotype penalty (safe default).
+
+migr_phenotype_animalic = {
+	OR = {
+		is_species_class = MAM		# Mammalian
+		is_species_class = REP		# Reptilian
+		is_species_class = AVI		# Avian
+		is_species_class = ART		# Arthropoid
+		is_species_class = MOL		# Molluscoid
+		is_species_class = HUM		# Humanoid
+		is_species_class = NECROID
+		is_species_class = AQUATIC
+		is_species_class = TOX		# Toxoid
+	}
+}
+
+migr_phenotype_flora = {
+	OR = {
+		is_species_class = PLANT	# Plantoid
+		is_species_class = FUN		# Fungoid
+	}
+}
+
+migr_phenotype_mineral = {
+	is_species_class = LITHOID
+}
+
+migr_phenotype_synthetic = {
+	OR = {
+		is_species_class = MACHINE
+		is_species_class = ROBOT
+		is_species_class = AI
+	}
+}
+
+# Convenience: any carbon/silicon biological family (not synthetic).
+migr_phenotype_organic = {
+	OR = {
+		migr_phenotype_animalic = yes
+		migr_phenotype_flora = yes
+		migr_phenotype_mineral = yes
+	}
+}

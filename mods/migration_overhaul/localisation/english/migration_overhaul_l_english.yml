@@ -1,0 +1,8 @@
+﻿l_english:
+ # Add localisation keys below
+ # Format: KEY:0 "Displayed text"
+
+ # Angle A — phenotype distrust opinion modifiers (see migr_phenotype_opinion.txt)
+ migr_opinion_phenotype_near:0 "Unfamiliar Phenotype"
+ migr_opinion_phenotype_far:0 "Alien Phenotype"
+ migr_opinion_phenotype_alien:0 "Wholly Alien Biology"

@@ -154,9 +154,17 @@ Living standards are split across files: `00_living_standards.txt` (core: `livin
 - Migration pacts are diplomatic actions in `common/diplomatic_actions/`
 - Closed borders inherently block migration treaties
 
+### Habitability & migration defines (`common/defines/00_defines.txt`) — 4.4.3 verified
+Two **distinct** systems — don't conflate (see [patch-4.4-changes.md](patch-4.4-changes.md) §4 for the correction history):
+- **`HABITABILITY_AUTO_MIGRATION = 0.20`** (line 849) — minimum target habitability for **automatic** migration. Pops do **not** auto-migrate to planets below this. **Prime single-define lever** for "pops shouldn't migrate where habitability works against them" — raise it.
+- **`RESETTLE_UNEMPLOYED_BASE_RATE = 10`** (1935) — base pop amount that can auto-migrate per planet per month.
+- **`RESETTLE_ABROAD_MULTIPLIER = 0.8`** (1937) — score multiplier for auto-migration targets in *other* empires.
+- **AI *manual* resettlement** is gated by pop-count, NOT habitability: `AI_LEAVE_POPS_WHEN_RESETTLING = 500` (2173), `AI_SKIP_RESETTLING_MANY_POPS = 50000` (2176). The old `AI_RESETTLE_*_HABITABILITY_THRESHOLD` defines were removed in 4.4.
+
 ### Hardcoded
-- No native "travel time" mechanic for resettlement — would need event-based simulation (move pop, apply debuff/penalty timer)
-- Pop automatic migration logic (growth-based) is engine-level
+- No native "travel time" mechanic for **forced/manual** resettlement — would need event-based simulation (move pop, apply debuff/penalty timer). This (instant, unrestricted forced resettlement) is the real gap for the "timed resettlement" goal — automatic migration is already habitability-gated by the define above.
+- Pop automatic migration logic (growth-based) is engine-level, but tunable via the migration defines above.
+- **⚠️ Habitability *weighting* in the auto-migration destination score is NOT moddable** (verified: no define/modifier exposes it). Above the `HABITABILITY_AUTO_MIGRATION` floor, how habitability competes with jobs/housing/unemployment in target selection is hardcoded. The only migration levers are: the **binary** floor define, rate defines (`RESETTLE_UNEMPLOYED_BASE_RATE`, `RESETTLE_ABROAD_MULTIPLIER`), the `mod_country_emigration_push_mult` modifier (emigration *push*, not destination choice), and per-species `migration_controls/` (binary allow/block). **To discourage migration to *mediocre* (20–50%) worlds you must either raise the binary floor or build a custom event-driven restriction — there is no "gently weight habitability" knob.**
 
 ---
 

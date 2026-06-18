@@ -21,6 +21,22 @@ Document balance decisions here as mods are developed. Include the rationale so 
 - **Reason:** +20% was too strong compared to vanilla equivalents
 -->
 
+### Species relations — phenotype trust (Angle A, opinion modifier)
+- **Decision:** Add empire-to-empire **phenotype distrust** opinion modifiers, **graded by phenotype
+  family** (not vanilla's binary same-class) and **laddered by ethics** (fanatic xenophobe harshest →
+  fanatic xenophile zero). First-pass values: Tier 1 / Tier 2 / Tier 3 = roughly -20/-40/-50 (fanatic
+  xenophobe) down to 0/0/0 (fanatic xenophile) — full table in
+  [species-relations-design.md](species-relations-design.md).
+- **Reason:** Vanilla's existing `triggered_opinion_xenophobes/xenophiles` are too mild (±5…±20) and
+  binary; the vision wants species relations to genuinely shape diplomacy ("Diplomacy with teeth").
+- **Implementation note:** Additive on top of vanilla (no override of `00_opinion_modifiers.txt`);
+  auto-applied via the engine's `trigger`-block mechanism, so it is **pure data / MP-safe** (no
+  on_action, no desync surface). Values are starting points — **re-tune after playtest**, and watch
+  for double-counting with the vanilla pair.
+- **Scope note:** This is the inter-empire half. The intra-empire half (Angle B: cohabiting free xenos
+  → instability → ethnic secession, with slaves/purged excluded) is **designed but deferred** to a
+  follow-up mod — see [species-relations-design.md](species-relations-design.md).
+
 ### Nomadic empires (Nomads DLC) — banned from the campaign
 - **Decision:** Nomadic empires are **not allowed** in our 7-player MP match. Nomadic origins should be removed from empire selection (and AI use should be prevented — see open sub-question below).
 - **Reason:** Judged both **overpowered** and **game-concept-breaking** — the arkship/waystation/wayline model is a separate, asymmetric ruleset (no territory, space-only economy, partial-outcome war goals) that doesn't balance cleanly against settled empires.

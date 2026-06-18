@@ -141,6 +141,10 @@ Turn Stellaris into a **genuine geopolitical simulator in space** — a real 4X 
 - Species-type diplomacy modifiers (phenotype-based trust/distrust)
 - Xenophile/xenophobe ethics should amplify or reduce species-type effects
 
+> **Implementation design:** see [species-relations-design.md](species-relations-design.md) — splits
+> into Angle A (inter-empire opinion, graded by phenotype family, ethics-laddered — *shipping now*) and
+> Angle B (intra-empire cohesion → ethnic secession — *deferred follow-up*).
+
 ---
 
 ## Related Documents

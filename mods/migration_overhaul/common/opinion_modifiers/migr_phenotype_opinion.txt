@@ -1,0 +1,114 @@
+# Angle A — inter-empire phenotype distrust (species-relations system).
+# See docs/species-relations-design.md for the full design + value rationale.
+#
+# Auto-applied by the engine via the top-level `trigger` block (like vanilla's
+# triggered_opinion_xenophobes) -> pure data, no on_action, MP-safe. ROOT is the
+# OBSERVER (whose ethics set the magnitude); FROM is the empire being judged.
+#
+# GRADED BY PHENOTYPE FAMILY (migr_phenotype_* scripted triggers):
+#   Tier 1 "near"  = same family, different class      (e.g. MAM vs REP)
+#   Tier 2 "far"   = different organic family          (e.g. MAM vs FUN / LITHOID)
+#   Tier 3 "alien" = organic vs synthetic              (e.g. MAM vs MACHINE)
+# Tier 0 (same class) is left to vanilla kinship handling -> no entry here.
+#
+# Ethics ladder (observer): fanatic xenophobe harshest -> fanatic xenophile = 0
+# (no penalty block = net 0). "Neutral" = no xeno ethic (also catches gestalts).
+#
+# ADDITIVE on top of vanilla's mild triggered_opinion_xenophobes/xenophiles
+# (we do NOT override 00_opinion_modifiers.txt). Values are FIRST-PASS / TUNABLE.
+
+# ─── Tier 1: same phenotype family, different class ──────────────────────────
+migr_opinion_phenotype_near = {
+	trigger = {
+		exists = from
+		exists = from.species
+		is_country_type = default
+		FROM = { is_country_type = default }
+		NOT = { is_same_species_class = FROM }		# exclude Tier 0 (same class)
+		OR = {										# same family, different class
+			AND = { migr_phenotype_animalic = yes  FROM = { migr_phenotype_animalic = yes } }
+			AND = { migr_phenotype_flora = yes     FROM = { migr_phenotype_flora = yes } }
+			AND = { migr_phenotype_synthetic = yes FROM = { migr_phenotype_synthetic = yes } }
+			# mineral family has only LITHOID -> no same-family-different-class case
+		}
+	}
+	opinion = {
+		base = 0
+		modifier = { add = -20  has_ethic = ethic_fanatic_xenophobe }
+		modifier = { add = -10  has_ethic = ethic_xenophobe }
+		modifier = {
+			add = -5
+			NOR = {
+				has_ethic = ethic_fanatic_xenophobe
+				has_ethic = ethic_xenophobe
+				has_ethic = ethic_xenophile
+				has_ethic = ethic_fanatic_xenophile
+			}
+		}
+		modifier = { add = -2  has_ethic = ethic_xenophile }
+		# fanatic xenophile: no block -> 0
+	}
+}
+
+# ─── Tier 2: different organic family ────────────────────────────────────────
+migr_opinion_phenotype_far = {
+	trigger = {
+		exists = from
+		exists = from.species
+		is_country_type = default
+		FROM = { is_country_type = default }
+		migr_phenotype_organic = yes
+		FROM = { migr_phenotype_organic = yes }
+		NOT = {										# different organic family
+			OR = {
+				AND = { migr_phenotype_animalic = yes FROM = { migr_phenotype_animalic = yes } }
+				AND = { migr_phenotype_flora = yes    FROM = { migr_phenotype_flora = yes } }
+				AND = { migr_phenotype_mineral = yes  FROM = { migr_phenotype_mineral = yes } }
+			}
+		}
+	}
+	opinion = {
+		base = 0
+		modifier = { add = -40  has_ethic = ethic_fanatic_xenophobe }
+		modifier = { add = -25  has_ethic = ethic_xenophobe }
+		modifier = {
+			add = -10
+			NOR = {
+				has_ethic = ethic_fanatic_xenophobe
+				has_ethic = ethic_xenophobe
+				has_ethic = ethic_xenophile
+				has_ethic = ethic_fanatic_xenophile
+			}
+		}
+		modifier = { add = -5  has_ethic = ethic_xenophile }
+	}
+}
+
+# ─── Tier 3: organic vs synthetic (most alien) ───────────────────────────────
+migr_opinion_phenotype_alien = {
+	trigger = {
+		exists = from
+		exists = from.species
+		is_country_type = default
+		FROM = { is_country_type = default }
+		OR = {
+			AND = { migr_phenotype_synthetic = yes FROM = { migr_phenotype_organic = yes } }
+			AND = { migr_phenotype_organic = yes   FROM = { migr_phenotype_synthetic = yes } }
+		}
+	}
+	opinion = {
+		base = 0
+		modifier = { add = -50  has_ethic = ethic_fanatic_xenophobe }
+		modifier = { add = -35  has_ethic = ethic_xenophobe }
+		modifier = {
+			add = -15
+			NOR = {
+				has_ethic = ethic_fanatic_xenophobe
+				has_ethic = ethic_xenophobe
+				has_ethic = ethic_xenophile
+				has_ethic = ethic_fanatic_xenophile
+			}
+		}
+		modifier = { add = -8  has_ethic = ethic_xenophile }
+	}
+}

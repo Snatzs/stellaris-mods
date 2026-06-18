@@ -67,10 +67,12 @@ These are new scripting primitives the patch added. They directly enable roadmap
 
 ## 4. ⚠️ Where vanilla 4.4 moved AGAINST our vision (needs a group decision)
 
-**Migration / resettlement reversed direction.** Our vision (design-vision.md → Population & Migration) wants resettlement to be **harder, timed, and habitability-gated**. Vanilla 4.4 went the **opposite way**:
-- The habitability-based resettlement defines (`AI_RESETTLE_FROM_LOW_HABITABILITY_THRESHOLD`, `AI_RESETTLE_TO_HIGH_HABITABILITY_THRESHOLD`) were **removed — VERIFIED absent** from `common/defines/`.
-- AI now resettles pops from overpopulated → underpopulated planets **regardless of habitability**.
-- **Decision needed:** our migration-restriction mod now has to *re-impose* friction the base game just removed, and fight the AI's new resettlement behavior. This raises the cost/risk of that roadmap item. Flag for group discussion before committing effort.
+**Migration / resettlement — partly reversed, but NOT as badly as first recorded.** ⚠️ *Corrected 2026-06-18 after re-verifying live defines — the earlier version of this note overstated the change.* There are **two distinct systems**; only one changed:
+
+1. **Automatic migration (passive, growth/unemployment-driven pop flow) — STILL habitability-gated.** `HABITABILITY_AUTO_MIGRATION = 0.20` (`common/defines/00_defines.txt` line 849) — *"The minimum habitability that will be considered for automatic migration."* A planet below 20% habitability is **never an auto-migration target**. Pops do **not** autonomously move to 0%-habitability worlds. This define is a clean, single moddable lever for our "pops shouldn't migrate where habitability works against them" goal — raise it (e.g. 0.20 → 0.50) instead of event-fighting the AI.
+2. **AI *manual* resettlement (AI actively shuffling its own pops) — habitability threshold removed.** The old `AI_RESETTLE_*_HABITABILITY_THRESHOLD` defines **are** absent (verified). Replaced by **pop-count overcrowding** guards, not habitability: `AI_LEAVE_POPS_WHEN_RESETTLING = 500` (line 2173), `AI_SKIP_RESETTLING_MANY_POPS = 50000` (line 2176). Plus auto-migration scoring defines `RESETTLE_UNEMPLOYED_BASE_RATE` (1935), `RESETTLE_ABROAD_MULTIPLIER` (1937).
+
+- **Net:** the vision's habitability-gated migration is **largely already true** for system #1. The real remaining gap is **forced/manual resettlement being instant + unrestricted** (the "timed resettlement" goal) — a separate lever (`pop_categories` `resettlement_costs` inline script + event-simulated travel time), not a fight against the base AI. Lower cost/risk than previously flagged.
 
 **`UNDERDEVELOPED_PLANET_LIMIT` softened** to a weight (applies only after ~15 years) and **abandon-colony cost cut 200→50 influence** — both lower the friction on wide sprawl. Net-helpful for "wide > tall," but also weakens any natural cap on overextension we were relying on.
 
