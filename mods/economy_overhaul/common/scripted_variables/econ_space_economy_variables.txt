@@ -30,3 +30,16 @@
 @econ_planet_miners_nerf = 0			# fine-tune lever (unused); e.g. -0.2 = -20% planetary minerals
 @econ_planet_technician_nerf = 0		# fine-tune lever (unused); e.g. -0.2 = -20% planetary energy
 @econ_planet_farmers_nerf = 0			# fine-tune lever (unused); e.g. -0.2 = -20% planetary food
+
+# --- Slice 2: bulk scaling PARITY (repeatable-tech per-level rate) ---
+# ONE rate shared by all five repeatables (3 vanilla tile overrides + 2 new station
+# techs) so planet-job scaling and station scaling "climb together but gently"
+# (design doc Track 1, levers 2-3). Vanilla tile repeatables are 0.05/level and
+# INFINITE (levels = -1) with NO station counterpart — that asymmetry is why space
+# falls behind. We (a) NERF the tile rate 0.05 -> 0.03 (bloat control, Cetus-safe)
+# and (b) ADD station gatherers/researchers repeatables at the SAME 0.03 so the
+# space>planet RATIO set by slice 1 (structural cuts + station buffs) is preserved
+# as the game advances rather than eroding. Lower this further if late-game numbers
+# still bloat; raise if scaling feels too flat. See tech_repeatable_* in
+# common/technology/zzz_econ_repeatable_techs.txt.
+@econ_repeatable_per_level = 0.03		# +3% per repeatable level (vanilla tile was +5%)

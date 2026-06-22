@@ -46,6 +46,23 @@ additive `on_game_start_country` (zero vanilla overrides — on_actions merge):
 All numbers are tunable in `common/scripted_variables/` (the two overrides in `zzz_…`, the station
 buffs in `econ_space_economy_variables.txt`).
 
+### Slice 2 — Bulk scaling parity (repeatable techs)
+Slice 1 sets the space>planet *ratio*; slice 2 makes that ratio **hold over the whole game**
+instead of eroding. Vanilla ships infinite tile-output repeatables (planet jobs +5%/level,
+`levels = -1`) but **no station repeatable** — so left alone, planets out-scale stations late.
+Fix, all at one shared gentle rate (`@econ_repeatable_per_level`, default **+3%/level**):
+
+| Change | Tech(s) | Effect |
+|---|---|---|
+| **Nerf** vanilla tile repeatables (override) | `tech_repeatable_improved_tile_{mineral,energy,food}_output` | per-level 0.05 → **0.03** (bloat control, Cetus-safe) |
+| **Add** station-gatherers repeatable | `tech_repeatable_econ_station_gatherers_output` (after `tech_space_mining_5`) | `station_gatherers_produces_mult` **+0.03/level** |
+| **Add** research-station repeatable | `tech_repeatable_econ_station_researchers_output` (after `tech_space_science_5`) | `station_researchers_produces_mult` **+0.03/level** |
+
+One rate for all five = planet and space scaling "climb together but gently," so the ratio set by
+slice 1 is preserved as tech advances. The three tile overrides are faithful copies of vanilla
+4.4.3 with only the per-level value changed (logged in `compatibility.md`); the two new techs are
+additive. File: `common/technology/zzz_econ_repeatable_techs.txt`.
+
 ## MP-fairness
 All effects are **symmetric** across every empire (player + AI) and use no randomness — no single
 player gains an advantage, no desync risk. The structural variables are galaxy-gen / district
@@ -53,14 +70,15 @@ constants (identical for everyone); the station modifier is applied to every emp
 
 ## Files
 - `common/scripted_variables/zzz_economy_overhaul_overrides.txt` — the two vanilla-variable overrides
-- `common/scripted_variables/econ_space_economy_variables.txt` — station-buff values + (unused) fine-tune nerf vars
+- `common/scripted_variables/econ_space_economy_variables.txt` — station-buff values, repeatable per-level rate, + (unused) fine-tune nerf vars
 - `common/static_modifiers/econ_space_economy_modifiers.txt` — `econ_space_primacy` (station buffs)
 - `common/on_actions/econ_on_actions.txt` — appends to `on_game_start_country`
+- `common/technology/zzz_econ_repeatable_techs.txt` — slice-2 tile-repeatable overrides + new station repeatables
 - `localisation/english/economy_overhaul_l_english.yml`
 
 ## What's NOT built yet (later slices — see design doc build order)
-- **Slice 2 — bulk scaling parity:** nerf tile-output repeatables + add station/research-station
-  repeatables + amplify finite station techs (so space ramps and plateaus, no infinity).
+- **Slice 2 follow-up (optional):** amplify the finite vanilla station techs further (lever #6) —
+  deferred; the slice-1 +50% station baseline is assumed sufficient until playtest says otherwise.
 - **Slice 3 — multiplier taming:** disable Astro-Mining Drones + Privatized Exploration civics;
   nerf+limit Arc Furnace / Dyson Swarm; halve `PLANET_ASCENSION_MODIFIER_SCALE`.
 - **Slice 4 — strategic resources:** refining nerf + strategic repeatable + deposit concentration.
@@ -82,6 +100,15 @@ test session. Watch `error.log` throughout.
    collapse. If so, soften `@base_rural_district_jobs` toward 170–180. (This is the #1 calibration
    target.)
 4. **No `error.log` spam** referencing the two variables or the override file.
+
+### Bulk scaling parity (slice 2)
+4a. **Tile-repeatable overrides win.** Research one level of a vanilla tile repeatable (e.g.
+   "Improved Mineral Tile Output") and confirm the bonus is **+3%**, not +5%. If +5%, the `zzz_`
+   tech file lost load order (or vanilla logged a duplicate but kept its own) — check error.log.
+4b. **New station repeatables appear.** After completing the finite chains (`tech_space_mining_5` /
+   `tech_space_science_5`), confirm "Orbital Extraction Optimisation" and "Deep-Space Survey
+   Networks" show up as repeatable research options, each granting **+3%** station output/level.
+4c. **No broken-prerequisite / duplicate-key errors** in error.log referencing the five techs.
 
 ### Station-buff modifier
 5. **Modifier applies to all empires.** Open the player country's modifier list → confirm

@@ -1,0 +1,199 @@
+# Economy Overhaul — slice 2: bulk scaling parity (repeatable techs)
+# =================================================================
+# Design doc Track 1, levers 2-3: vanilla has infinite tile-output repeatables
+# (planets scale forever at +5%/level) but NO station repeatable -> stations fall
+# behind over the game. This file:
+#   (A) OVERRIDES the 3 vanilla tile repeatables to a gentler +@econ_repeatable_per_level
+#       /level (bloat control, Cetus-safe), and
+#   (B) ADDS matching station-gatherers / station-researchers repeatables at the
+#       SAME rate, so planet-job scaling and station scaling climb together and the
+#       space>planet ratio set by slice 1 (structural cuts + station buffs) holds
+#       as the game advances.
+#
+# OVERRIDE MECHANISM: (A) redefines vanilla tech KEYS. Technologies are keyed DB
+# objects -> a same-key definition in a later-loaded file REPLACES the vanilla one.
+# The "zzz_" filename sorts after vanilla's 00_*_tech_repeatable.txt so our versions
+# win. These three keys are logged in docs/compatibility.md. Every field below is a
+# faithful copy of vanilla 4.4.3 EXCEPT the modifier value (0.05 -> variable); if a
+# future patch changes the other fields, re-sync this override.
+#
+# ⚠️ RUNTIME-VERIFY (file-inspection only): confirm in error.log that the three
+# overrides replace (a benign "duplicate" log line may appear) and that the two new
+# repeatables appear as research options after the finite chains complete. See README.
+
+# =========================================================================
+# (A) Vanilla tile-output repeatables — OVERRIDDEN to the gentler shared rate
+# =========================================================================
+
+# vanilla: common/technology/00_eng_tech_repeatable.txt (modifier was 0.05)
+tech_repeatable_improved_tile_mineral_output = {
+	area = engineering
+	cost = @repeatableTechBaseCost
+	cost_per_level = @repeatableTechLevelCost
+	tier = @repeatableTechTier
+	category = { industry }
+	levels = -1
+	prerequisites = { "tech_mineral_purification_2" }
+	weight = @repeatableTechWeight
+
+	weight_modifier = {
+		factor = @repatableTechFactor
+	}
+
+	ai_weight = {
+		factor = @ai_mining_factor
+	}
+
+	weight_groups = {
+		repeatable
+	}
+	mod_weight_if_group_picked = {
+		repeatable = 0.01
+	}
+
+	modifier = {
+		planet_jobs_minerals_produces_mult = @econ_repeatable_per_level
+	}
+}
+
+# vanilla: common/technology/00_phys_tech_repeatable.txt (modifier was 0.05)
+tech_repeatable_improved_tile_energy_output = {
+	area = physics
+	cost = @repeatableTechBaseCost
+	cost_per_level = @repeatableTechLevelCost
+	tier = @repeatableTechTier
+	category = { field_manipulation }
+	levels = -1
+	prerequisites = { "tech_power_plant_3" }
+	weight = @repeatableTechWeight
+
+	weight_modifier = {
+		factor = @repatableTechFactor
+	}
+
+	ai_weight = {
+		factor = @technician_ai_factor
+	}
+
+	weight_groups = {
+		repeatable
+	}
+	mod_weight_if_group_picked = {
+		repeatable = 0.01
+	}
+
+	modifier = {
+		planet_jobs_energy_produces_mult = @econ_repeatable_per_level
+	}
+}
+
+# vanilla: common/technology/00_soc_tech_repeatable.txt (modifier was 0.05)
+tech_repeatable_improved_tile_food_output = {
+	area = society
+	cost = @repeatableTechBaseCost
+	cost_per_level = @repeatableTechLevelCost
+	tier = @repeatableTechTier
+	category = { biology }
+	levels = -1
+
+	potential = {
+		is_wilderness_empire = no
+	}
+	prerequisites = { "tech_gene_crops" }
+
+	weight = @repeatableTechWeight
+
+	weight_modifier = {
+		factor = @repatableTechFactor
+	}
+
+	ai_weight = {
+		factor = 1.0
+	}
+
+	weight_groups = {
+		repeatable
+	}
+	mod_weight_if_group_picked = {
+		repeatable = 0.01
+	}
+
+	modifier = {
+		planet_jobs_food_produces_mult = @econ_repeatable_per_level
+	}
+}
+
+# =========================================================================
+# (B) NEW station repeatables — give space the scaling parity it lacked
+# =========================================================================
+# Mirror the tile repeatables exactly (same cost/tier/weight vars, same rate),
+# gated behind the full finite station chains (tech_space_mining_5 /
+# tech_space_science_5) just as the tile repeatables gate behind their finite techs.
+
+tech_repeatable_econ_station_gatherers_output = {
+	area = engineering
+	cost = @repeatableTechBaseCost
+	cost_per_level = @repeatableTechLevelCost
+	tier = @repeatableTechTier
+	category = { industry }
+	levels = -1
+
+	potential = {
+		is_wilderness_empire = no
+	}
+	prerequisites = { "tech_space_mining_5" }
+	weight = @repeatableTechWeight
+
+	weight_modifier = {
+		factor = @repatableTechFactor
+	}
+
+	ai_weight = {
+		factor = @ai_mining_factor
+	}
+
+	weight_groups = {
+		repeatable
+	}
+	mod_weight_if_group_picked = {
+		repeatable = 0.01
+	}
+
+	modifier = {
+		station_gatherers_produces_mult = @econ_repeatable_per_level
+	}
+}
+
+tech_repeatable_econ_station_researchers_output = {
+	area = physics
+	cost = @repeatableTechBaseCost
+	cost_per_level = @repeatableTechLevelCost
+	tier = @repeatableTechTier
+	category = { computing }
+	levels = -1
+
+	potential = {
+		is_wilderness_empire = no
+	}
+	prerequisites = { "tech_space_science_5" }
+	weight = @repeatableTechWeight
+
+	weight_modifier = {
+		factor = @repatableTechFactor
+	}
+
+	ai_weight = {
+		factor = 1.0
+	}
+
+	weight_groups = {
+		repeatable
+	}
+	mod_weight_if_group_picked = {
+		repeatable = 0.01
+	}
+
+	modifier = {
+		station_researchers_produces_mult = @econ_repeatable_per_level
+	}
+}

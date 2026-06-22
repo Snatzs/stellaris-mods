@@ -2,3 +2,8 @@
  # --- Space > Planets rebalance ---
  econ_space_primacy:0 "Galactic Resource Distribution"
  econ_space_primacy_desc:0 "The astropolitical order of this era favours those who command the void. Orbital extraction and research stations vastly outproduce the cramped, resource-poor worlds of settled space."
+ # --- Slice 2: new station-scaling repeatable techs ---
+ tech_repeatable_econ_station_gatherers_output:0 "Orbital Extraction Optimisation"
+ tech_repeatable_econ_station_gatherers_output_desc:0 "Continual refinement of mining-, gathering-, and harvesting-station systems steadily increases the yield drawn from orbital deposits across the empire."
+ tech_repeatable_econ_station_researchers_output:0 "Deep-Space Survey Networks"
+ tech_repeatable_econ_station_researchers_output_desc:0 "Ever more sophisticated observation arrays and survey protocols steadily increase the output of research stations throughout the empire."
