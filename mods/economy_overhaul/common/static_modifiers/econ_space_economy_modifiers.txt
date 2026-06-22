@@ -25,4 +25,11 @@ econ_space_primacy = {
 	# shows planets still over-produce after the structural cuts.)
 	station_gatherers_produces_mult = @econ_station_gatherers_buff
 	station_researchers_produces_mult = @econ_station_researchers_buff
+
+	# Slice 3 (lever #12b): trim the scaling-kilostructure build caps. *_limit_add is
+	# a country modifier (category = country); the cap = base 0 + sum of these, so a
+	# negative value lowers it for every empire symmetrically. Per-tier kilostructure
+	# OUTPUT is cut separately via scripted-variable overrides (zzz_…_overrides.txt).
+	arc_furnace_limit_add = @econ_kilostructure_limit_reduction
+	dyson_swarm_limit_add = @econ_kilostructure_limit_reduction
 }

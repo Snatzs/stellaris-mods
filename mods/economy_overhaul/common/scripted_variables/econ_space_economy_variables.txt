@@ -43,3 +43,12 @@
 # still bloat; raise if scaling feels too flat. See tech_repeatable_* in
 # common/technology/zzz_econ_repeatable_techs.txt.
 @econ_repeatable_per_level = 0.03		# +3% per repeatable level (vanilla tile was +5%)
+
+# --- Slice 3: kilostructure build-limit reduction (multiplier taming, lever #12b) ---
+# The Arc Furnace / Dyson Swarm build caps are `base 0 + sum of modifier:*_limit_add`
+# (verified: common/script_values/04_script_values_machine_age.txt). So we lower the cap
+# cleanly with a NEGATIVE country modifier (additive, no vanilla override) applied to
+# every empire — fewer of these stacking compounders. Vanilla grants total ~5-6 per
+# structure (megastructure tech + machine-age tech + an origin); -1 trims one slot.
+# Empires without the unlocking tech have cap 0 and still can't build (harmless).
+@econ_kilostructure_limit_reduction = -1	# -1 to each of arc-furnace / dyson-swarm caps

@@ -1,0 +1,14 @@
+# Economy Overhaul — slice 3: multiplier taming (defines override)
+# ================================================================
+# Defines are overridden by MERGE: a mod defines file that restates a namespace
+# block with one key changes only that key (everything else stays vanilla). No
+# need to replicate the whole NGameplay block. Logged in docs/compatibility.md.
+
+NGameplay = {
+	# Planetary ascension is a late/super-late planet scaler (4.4 buffed it vs 4.3).
+	# Designation-bonus amplifier per ascension tier (design lever #13). Halving it
+	# keeps ascension worthwhile without letting tall mega-planets run away on top of
+	# everything else. Vanilla 0.10 -> 0.05 (common/defines/00_defines.txt:1238).
+	# Leaving PLANET_ASCENSION_HARD_CAP = 10 alone unless playtest shows runaway.
+	PLANET_ASCENSION_MODIFIER_SCALE = 0.05
+}

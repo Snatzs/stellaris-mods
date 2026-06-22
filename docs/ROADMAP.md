@@ -56,10 +56,12 @@ Track what needs to be done, what's in progress, and what's done.
 space>planet flip, research planet-primary, strategic-resource concentration + demand-matched
 scaling. Read it before building any economy slice.)*
 
-> **NOTE:** the **bulk-structural slice** (planet size cap + unpaired jobs-per-district cut) is now
-> **BUILT** and is the primary planet-down lever. The original flat per-pop planet nerf is
-> **neutralized** (set to 0, removed from the `econ_space_primacy` modifier) to avoid double-nerfing;
-> the station-buff half of that modifier survives. All economy work is **logic-untested in-game.**
+> **NOTE:** slices **1 (bulk structural)**, **2 (scaling parity)**, and **3 (multiplier taming)**
+> are **BUILT** on `mod/economy-overhaul`. Slice 1 = planet size cap + unpaired jobs cut (primary
+> planet-down lever; flat per-pop nerf neutralized to avoid double-nerf). Slice 2 = repeatable-tech
+> parity. Slice 3 = disable Astro-Mining Drones + cut Privatized Exploration; cut Arc Furnace /
+> Dyson Swarm per-tier output + build caps; halve `PLANET_ASCENSION_MODIFIER_SCALE`. Only **slice 4
+> (strategic resources)** remains. All economy work is **logic-untested in-game.**
 
 - [~] Space resources as primary source (outproduce planets) — **BUILT** in `economy_overhaul`, logic-untested. (a) Structural planet-down (below) makes space *relatively* dominant; (b) `econ_space_primacy` country modifier on all empires via `on_game_start_country`: `station_gatherers` / `station_researchers` `_produces_mult` +50%. See mod README checklist.
 - [~] Space resource scaling (yield increases with game progression) — **BUILT** (slice 2), logic-untested. `zzz_econ_repeatable_techs.txt`: nerf the 3 vanilla tile repeatables +5%→+3%/level (override) + add station-gatherers/research-station repeatables at the same +3%/level (`@econ_repeatable_per_level`). One rate → planet & space scaling climb together, preserving slice-1's ratio. Finite-tech amplification (lever #6) deferred (slice-1 +50% baseline assumed sufficient).
@@ -114,7 +116,7 @@ scaling. Read it before building any economy slice.)*
 
 - [ ] Disable nomadic empires for MP — ✅ DECIDED (group, 2026-06-18): nomads banned as OP + concept-breaking. Remove the 4 nomadic origins from selection; resolve player-only vs. AI-too sub-question before building (see multiplayer-balance.md). We still mine their mechanics (patch-4.4-changes.md §6).
 - [!] Evaluate/disable other exploitable origins (Knights of The Toxic Gods, etc.) — 4.4 also added Defender of the Galaxy Ambition + reworked Commander traits to audit (see patch-4.4-changes.md §6)
-- [ ] Kill "build" meta synergies (approach TBD)
+- [~] Kill "build" meta synergies (approach TBD) — **partial:** economy_overhaul slice 3 neuters two space-economy auto-picks (Astro-Mining Drones civic **disabled**; Privatized Exploration **cut** to +10%) + tames Arc Furnace / Dyson Swarm / planetary ascension. More synergies TBD.
 
 ## Open Design Questions
 

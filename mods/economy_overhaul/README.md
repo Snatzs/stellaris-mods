@@ -63,6 +63,27 @@ slice 1 is preserved as tech advances. The three tile overrides are faithful cop
 4.4.3 with only the per-level value changed (logged in `compatibility.md`); the two new techs are
 additive. File: `common/technology/zzz_econ_repeatable_techs.txt`.
 
+### Slice 3 — Multiplier taming
+Anything that multiplies station output in the same category compounds with slices 1–2. Left
+unchecked, two civics become near-auto-picks and two scaling kilostructures (plus planetary
+ascension) re-inflate the late game. Tamed (design levers #10–#13):
+
+| Lever | Change | Mechanism |
+|---|---|---|
+| **Astro-Mining Drones** civic | **Disabled** from selection (`playable`/`ai_playable` → `always = no`) — cutting its +50% station buff would leave only a planet self-nerf (trap pick). | civic override |
+| **Privatized Exploration** civic | Station bonuses **+0.25 → +0.10** (kept as a balanced pick). | civic override |
+| **Orbital Arc Furnace** (4 tiers) | Per-tier `station_gatherers` output cut ~40% (0.25/0.50/0.75/1.00 → 0.15/0.30/0.45/0.60); build cap −1. | scripted-var override + country modifier |
+| **Dyson Swarm** (3 tiers) | Per-tier `station_gatherers`+`station_researchers` output cut ~40% (5/15/30 → 3/9/18); build cap −1. | scripted-var override + country modifier |
+| **Planetary Ascension** | `PLANET_ASCENSION_MODIFIER_SCALE` **0.10 → 0.05** (halve the per-tier designation amplifier; hard cap left at 10). | defines merge |
+
+Fixed-output megastructures (Dyson **Sphere**, Matter Decompressor) are deliberately left alone —
+their output is a separate silo untouched by our station buffs. The kilostructure build caps are
+lowered via a negative `*_limit_add` country modifier on `econ_space_primacy` (additive, no override),
+since the vanilla cap is `base 0 + sum of modifier:*_limit_add`. Tuning knobs:
+`@arc_furnace_*_mod_value` / `@dyson_swarm_*_mod_value` (in `zzz_…_overrides.txt`) and
+`@econ_kilostructure_limit_reduction`. Files: `common/governments/civics/zzz_econ_civic_overrides.txt`,
+`common/defines/zzz_econ_defines.txt`.
+
 ## MP-fairness
 All effects are **symmetric** across every empire (player + AI) and use no randomness — no single
 player gains an advantage, no desync risk. The structural variables are galaxy-gen / district
@@ -74,13 +95,13 @@ constants (identical for everyone); the station modifier is applied to every emp
 - `common/static_modifiers/econ_space_economy_modifiers.txt` — `econ_space_primacy` (station buffs)
 - `common/on_actions/econ_on_actions.txt` — appends to `on_game_start_country`
 - `common/technology/zzz_econ_repeatable_techs.txt` — slice-2 tile-repeatable overrides + new station repeatables
+- `common/governments/civics/zzz_econ_civic_overrides.txt` — slice-3 civic overrides (Astro-Mining, Privatized Exploration)
+- `common/defines/zzz_econ_defines.txt` — slice-3 ascension-scale override
 - `localisation/english/economy_overhaul_l_english.yml`
 
 ## What's NOT built yet (later slices — see design doc build order)
 - **Slice 2 follow-up (optional):** amplify the finite vanilla station techs further (lever #6) —
   deferred; the slice-1 +50% station baseline is assumed sufficient until playtest says otherwise.
-- **Slice 3 — multiplier taming:** disable Astro-Mining Drones + Privatized Exploration civics;
-  nerf+limit Arc Furnace / Dyson Swarm; halve `PLANET_ASCENSION_MODIFIER_SCALE`.
 - **Slice 4 — strategic resources:** refining nerf + strategic repeatable + deposit concentration.
 
 ## ⚠️ Runtime-verification checklist (logic-untested in-game)
@@ -109,6 +130,19 @@ test session. Watch `error.log` throughout.
    `tech_space_science_5`), confirm "Orbital Extraction Optimisation" and "Deep-Space Survey
    Networks" show up as repeatable research options, each granting **+3%** station output/level.
 4c. **No broken-prerequisite / duplicate-key errors** in error.log referencing the five techs.
+
+### Multiplier taming (slice 3)
+4d. **Astro-Mining Drones gone.** In empire creation as a Machine Intelligence MegaCorp, confirm
+   "Astro-Mining Drones" is **not** an available civic. (Also confirm AI machine empires don't roll it.)
+4e. **Privatized Exploration cut.** As a corporate empire with that civic, its tooltip shows
+   **+10%** station gatherers/researchers, not +25%.
+4f. **Kilostructure output cut.** Build/observe an Orbital Arc Furnace and a Dyson Swarm; per-tier
+   station output bonus matches the cut values (arc tier 1 = +15%, dyson tier 1 = +3% etc.).
+4g. **Kilostructure caps −1.** With the relevant techs, the Arc Furnace / Dyson Swarm build limit
+   is one lower than vanilla (check the "requires less than X" build tooltip).
+4h. **Ascension scale halved.** A planet's ascension designation bonus grows by **+5%/tier**, not +10%.
+4i. **No `error.log` errors** referencing the two civics, the kilostructure variables, the defines
+   file, or `econ_space_primacy` (now also carries the two `*_limit_add` lines).
 
 ### Station-buff modifier
 5. **Modifier applies to all empires.** Open the player country's modifier list → confirm

@@ -37,3 +37,19 @@
 # ~140 only after playtest (too aggressive -> unemployment death spiral). #1 calibration target.
 # NOTE: deliberately leaves @base_rural_nomad_district_jobs untouched (nomads are banned).
 @base_rural_district_jobs = 160
+
+# --- Slice 3: kilostructure per-tier mod-value cut (multiplier taming, lever #12a) ---
+# Orbital Arc Furnace (per-tier station_gatherers_produces_mult) and Dyson Swarm
+# (per-tier station_gatherers + station_researchers) are SCALING kilostructures that
+# compound hard with our station buffs + repeatables. Cut each per-tier value ~40%
+# (×0.6) so they stay worth building but stop warping the economy. Vanilla values from
+# common/scripted_variables/07_scripted_variables_machine_age.txt. Build LIMITS are
+# lowered separately via a negative country modifier (see econ_space_economy_modifiers.txt).
+# (Fixed-output Dyson SPHERE / Matter Decompressor are deliberately left alone.)
+@arc_furnace_1_mod_value = 0.15		# vanilla 0.25
+@arc_furnace_2_mod_value = 0.30		# vanilla 0.50
+@arc_furnace_3_mod_value = 0.45		# vanilla 0.75
+@arc_furnace_4_mod_value = 0.60		# vanilla 1.00
+@dyson_swarm_1_mod_value = 3		# vanilla 5
+@dyson_swarm_2_mod_value = 9		# vanilla 15
+@dyson_swarm_3_mod_value = 18		# vanilla 30
