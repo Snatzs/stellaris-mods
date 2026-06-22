@@ -18,12 +18,11 @@
 econ_space_primacy = {
 	hide_from_country_list = no
 
-	# Space output up
+	# Space output up (the planet-down half is now STRUCTURAL — see
+	# zzz_economy_overhaul_overrides.txt: planet size cap + rural jobs cut — so the
+	# flat planet_*_produces_mult nerfs are removed from this modifier to avoid
+	# double-nerfing. Re-add them (wired to @econ_planet_*_nerf) only if playtest
+	# shows planets still over-produce after the structural cuts.)
 	station_gatherers_produces_mult = @econ_station_gatherers_buff
 	station_researchers_produces_mult = @econ_station_researchers_buff
-
-	# Planetary primary-resource output down
-	planet_miners_minerals_produces_mult = @econ_planet_miners_nerf
-	planet_technician_energy_produces_mult = @econ_planet_technician_nerf
-	planet_farmers_food_produces_mult = @econ_planet_farmers_nerf
 }

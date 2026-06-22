@@ -1,100 +1,97 @@
 # Economy Overhaul
 
-> ⚠️ **The slice-1 design below is SUPERSEDED.** After a full design pass (2026-06-20),
-> the flat per-pop output nerf is replaced by a structural approach (planet size cap +
-> unpaired jobs-per-district cut) and a three-track model. **Read
-> [`docs/economy-overhaul-design.md`](../../docs/economy-overhaul-design.md) before building
-> further.** The slice-1 files (`econ_space_primacy` country modifier etc.) remain in the mod
-> only until the bulk-structural slice replaces them — do **not** test or ship slice 1 as-is.
+Rebalances the resource economy so **space outproduces planets** — making *systems*
+(not just planets) worth fighting over, planets scarce defensible anchors rather than
+self-sufficient engines. Implements Track 1 (bulk minerals/energy) of the full design.
 
-## Overview
+> **Read [`docs/economy-overhaul-design.md`](../../docs/economy-overhaul-design.md) first.**
+> It defines the three-track model and the build-order slices. This mod currently implements
+> **slice 1 (bulk structural)** plus the surviving station-buff half of the original flat slice.
 
-Rebalances the economy so that **space outproduces planets**. Mining and research
-stations get a large output buff; planetary primary-resource jobs (minerals,
-energy, food) get a matching nerf. The net effect: a mineral-rich asteroid belt
-or a star's energy should dwarf what a planet's pops can dig or harvest — planets
-become scarce, valuable, and worth fighting *systems* over, rather than
-self-sufficient resource engines.
+## What's built
 
-This is **slice 1** of the economy overhaul (the "Space > Planets" rebalance).
-Later slices — space-yield era scaling, strategic-resource concentration, planet
-size caps, fewer jobs per district, harsher housing/amenity deficits,
-mega-planet penalties — are tracked in `docs/ROADMAP.md`.
+### Slice 1 — Bulk structural (planet-down) — PRIMARY lever
+The "space > planets" goal is achieved by **bringing planets down, not inflating space**
+(inflating base yields compounds with multipliers into late-game bloat). Two **targeted
+vanilla scripted-variable overrides** in
+`common/scripted_variables/zzz_economy_overhaul_overrides.txt`:
 
-## Design Goals
-
-Addresses `docs/design-vision.md` pillars:
-
-- **1 — Geography matters** / **2 — Scarcity drives strategy**: making space the
-  primary resource source means *systems* (not just planets) are worth fighting
-  over, and planetary output alone can't make an empire self-sufficient.
-- **3 — Wide > tall**: nerfing per-pop planetary output (without touching
-  station output) pushes empires to expand across many systems rather than
-  hyper-optimise a few tall worlds.
-
-Directly implements the Economy section's "Space Resources" and "Planetary
-Economy" bullets ("space should be the primary resource source, not planets";
-"planetary primary and strategic resource collection should be LESS efficient").
-
-## Changes
-
-All effects are applied via a single permanent **country** static modifier,
-`econ_space_primacy`, granted to **every empire** (player + AI) at game start
-through `on_game_start_country`. Symmetric across all empires, so it gives **no
-single player an advantage** (MP-balance rule) and uses no randomness (MP-safe).
-
-| Lever | Modifier | Default value |
+| Lever | Vanilla → New | Effect |
 |---|---|---|
-| Mining-station output (minerals/energy/space strategic resources) | `station_gatherers_produces_mult` | **+50%** |
+| `@habitable_planet_max_size` | **25 → 18** | Planets generate at 12–18; truncating the range drops the average size for free → fewer districts (#districts ≈ planet size) → lower per-planet output ceiling → wide > tall, mega-planets capped. |
+| `@base_rural_district_jobs` | **200 → 160** | Rural (mining/generator/farming) districts grant 160 jobs instead of 200. **Housing stays 200** (separate hardcoded literal — verified) → +40 surplus housing/district → overpopulation/unemployment pressure → housing & amenities finally matter. |
+
+Both are **targeted variable redefinitions**, not whole-file replacements — the `zzz_`
+filename sorts after every vanilla scripted-variable file so it wins last-loaded, while every
+other vanilla variable stays vanilla (patch-safe). Logged in
+[`docs/compatibility.md`](../../docs/compatibility.md) (the mod's first real vanilla overrides).
+
+### Station-buff modifier (`econ_space_primacy`) — the surviving half of the original flat slice
+A permanent **country** static modifier granted to **every empire** at game start via
+additive `on_game_start_country` (zero vanilla overrides — on_actions merge):
+
+| Lever | Modifier | Default |
+|---|---|---|
+| Mining-station output (minerals/energy/space strategics) | `station_gatherers_produces_mult` | **+50%** |
 | Research-station output | `station_researchers_produces_mult` | **+50%** |
-| Planetary mineral jobs | `planet_miners_minerals_produces_mult` | **−50%** |
-| Planetary energy jobs | `planet_technician_energy_produces_mult` | **−50%** |
-| Planetary food jobs | `planet_farmers_food_produces_mult` | **−50%** |
 
-All five numbers are **tunable in one place**:
-`common/scripted_variables/econ_space_economy_variables.txt`.
+> The original flat **planetary per-pop nerf** (`planet_miners_minerals` / `planet_technician_energy`
+> / `planet_farmers_food` `_produces_mult` −50%) is **removed from this modifier** — the structural
+> cuts above now do the planet-down work, and stacking both risks an unemployment death spiral. The
+> three `@econ_planet_*_nerf` variables remain (default **0**) as an optional fine-tune lever; re-wire
+> them into `econ_space_primacy` only if playtest shows planets still over-produce *after* the
+> structural cuts. Planetary **research** is deliberately never nerfed (vision targets PRIMARY
+> resources; an empire-wide research nerf would just slow global tech pace).
 
-Planetary **research** is intentionally left untouched in this slice — the design
-vision targets *primary* resources, and an empire-wide planetary-research nerf
-would slow the whole game's tech pace rather than shift the space-vs-planet
-balance.
+All numbers are tunable in `common/scripted_variables/` (the two overrides in `zzz_…`, the station
+buffs in `econ_space_economy_variables.txt`).
 
-### Files (zero vanilla overrides)
+## MP-fairness
+All effects are **symmetric** across every empire (player + AI) and use no randomness — no single
+player gains an advantage, no desync risk. The structural variables are galaxy-gen / district
+constants (identical for everyone); the station modifier is applied to every empire identically.
 
-- `common/scripted_variables/econ_space_economy_variables.txt` — tunable values
-- `common/static_modifiers/econ_space_economy_modifiers.txt` — `econ_space_primacy`
+## Files
+- `common/scripted_variables/zzz_economy_overhaul_overrides.txt` — the two vanilla-variable overrides
+- `common/scripted_variables/econ_space_economy_variables.txt` — station-buff values + (unused) fine-tune nerf vars
+- `common/static_modifiers/econ_space_economy_modifiers.txt` — `econ_space_primacy` (station buffs)
 - `common/on_actions/econ_on_actions.txt` — appends to `on_game_start_country`
 - `localisation/english/economy_overhaul_l_english.yml`
 
-## Compatibility
-
-**No vanilla files overridden.** The only vanilla touch-point is `on_game_start_country`,
-and on_actions **merge** (our `effect` block runs *alongside* vanilla's, it does
-not replace it). Safe to run beside `migration_overhaul`. See `docs/compatibility.md`.
+## What's NOT built yet (later slices — see design doc build order)
+- **Slice 2 — bulk scaling parity:** nerf tile-output repeatables + add station/research-station
+  repeatables + amplify finite station techs (so space ramps and plateaus, no infinity).
+- **Slice 3 — multiplier taming:** disable Astro-Mining Drones + Privatized Exploration civics;
+  nerf+limit Arc Furnace / Dyson Swarm; halve `PLANET_ASCENSION_MODIFIER_SCALE`.
+- **Slice 4 — strategic resources:** refining nerf + strategic repeatable + deposit concentration.
 
 ## ⚠️ Runtime-verification checklist (logic-untested in-game)
 
-Built by file-inspection against vanilla 4.4.3; **not yet tested in-game.** Verify
-in the batched test session. Watch `error.log` throughout.
+Built by file-inspection against vanilla 4.4.3; **not yet tested in-game.** Verify in the batched
+test session. Watch `error.log` throughout.
 
-1. **Modifier applies to all empires.** Start a game, open the player country's
-   modifier list → confirm **"Galactic Resource Distribution"** is present. (AI
-   empires get it via the same on_action; spot-check via console `tweakergui` /
-   observer mode if desired.)
-2. **#1 KEY UNKNOWN — planet job nerf cascades from country scope.** Confirm a
-   colony's miner jobs actually produce ~50% less mineral output and technician
-   jobs ~50% less energy. This relies on country-scope `planet_<job>_<resource>_produces_mult`
-   cascading to all owned planets. *Strong evidence it works* (vanilla economy
-   techs use exactly these modifiers at country scope, e.g.
-   `planet_miners_minerals_produces_mult` in `00_eng_tech.txt`), but confirm the
-   actual per-planet job tooltip shows the reduction. If it does NOT apply:
-   fallback is a `planet_modifier` granted to every owned planet via an
-   `on_yearly_pulse_country` / colony on_action instead of a country modifier.
-3. **Station buff applies.** Confirm a mining station's mineral output and a
-   research station's output are ~50% higher than vanilla (check the station
-   deposit tooltip / planet-orbit view).
-4. **Net balance feel.** With defaults, is space clearly the better resource
-   source without making early-game planets feel worthless? Tune the five
-   variables (design target for mining is ~−66%, "3 → 1 minerals per 100 pops").
-5. **No `error.log` spam** referencing `econ_space_primacy`, the on_action, or
-   any of the five modifier names.
+### Structural overrides (slice 1) — #1 priority
+1. **Load-order win.** Start a game; confirm habitable planets generate no larger than **18**
+   (check several home/colonisable worlds) and that a rural district grants **160 jobs** (planet
+   view → build a mining/generator/farming district → job count). If sizes are still up to 25 or
+   districts still grant 200, the `zzz_` override lost load order — escalate the filename or
+   coordinate playset load order; see `docs/compatibility.md`.
+2. **Housing stays 200 (unpaired).** Confirm a rural district still adds **200 housing** while
+   granting only 160 jobs → a visible housing surplus / unemployment pressure as the planet fills.
+3. **No death spiral.** Watch whether mid-size colonies tip into runaway unemployment/stability
+   collapse. If so, soften `@base_rural_district_jobs` toward 170–180. (This is the #1 calibration
+   target.)
+4. **No `error.log` spam** referencing the two variables or the override file.
+
+### Station-buff modifier
+5. **Modifier applies to all empires.** Open the player country's modifier list → confirm
+   **"Galactic Resource Distribution"** is present (AI gets it via the same on_action).
+6. **Station buff applies.** A mining station's mineral output and a research station's output are
+   ~50% higher than vanilla (station deposit tooltip / planet-orbit view).
+7. **No leftover planet nerf.** Confirm the modifier no longer shows any `planet_*_produces_mult`
+   line (the per-pop nerf was removed; planet-down is structural now).
+
+### Net feel
+8. **Aggregate space > planets.** Across a developed empire, is space (stations) clearly the larger
+   mineral/energy source vs planets, *without* early-game planets feeling worthless? Tune the size
+   cap / jobs cut / station buffs together.

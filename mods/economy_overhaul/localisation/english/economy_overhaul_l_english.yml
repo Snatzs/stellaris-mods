@@ -1,4 +1,4 @@
 ﻿l_english:
  # --- Space > Planets rebalance ---
  econ_space_primacy:0 "Galactic Resource Distribution"
- econ_space_primacy_desc:0 "The astropolitical order of this era favours those who command the void. Orbital extraction and research stations vastly outproduce planet-bound industry, while planetary primary-resource jobs yield far less than in ages past."
+ econ_space_primacy_desc:0 "The astropolitical order of this era favours those who command the void. Orbital extraction and research stations vastly outproduce the cramped, resource-poor worlds of settled space."

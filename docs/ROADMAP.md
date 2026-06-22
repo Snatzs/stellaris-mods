@@ -56,17 +56,18 @@ Track what needs to be done, what's in progress, and what's done.
 space>planet flip, research planet-primary, strategic-resource concentration + demand-matched
 scaling. Read it before building any economy slice.)*
 
-> **NOTE:** `economy_overhaul` **slice 1** (flat per-pop output nerf) is **superseded** by the
-> structural approach in the design doc (planet size cap + unpaired jobs-per-district cut). The
-> built slice-1 files stay until the structural slice replaces them.
+> **NOTE:** the **bulk-structural slice** (planet size cap + unpaired jobs-per-district cut) is now
+> **BUILT** and is the primary planet-down lever. The original flat per-pop planet nerf is
+> **neutralized** (set to 0, removed from the `econ_space_primacy` modifier) to avoid double-nerfing;
+> the station-buff half of that modifier survives. All economy work is **logic-untested in-game.**
 
-- [~] Space resources as primary source (outproduce planets) — **BUILT** (slice 1) in `economy_overhaul`, logic-untested. Country static modifier `econ_space_primacy` on all empires via `on_game_start_country`: `station_gatherers_produces_mult` / `station_researchers_produces_mult` +50%. **Zero vanilla overrides.** See mod README checklist.
-- [ ] Space resource scaling (yield increases with game progression) — *next economy slice*
-- [ ] Strategic resource rebalance (less frequent, more concentrated)
-- [~] Planetary resource efficiency nerf (less output per pop/district) — **BUILT** (slice 1) in `economy_overhaul`, logic-untested. Same `econ_space_primacy` modifier: `planet_miners_minerals` / `planet_technician_energy` / `planet_farmers_food` `_produces_mult` −50% (per-resource variants vanilla techs use at country scope → cascade to planets). Research left untouched (primary-resource focus).
-- [!] Planet size cap (max 16–18) and size distribution shift (more 12–14) — use `planet_max_districts_add`/`_mult` + new 4.4 `planet_artificial_max_districts_add` (habitats/ringworlds/arkships count separately)
-- [ ] Reduce jobs per district
-- [ ] Increase housing/amenities deficit penalties
+- [~] Space resources as primary source (outproduce planets) — **BUILT** in `economy_overhaul`, logic-untested. (a) Structural planet-down (below) makes space *relatively* dominant; (b) `econ_space_primacy` country modifier on all empires via `on_game_start_country`: `station_gatherers` / `station_researchers` `_produces_mult` +50%. See mod README checklist.
+- [ ] Space resource scaling (yield increases with game progression) — *slice 2: tile-repeatable nerf + new station/research-station repeatables + finite-tech amplification*
+- [ ] Strategic resource rebalance (less frequent, more concentrated) — *slice 4*
+- [~] Planetary resource efficiency nerf (less output per pop/district) — **DONE structurally** (size cap + jobs cut below). Flat per-pop nerf retained only as an unused fine-tune lever (`@econ_planet_*_nerf`, default 0). Research deliberately untouched (primary-resource focus).
+- [~] Planet size cap (max 16–18) and size distribution shift (more 12–14) — **BUILT**: override `@habitable_planet_max_size` 25 → **18** (`zzz_economy_overhaul_overrides.txt`). Truncating drops the average too. First real vanilla override (logged in compatibility.md); load-order win is file-inspection-reasoned, **runtime-verify**.
+- [~] Reduce jobs per district — **BUILT**: override `@base_rural_district_jobs` 200 → **160** (housing stays 200 → deliberate overpopulation pressure). Gentle first pass; **#1 calibration target** (too aggressive → unemployment death spiral).
+- [ ] Increase housing/amenities deficit penalties — *partially emergent from the unpaired jobs/housing cut; revisit after playtest*
 - [ ] Hyper-specialized mega-planet penalties
 
 ## Mods — Empire & Fleet

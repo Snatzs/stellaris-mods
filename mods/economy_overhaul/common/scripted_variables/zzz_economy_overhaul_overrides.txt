@@ -1,0 +1,39 @@
+# Economy Overhaul — bulk-structural slice: vanilla scripted-variable overrides
+# =============================================================================
+# This file REDEFINES two vanilla scripted variables to bring planets DOWN, the
+# core of Track 1 (bulk minerals/energy) in docs/economy-overhaul-design.md:
+# "space > planets is achieved by bringing planets down, not by inflating space."
+#
+# WHY A SEPARATE, zzz-PREFIXED FILE (load order):
+#   Scripted variables resolve last-loaded-wins by filename (alphabetical), with
+#   mod files loading after vanilla. Vanilla's highest-sorting files are the
+#   "100_"/"10_" set; a letter-prefixed filename sorts AFTER every numeric one
+#   (ASCII digits < letters), so "zzz_" is maximally safe — these redefinitions
+#   win over vanilla's 00_scripted_variables.txt and 100_scripted_variables_zones.txt.
+#   This is a TARGETED override (two variables), NOT a whole-file replacement, so
+#   every other vanilla variable in those files is untouched and patch-safe.
+#   => Logged in docs/compatibility.md (our first real vanilla overrides).
+#
+# ⚠️ RUNTIME-VERIFY (file-inspection-verified only; see mod README checklist):
+#   confirm in-game that load order actually wins and planets generate at <=18 /
+#   rural districts grant 160 jobs. Watch error.log on first load.
+
+# --- Planet size cap (primary planet-down lever) ---
+# Vanilla: @habitable_planet_max_size = 25 (common/scripted_variables/00_scripted_variables.txt:179).
+# Capping 25 -> 18 truncates the generated size range (min stays 12), dropping the
+# average planet size for free -> fewer districts (#districts ~= planet size, engine-
+# calculated) -> lower per-planet output ceiling -> wide > tall, mega-planets capped.
+# Galaxy-gen constant: no temporal nerf, applies to all empires symmetrically (MP-fair).
+@habitable_planet_max_size = 18
+
+# --- Jobs per rural district (secondary planet-down lever, UNPAIRED with housing) ---
+# Vanilla: @base_rural_district_jobs = 200 (common/scripted_variables/100_scripted_variables_zones.txt:11).
+# VERIFIED in common/districts/02_rural_districts.txt: rural district JOBS come from
+#   inline_script jobs/{miners,technicians,farmers}_add  AMOUNT = @base_rural_district_jobs,
+# while HOUSING is a SEPARATE hardcoded literal `planet_housing_add = 200` that does NOT
+# reference this variable. So cutting jobs 200 -> 160 leaves housing at 200 => +40 surplus
+# housing per rural district -> overpopulation/unemployment pressure -> housing & amenities
+# finally matter (on-vision: punishes cramming). Gentle first pass (200->160); steepen toward
+# ~140 only after playtest (too aggressive -> unemployment death spiral). #1 calibration target.
+# NOTE: deliberately leaves @base_rural_nomad_district_jobs untouched (nomads are banned).
+@base_rural_district_jobs = 160

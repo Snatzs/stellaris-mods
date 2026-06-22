@@ -16,14 +16,17 @@
 @econ_station_gatherers_buff = 0.5		# +50% all mining-station output
 @econ_station_researchers_buff = 0.5	# +50% all research-station output
 
-# --- Planetary primary-resource job output NERFS ---
-# Per-resource variants are exactly what vanilla economy techs use at country
-# scope (00_eng_tech.txt / 00_phys_tech.txt / 00_soc_tech.txt), so they provably
-# cascade to all owned planets. Design target (design-vision.md) is "3 minerals
-# per 100 pops -> 1" (~-66%) for mining; starting conservative at -50% and
-# leaving headroom to steepen after the first test. Research is intentionally
-# NOT nerfed in this slice (vision targets PRIMARY resources; nerfing planetary
-# research empire-wide would slow the whole game's tech pace).
-@econ_planet_miners_nerf = -0.5			# -50% planetary mineral output
-@econ_planet_technician_nerf = -0.5		# -50% planetary energy output
-@econ_planet_farmers_nerf = -0.5		# -50% planetary food output
+# --- Planetary primary-resource job output NERFS (OPTIONAL fine-tune — DEFAULT 0) ---
+# SUPERSEDED as the primary planet-down lever. The structural slice
+# (zzz_economy_overhaul_overrides.txt: planet size cap 25->18 + rural jobs 200->160)
+# now does the planet-down work. Per the design doc (Track 1), this flat per-pop
+# nerf becomes an OPTIONAL light fine-tune that must NOT stack hard on the
+# structural cuts (double-nerf -> unemployment death spiral). Left at 0 (unused) —
+# the modifier lines are removed from econ_space_primacy; re-wire them there only
+# if playtest shows planets still over-produce AFTER the structural cuts.
+# Per-resource variants are exactly what vanilla economy techs use at country scope
+# (00_eng_tech.txt / 00_phys_tech.txt / 00_soc_tech.txt), so they cascade to all
+# owned planets. Research deliberately never nerfed (vision targets PRIMARY resources).
+@econ_planet_miners_nerf = 0			# fine-tune lever (unused); e.g. -0.2 = -20% planetary minerals
+@econ_planet_technician_nerf = 0		# fine-tune lever (unused); e.g. -0.2 = -20% planetary energy
+@econ_planet_farmers_nerf = 0			# fine-tune lever (unused); e.g. -0.2 = -20% planetary food
