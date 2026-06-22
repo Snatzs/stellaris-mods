@@ -6,6 +6,46 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## ▶ Current Focus / Session Handoff
 
+> **⚠️ Branch note:** this is the **`mod/economy-overhaul`** branch (off `master`). The
+> "Last session (2026-06-18)" + migration handoff text below is `master`'s narrative and is
+> **stale here** — the migration mod is built on `mod/migration-overhaul` and will arrive on
+> `master` via its own merge. The economy handoff is the authoritative one for THIS branch.
+
+**THIS SESSION (2026-06-22) — economy_overhaul slices 1–3 built on `mod/economy-overhaul`.**
+Branched off `master` and moved the 2026-06-20 economy-design work here (kept `mod/migration-overhaul`
+clean for its own test+merge). Commits: baseline (design doc + superseded slice-1) → slice 1 → slice 2 → slice 3.
+- **Slice 1 — bulk structural (planet-down):** `@habitable_planet_max_size` 25→**18**, `@base_rural_district_jobs`
+  200→**160** (housing stays 200 → overpopulation pressure). Verified rural housing is a separate literal.
+  Slice-1's flat per-pop nerf neutralized; station +50% buff (`econ_space_primacy`) retained.
+- **Slice 2 — scaling parity:** nerf 3 vanilla tile repeatables +5%→+3%/level + add station gatherers/research
+  repeatables at the same rate (`@econ_repeatable_per_level`) so planet & space scaling climb together.
+- **Slice 3 — multiplier taming:** Astro-Mining Drones civic **disabled**; Privatized Exploration **+0.25→+0.10**;
+  Arc Furnace / Dyson Swarm per-tier output cut ~40% + build caps −1; `PLANET_ASCENSION_MODIFIER_SCALE` 0.10→**0.05**.
+- **14 vanilla overrides** (vars/techs/civics/defines) — all targeted `zzz_` redefinitions, logged in
+  [compatibility.md](compatibility.md). Verification-rigor: read every vanilla file before scripting;
+  caught one design-doc citation error (`@habitable_planet_max_size` is in `00_scripted_variables.txt`, not the zones file).
+
+**▶ START HERE NEXT SESSION — pick one:**
+- **(A) Build economy slice 4 — strategic resources** (the make-or-break track): refining nerf
+  (`planet_refiners`/`planet_chemists_produces_mult`) + a strategic repeatable (`exotic_gases`/`volatile_motes`/
+  `rare_crystals_produces_mult`) calibrated to the demand curve + the high-risk deposit-concentration
+  `drop_weight` rework in `02_sr_deposits.txt`. Read [economy-overhaul-design.md](economy-overhaul-design.md) Track 3 first.
+- **(B) Batch in-game test economy slices 1–3** (all logic-untested): `bash tools/deploy.sh`, enable, start a game,
+  work the README runtime-verification checklists (planet sizes ≤18, district jobs=160 w/ housing 200, repeatables
+  at +3%, Astro-Mining absent, Privatized +10%, kilostructure cuts, ascension +5%/tier). Watch `error.log` — top
+  suspects are load-order on the `zzz_` overrides and the two faithful civic copies. **Recommended before slice 4**,
+  since slice 4 builds on an unverified stack.
+- **(C) Migration mod:** independently, `mod/migration-overhaul` is still code-complete/untested and awaiting its
+  own batch test + merge to `master`.
+
+**Housekeeping:** a parked git stash (`stash@{0}`, "economy-session doc edits") holds the old migration-base doc
+edits + a few `.claude/settings.local.json` permission additions that were never re-committed — harmless; drop it
+when convenient (`git stash drop`).
+
+---
+
+### (Stale below — master's migration-build handoff, kept for the eventual merge)
+
 **Last session (2026-06-18):** Bumped the whole repo from 4.3 → **4.4.3 "Pegasus" + Nomads**; re-verified all 4 `docs/vanilla/` architecture docs against live game files; mined the 4.4 changelog into [`docs/vanilla/patch-4.4-changes.md`](vanilla/patch-4.4-changes.md); logged two group decisions (nomads **banned**; migration mod **approved**). All merged to `master`. `mods/` is still empty — toolchain (`new-mod.sh`/`validate.sh`/`deploy.sh`) is **untested end-to-end**.
 
 **Next session — build the migration mod FIRST.** Starting context so you can dive in:
