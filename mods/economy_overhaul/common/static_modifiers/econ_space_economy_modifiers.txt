@@ -1,0 +1,29 @@
+# Economy Overhaul — "Space > Planets" country static modifier
+# ------------------------------------------------------------
+# A single permanent COUNTRY modifier applied to every empire at game start
+# (see econ_on_actions.txt). Zero vanilla file overrides — this is a NEW static
+# modifier, applied additively, exactly like migration_overhaul's approach.
+#
+# Why these modifier names work at country scope:
+#   - station_gatherers_produces_mult / station_researchers_produces_mult are
+#     country-scope economy-category modifiers (vanilla uses them in difficulty
+#     static modifiers, e.g. difficulty_grand_admiral).
+#   - planet_<job>_<resource>_produces_mult are the SAME modifiers vanilla
+#     economy techs apply at country scope (e.g. planet_miners_minerals_produces_mult
+#     in 00_eng_tech.txt). A country-scope modifier cascades to all owned planets.
+#
+# Numbers come from econ_space_economy_variables.txt. hide_from_country_list = no
+# so players can see the effect in their country modifier tooltip.
+
+econ_space_primacy = {
+	hide_from_country_list = no
+
+	# Space output up
+	station_gatherers_produces_mult = @econ_station_gatherers_buff
+	station_researchers_produces_mult = @econ_station_researchers_buff
+
+	# Planetary primary-resource output down
+	planet_miners_minerals_produces_mult = @econ_planet_miners_nerf
+	planet_technician_energy_produces_mult = @econ_planet_technician_nerf
+	planet_farmers_food_produces_mult = @econ_planet_farmers_nerf
+}

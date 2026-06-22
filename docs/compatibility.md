@@ -15,6 +15,13 @@ Before overriding a vanilla file in your mod:
 |---|---|---|---|
 | (no overrides yet) | | | |
 
+**Note on additive `on_actions`:** `migration_overhaul` and `economy_overhaul` both
+append to vanilla `on_action` hooks (e.g. `on_game_start_country`,
+`on_pop_group_resettled`). These are **merges, not overrides** — every mod's
+`effect`/`events` block runs alongside vanilla's — so they are not listed in the
+override registry. If a future mod ever *replaces* a vanilla on_actions file
+wholesale, that IS an override and must be logged.
+
 ## Cross-Mod Dependencies
 
 Track any cases where one mod depends on or interacts with another:

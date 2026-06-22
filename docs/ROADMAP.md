@@ -51,12 +51,19 @@ Track what needs to be done, what's in progress, and what's done.
 
 ## Mods — Economy & Resources
 
-*(Changes from `docs/design-vision.md` — Economy section)*
+*(Changes from `docs/design-vision.md` — Economy section. **Full design:
+[economy-overhaul-design.md](economy-overhaul-design.md)** — three-track model: bulk
+space>planet flip, research planet-primary, strategic-resource concentration + demand-matched
+scaling. Read it before building any economy slice.)*
 
-- [ ] Space resources as primary source (outproduce planets)
-- [ ] Space resource scaling (yield increases with game progression)
+> **NOTE:** `economy_overhaul` **slice 1** (flat per-pop output nerf) is **superseded** by the
+> structural approach in the design doc (planet size cap + unpaired jobs-per-district cut). The
+> built slice-1 files stay until the structural slice replaces them.
+
+- [~] Space resources as primary source (outproduce planets) — **BUILT** (slice 1) in `economy_overhaul`, logic-untested. Country static modifier `econ_space_primacy` on all empires via `on_game_start_country`: `station_gatherers_produces_mult` / `station_researchers_produces_mult` +50%. **Zero vanilla overrides.** See mod README checklist.
+- [ ] Space resource scaling (yield increases with game progression) — *next economy slice*
 - [ ] Strategic resource rebalance (less frequent, more concentrated)
-- [ ] Planetary resource efficiency nerf (less output per pop/district)
+- [~] Planetary resource efficiency nerf (less output per pop/district) — **BUILT** (slice 1) in `economy_overhaul`, logic-untested. Same `econ_space_primacy` modifier: `planet_miners_minerals` / `planet_technician_energy` / `planet_farmers_food` `_produces_mult` −50% (per-resource variants vanilla techs use at country scope → cascade to planets). Research left untouched (primary-resource focus).
 - [!] Planet size cap (max 16–18) and size distribution shift (more 12–14) — use `planet_max_districts_add`/`_mult` + new 4.4 `planet_artificial_max_districts_add` (habitats/ringworlds/arkships count separately)
 - [ ] Reduce jobs per district
 - [ ] Increase housing/amenities deficit penalties

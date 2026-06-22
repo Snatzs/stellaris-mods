@@ -1,0 +1,17 @@
+# Economy Overhaul — apply the space-primacy modifier to every empire.
+# on_actions MERGE with vanilla (and with other mods) — this appends to, does
+# NOT override, the vanilla on_game_start_country definition. Scope verified in
+# D:\Stellaris\common\on_actions\00_on_actions.txt: on_game_start_country runs
+# once per empire at game start with this = country. Player + AI alike => MP-fair.
+#
+# days = -1 makes the modifier permanent. add_modifier is idempotent for a given
+# modifier id, so re-application is harmless.
+
+on_game_start_country = {
+	effect = {
+		add_modifier = {
+			modifier = econ_space_primacy
+			days = -1
+		}
+	}
+}

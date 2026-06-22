@@ -1,0 +1,29 @@
+# Economy Overhaul — "Space > Planets" tunable values
+# ---------------------------------------------------
+# All balance knobs for the space-vs-planet rebalance live here so the batched
+# in-game test session can tune them in ONE place. These feed the country static
+# modifier econ_space_primacy (see econ_space_economy_modifiers.txt), applied to
+# every empire at game start (econ_on_actions.txt). Symmetric across all empires
+# => MP-fair (no single player gains an advantage).
+#
+# Sign convention: buffs are positive, nerfs are negative. Values are mults
+# (0.5 = +50%, -0.5 = -50%).
+
+# --- Space station output BUFFS (make space the primary resource source) ---
+# station_gatherers covers mining stations: minerals, energy, AND space-gathered
+# strategic resources (gases/motes/crystals). station_researchers covers research
+# stations. Verified country-scope levers in docs/vanilla/economy.md.
+@econ_station_gatherers_buff = 0.5		# +50% all mining-station output
+@econ_station_researchers_buff = 0.5	# +50% all research-station output
+
+# --- Planetary primary-resource job output NERFS ---
+# Per-resource variants are exactly what vanilla economy techs use at country
+# scope (00_eng_tech.txt / 00_phys_tech.txt / 00_soc_tech.txt), so they provably
+# cascade to all owned planets. Design target (design-vision.md) is "3 minerals
+# per 100 pops -> 1" (~-66%) for mining; starting conservative at -50% and
+# leaving headroom to steepen after the first test. Research is intentionally
+# NOT nerfed in this slice (vision targets PRIMARY resources; nerfing planetary
+# research empire-wide would slow the whole game's tech pace).
+@econ_planet_miners_nerf = -0.5			# -50% planetary mineral output
+@econ_planet_technician_nerf = -0.5		# -50% planetary energy output
+@econ_planet_farmers_nerf = -0.5		# -50% planetary food output
