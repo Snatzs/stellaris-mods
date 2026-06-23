@@ -11,36 +11,43 @@ Track what needs to be done, what's in progress, and what's done.
 > **stale here** — the migration mod is built on `mod/migration-overhaul` and will arrive on
 > `master` via its own merge. The economy handoff is the authoritative one for THIS branch.
 
-**THIS SESSION (2026-06-22) — economy_overhaul slices 1–3 built on `mod/economy-overhaul`.**
-Branched off `master` and moved the 2026-06-20 economy-design work here (kept `mod/migration-overhaul`
-clean for its own test+merge). Commits: baseline (design doc + superseded slice-1) → slice 1 → slice 2 → slice 3.
-- **Slice 1 — bulk structural (planet-down):** `@habitable_planet_max_size` 25→**18**, `@base_rural_district_jobs`
-  200→**160** (housing stays 200 → overpopulation pressure). Verified rural housing is a separate literal.
-  Slice-1's flat per-pop nerf neutralized; station +50% buff (`econ_space_primacy`) retained.
-- **Slice 2 — scaling parity:** nerf 3 vanilla tile repeatables +5%→+3%/level + add station gatherers/research
-  repeatables at the same rate (`@econ_repeatable_per_level`) so planet & space scaling climb together.
-- **Slice 3 — multiplier taming:** Astro-Mining Drones civic **disabled**; Privatized Exploration **+0.25→+0.10**;
-  Arc Furnace / Dyson Swarm per-tier output cut ~40% + build caps −1; `PLANET_ASCENSION_MODIFIER_SCALE` 0.10→**0.05**.
-- **14 vanilla overrides** (vars/techs/civics/defines) — all targeted `zzz_` redefinitions, logged in
-  [compatibility.md](compatibility.md). Verification-rigor: read every vanilla file before scripting;
-  caught one design-doc citation error (`@habitable_planet_max_size` is in `00_scripted_variables.txt`, not the zones file).
+**SESSIONS 2026-06-23/24 — economy_overhaul reworked to "v2" and **in-game tested** on `mod/economy-overhaul`.**
+Slices 1–3 were found **broken in-game** (the original `zzz_` approach silently failed), then rebuilt and verified.
+**Read [economy-overhaul-design.md](economy-overhaul-design.md) → "v2 — Revised decisions" (top) — it is authoritative.**
 
-**▶ START HERE NEXT SESSION — pick one:**
-- **(A) Build economy slice 4 — strategic resources** (the make-or-break track): refining nerf
-  (`planet_refiners`/`planet_chemists_produces_mult`) + a strategic repeatable (`exotic_gases`/`volatile_motes`/
-  `rare_crystals_produces_mult`) calibrated to the demand curve + the high-risk deposit-concentration
-  `drop_weight` rework in `02_sr_deposits.txt`. Read [economy-overhaul-design.md](economy-overhaul-design.md) Track 3 first.
-- **(B) Batch in-game test economy slices 1–3** (all logic-untested): `bash tools/deploy.sh`, enable, start a game,
-  work the README runtime-verification checklists (planet sizes ≤18, district jobs=160 w/ housing 200, repeatables
-  at +3%, Astro-Mining absent, Privatized +10%, kilostructure cuts, ascension +5%/tier). Watch `error.log` — top
-  suspects are load-order on the `zzz_` overrides and the two faithful civic copies. **Recommended before slice 4**,
-  since slice 4 builds on an unverified stack.
-- **(C) Migration mod:** independently, `mod/migration-overhaul` is still code-complete/untested and awaiting its
-  own batch test + merge to `master`.
+**Hard-won 4.4.3 mechanics (don't re-learn these):**
+- **Scripted variables CANNOT be overridden by redefinition** (`error.log: Variable name X already taken`) → must
+  **whole-file replace** the defining file. DB objects (civics/techs) + defines DO override last-wins.
+- **on_actions reject bare `effect = {}`** → use `events = { id }` + a hidden `is_triggered_only` event.
+- **`every_system_planet` is SYSTEM-scoped** → wrap in `every_system { … }` to hit the whole galaxy.
+- **`@habitable_planet_max_size` does NOT cap procedural worlds** → cap via an `on_game_start` resize event.
+- **4.4 pop pressure = HOUSELESSNESS** (overcrowding stops growth/decline), not joblessness (jobless→civilians).
+- **Local dev mods need a junction into the game `mod/` dir + relative descriptor path** (external absolute path
+  registers but never loads). `tools/deploy.sh` now does this automatically (reads Irony's UserDirectory).
 
-**Housekeeping:** a parked git stash (`stash@{0}`, "economy-session doc edits") holds the old migration-base doc
-edits + a few `.claude/settings.local.json` permission additions that were never re-committed — harmless; drop it
-when convenient (`git stash drop`).
+**v2 state — BUILT & verified ✅ (see design-doc table for the full list):** deposit yields ×1.75 (flat +50%
+modifier removed); rural jobs 200→150; specialist zone jobs −30%; **urban district housing −30%** (replaced the
+global housing mult — spares rural/wide); overcrowding 1.10/1.20; **planet-size resize event** (≈no >18 worlds
+confirmed); kilostructures ×0.4; **mechanical pop assembly −33%**; civics/repeatables/ascension unchanged from before.
+All overrides re-logged in [compatibility.md](compatibility.md).
+
+**▶ START HERE NEXT SESSION — open items (in priority order):**
+1. **Hive/organic pop-GROWTH parity (the spawning-pool gap).** Confirmed in-game: spawning/offspring/clone drones
+   produce *Monthly Organic Pop Growth* (a GROWTH channel), so the `−33%` assembly nerf misses them. Bring in line
+   with base logistic growth — likely by overriding those drone jobs' growth output (surgical) rather than a broad
+   `bonus_pop_growth_mult` (which also hits trait bonuses like Fertile). See design-doc Open Item #1.
+2. **Decision B — planet bulk output.** Get a *regular colony's* minerals/energy (NOT the capital) to decide whether
+   to enable the reserved per-pop nerf (`planet_miners_minerals`/`planet_technician_energy_produces_mult` −30%).
+3. **Mono-specialised mega-planets** (100%-research ecumenopoli) — distinct design problem, parked. Design-doc Open #3.
+4. **Then** slice 4 — strategic resources (refining nerf + strategic repeatable + `02_sr_deposits.txt` `drop_weight`
+   concentration). The make-or-break track; do after the above settle.
+
+**Calibration knobs to watch** (all first-pass, tunable in their files): deposit ×1.75, rural 150, zone jobs −30%,
+urban housing ×0.70, overcrowding 1.10/1.20, assembly −33%, kilostructures ×0.4.
+
+**(C) Migration mod:** independent — `mod/migration-overhaul` still code-complete/untested, awaiting its own test + merge.
+
+**Housekeeping:** parked git stash (`stash@{0}`, old migration-base doc edits) — harmless, drop when convenient.
 
 ---
 
@@ -107,7 +114,7 @@ scaling. Read it before building any economy slice.)*
 - [~] Space resource scaling (yield increases with game progression) — **BUILT** (slice 2), logic-untested. `zzz_econ_repeatable_techs.txt`: nerf the 3 vanilla tile repeatables +5%→+3%/level (override) + add station-gatherers/research-station repeatables at the same +3%/level (`@econ_repeatable_per_level`). One rate → planet & space scaling climb together, preserving slice-1's ratio. Finite-tech amplification (lever #6) deferred (slice-1 +50% baseline assumed sufficient).
 - [ ] Strategic resource rebalance (less frequent, more concentrated) — *slice 4*
 - [~] Planetary resource efficiency nerf (less output per pop/district) — **DONE structurally** (size cap + jobs cut below). Flat per-pop nerf retained only as an unused fine-tune lever (`@econ_planet_*_nerf`, default 0). Research deliberately untouched (primary-resource focus).
-- [~] Planet size cap (max 16–18) and size distribution shift (more 12–14) — **BUILT**: override `@habitable_planet_max_size` 25 → **18** (`zzz_economy_overhaul_overrides.txt`). Truncating drops the average too. First real vanilla override (logged in compatibility.md); load-order win is file-inspection-reasoned, **runtime-verify**.
+- [~] Planet size cap (max 16–18) and size distribution shift (more 12–14) — **BUILT + fixed 2026-06-23**: `@habitable_planet_max_size` 25 → **18** via a **whole-file replacement** of `00_scripted_variables.txt` (the original `zzz_` redefinition silently failed — scripted vars can't be redefined; see compatibility.md). Re-test in-game pending.
 - [~] Reduce jobs per district — **BUILT**: override `@base_rural_district_jobs` 200 → **160** (housing stays 200 → deliberate overpopulation pressure). Gentle first pass; **#1 calibration target** (too aggressive → unemployment death spiral).
 - [ ] Increase housing/amenities deficit penalties — *partially emergent from the unpaired jobs/housing cut; revisit after playtest*
 - [ ] Hyper-specialized mega-planet penalties

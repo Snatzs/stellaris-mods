@@ -18,18 +18,29 @@
 econ_space_primacy = {
 	hide_from_country_list = no
 
-	# Space output up (the planet-down half is now STRUCTURAL — see
-	# zzz_economy_overhaul_overrides.txt: planet size cap + rural jobs cut — so the
-	# flat planet_*_produces_mult nerfs are removed from this modifier to avoid
-	# double-nerfing. Re-add them (wired to @econ_planet_*_nerf) only if playtest
-	# shows planets still over-produce after the structural cuts.)
-	station_gatherers_produces_mult = @econ_station_gatherers_buff
-	station_researchers_produces_mult = @econ_station_researchers_buff
+	# v2 (2026-06-23): the flat +50% station_*_produces_mult lines were REMOVED.
+	# "Space is the primary economy" is now carried by BUFFED DEPOSIT YIELDS at the
+	# source (whole-file 01_orbital_deposits.txt, produces ×1.75) + the station
+	# repeatables (slice 2), so we don't double-count base × flat-mult × repeatable
+	# (the multiplier-compounding the design doc warned about). This modifier now
+	# carries only the planet-DOWN structural support that has no cleaner home.
+
+	# Housing scarcity (v2.1): the global planet_housing_mult was REPLACED by a targeted
+	# -30% cut to URBAN (city/hive/nexus) district housing (whole-file 00_urban_districts.txt).
+	# Reason: the global mult also cut RURAL housing → penalised wide/resource planets; the
+	# urban-only cut spares rural and squeezes TALL/specialist-heavy planets (which stack city
+	# districts) → "wide > tall". Overcrowding defines (zzz_econ_defines.txt) still make it bite.
+
+	# Pop assembly nerf (v2): assembly is flat vs organic growth's logistic curve, so on
+	# smaller/housing-tight planets assemblers outpace growers. Bring ALL assembly down
+	# toward organic growth (machine/gestalt/hive + robots in organic empires). Cascades
+	# from this country modifier to every owned planet, like planet_housing_mult.
+	planet_pop_assembly_mult = @econ_assembly_nerf
 
 	# Slice 3 (lever #12b): trim the scaling-kilostructure build caps. *_limit_add is
 	# a country modifier (category = country); the cap = base 0 + sum of these, so a
 	# negative value lowers it for every empire symmetrically. Per-tier kilostructure
-	# OUTPUT is cut separately via scripted-variable overrides (zzz_…_overrides.txt).
+	# OUTPUT is cut separately via the 07_scripted_variables_machine_age.txt replacement.
 	arc_furnace_limit_add = @econ_kilostructure_limit_reduction
 	dyson_swarm_limit_add = @econ_kilostructure_limit_reduction
 }

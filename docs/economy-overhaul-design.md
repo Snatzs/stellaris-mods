@@ -12,6 +12,62 @@
 
 ---
 
+## ⚠️ v2 — Revised decisions (2026-06-23, supersede the drift below)
+
+The first in-game test exposed both **mechanism bugs** and **design drift** from the group's
+actual intent. This section is now authoritative; the original tracks below are kept for rationale
+but their *mechanisms* and a few choices are corrected here.
+
+**Verified Stellaris 4.4.3 mechanics (the hard lessons):**
+- **Scripted variables CANNOT be overridden by redefinition** (`error.log: Variable name X is
+  already taken` — vanilla wins). They must be changed by **whole-file replacement** of the
+  defining file. (DB objects — civics/techs — and defines DO override by last-wins; don't conflate.)
+- **on_actions reject a bare `effect = {}`** (`Unexpected token: effect`). Use `events = { <id> }`
+  + a hidden `is_triggered_only` event.
+- **4.4 employment model:** jobless pops become low-stakes **civilians** (no growth penalty);
+  **houseless/overcrowding is the real pressure** — growth stops at 1.15× over-housing, pops decline
+  at 1.25× (`NPop` defines). ⇒ The old "keep housing surplus → overpopulation pressure" idea was
+  **backwards**: surplus housing does nothing. We now **cut housing toward scarcity.**
+- **City/urban districts grant ZERO jobs in 4.4** — only housing. **Specialist jobs come from ZONES**
+  (`@scaling_district_*_job`). So "nerf city-district jobs" = cut the zone job variables.
+- **`@habitable_planet_max_size` does not reliably cap procedural galaxy worlds** (the homeworld uses
+  `@homeworld_max_size`; gas giants/special systems use explicit sizes). Whether it caps *ordinary*
+  procedural habitables is **under in-game test**; if not, use an `on_game_start` resize event.
+
+**Revised Track 1 lever set — BUILT & in-game-verified 2026-06-24 (except where noted):**
+| Goal | Lever | Mechanism | Value | Status |
+|---|---|---|---|---|
+| Space is primary | **Buff deposit base yields** (flat +50% station modifier REMOVED to avoid base×mult×repeatable bloat) | whole-file `01_orbital_deposits.txt`, all `produces` ×N | **×1.75** | ✅ space>job balance trending right by yr 20 |
+| Space scales | station gatherer/researcher repeatables | new techs | +3%/level | ✅ |
+| Planet basic-resource down | rural district jobs | `100_…zones.txt` | 200→**150** | ✅ |
+| Specialist VOLUME down (not output) | zone job vars `@scaling_district_*` | `100_…zones.txt` | **−~30%** | ✅ |
+| Housing scarcity | **urban (city/hive/nexus) district housing** (replaced the global `planet_housing_mult` — that also cut rural/wide housing) | whole-file `00_urban_districts.txt`, urban `planet_housing_add` ×0.70 | **−30%** | ✅ working in-game |
+| Housing bites sooner | overcrowding thresholds (+ machine variants) | `NPop` defines merge | 1.15→**1.10**, 1.25→**1.20** | ✅ |
+| Planet size ≤18 | **`on_game_start` resize event** (the scripted var does NOT govern procedural gen; that 623-line override was DROPPED) | event `econ_overhaul.2`, `every_system { every_system_planet }`, 19-25 → 16/17/18, capitals excluded | max **18** | ✅ confirmed ~no >18 worlds |
+| Tame kilostructures | Arc Furnace / Dyson Swarm per-tier output | whole-file `07_…machine_age.txt` | **×0.4** + cap −1 | ✅ |
+| Pop generation parity — MECHANICAL assembly | `planet_pop_assembly_mult` | `econ_space_primacy` | **−33%** | ✅ hits robots/machines |
+| Pop generation parity — HIVE/organic growth | spawning/offspring/clone drones produce **Monthly Organic Pop GROWTH** (not assembly), so `planet_pop_assembly_mult` misses them | TODO — see open items | — | ❌ **NOT yet done** |
+
+Specialist *output* is deliberately NOT nerfed (only job count per zone). Research stays
+planet-primary (Track 2 unchanged in intent).
+
+**Open items (next session):**
+1. **Hive/organic pop-growth parity (the spawning-pool gap).** Verified in-game: the spawning-drone
+   job converts food → *Monthly Organic Pop Growth* (a GROWTH channel), so our `−33%` assembly nerf
+   doesn't touch it. Bring it in line with base logistic growth. Candidate levers: override the
+   `spawning_drone`/`offspring_drone`/clone-vat jobs to cut their growth output (surgical), or a
+   negative `bonus_pop_growth_mult` (broader — also hits trait growth bonuses like Fertile, so
+   probably too blunt). Decide + build next session.
+2. **Planet bulk output (decision B).** Need a *regular colony's* minerals/energy (not the capital,
+   which is uncapped & district-heavy) to decide whether to enable the reserved per-pop output nerf
+   (`planet_miners_minerals` / `planet_technician_energy_produces_mult` −30% on `econ_space_primacy`).
+3. **Mono-specialised mega-planets** (100%-research ecumenopoli) vs healthy specialization (forge
+   world + a little food). Distinct design problem; housing cut doesn't solve it. Candidate
+   directions: diminishing returns on stacking one designation, or amenity/upkeep penalties for
+   zero-diversity builds. Parked.
+
+---
+
 ## The core idea
 
 Vanilla's economy is planet-centric and scales to infinity (repeatable tile-output techs,

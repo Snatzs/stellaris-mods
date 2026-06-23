@@ -9,17 +9,33 @@
 # Sign convention: buffs are positive, nerfs are negative. Values are mults
 # (0.5 = +50%, -0.5 = -50%).
 
-# --- Space station output BUFFS (make space the primary resource source) ---
-# station_gatherers covers mining stations: minerals, energy, AND space-gathered
-# strategic resources (gases/motes/crystals). station_researchers covers research
-# stations. Verified country-scope levers in docs/vanilla/economy.md.
-@econ_station_gatherers_buff = 0.5		# +50% all mining-station output
-@econ_station_researchers_buff = 0.5	# +50% all research-station output
+# --- Space strength: now carried by BUFFED DEPOSIT YIELDS, not a flat modifier ---
+# v2 (2026-06-23): the old flat +50% station_*_produces_mult modifier was REMOVED to
+# avoid base × flat-mult × repeatable compounding. "Space is primary" is now intrinsic
+# to the deposits: common/deposits/01_orbital_deposits.txt is whole-file-replaced with
+# every `produces` value ×1.75 (tune that multiplier there). Station repeatables
+# (slice 2, @econ_repeatable_per_level below) still scale space output over time.
+
+# --- Housing scarcity (v2.1) — now done in the district files, not here ---
+# Urban (city/hive/nexus) district housing is cut -30% directly in the whole-file
+# replacement common/districts/00_urban_districts.txt (tune the 0.70 multiplier there).
+# This replaced the old global @econ_housing_nerf / planet_housing_mult, which also hit
+# rural housing and penalised wide play. Rural housing stays vanilla. Pairs with the
+# tightened overcrowding defines (zzz_econ_defines.txt). #1 calibration target.
+
+# --- Pop ASSEMBLY nerf (v2: bring assembly in line with logistic organic growth) ---
+# Assembly is a FLAT rate (doesn't slow as a planet fills), organic growth is LOGISTIC
+# (slows near capacity). With smaller/housing-capped planets that makes assembly empires
+# pull ahead. planet_pop_assembly_mult hits ALL assembly (machine, gestalt, hive, AND
+# robots in organic empires — applies to every empire via econ_space_primacy). Organic
+# logistic GROWTH is deliberately left at vanilla; we only bring assembly down toward it.
+# Top calibration target — compare assembly/month vs a similar organic colony's growth.
+@econ_assembly_nerf = -0.33				# -33% pop assembly, all empires
 
 # --- Planetary primary-resource job output NERFS (OPTIONAL fine-tune — DEFAULT 0) ---
 # SUPERSEDED as the primary planet-down lever. The structural slice
-# (zzz_economy_overhaul_overrides.txt: planet size cap 25->18 + rural jobs 200->160)
-# now does the planet-down work. Per the design doc (Track 1), this flat per-pop
+# (whole-file replacements: 00_scripted_variables.txt planet size cap 25->18 +
+# 100_scripted_variables_zones.txt rural jobs 200->160) now does the planet-down work. Per the design doc (Track 1), this flat per-pop
 # nerf becomes an OPTIONAL light fine-tune that must NOT stack hard on the
 # structural cuts (double-nerf -> unemployment death spiral). Left at 0 (unused) —
 # the modifier lines are removed from econ_space_primacy; re-wire them there only

@@ -1,0 +1,63 @@
+# Economy Overhaul — events
+# ==========================
+# econ_overhaul.1 — fired once per empire from on_game_start_country (see
+# common/on_actions/econ_on_actions.txt). Applies the permanent space-primacy
+# country modifier. hide_window + is_triggered_only => no UI, no MTTH polling
+# (MP-safe). add_modifier with days = -1 is permanent and idempotent per id.
+
+namespace = econ_overhaul
+
+country_event = {
+	id = econ_overhaul.1
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		add_modifier = {
+			modifier = econ_space_primacy
+			days = -1
+		}
+	}
+}
+
+# econ_overhaul.2 — planet-size cap. Fired ONCE globally from on_game_start (see
+# econ_on_actions.txt). The scripted variable @habitable_planet_max_size does NOT
+# govern procedural galaxy generation (verified in-game 2026-06-23: desert/tropical/
+# tomb worlds spawned >18 with the var at 18), so we cap sizes here instead.
+# Tiered compression of oversized colonizable worlds into 16-18 (variety, not a
+# pile-up at 18). Capitals are EXCLUDED — shrinking a starting homeworld that already
+# has pops/districts for size ~25 would cause instant overcrowding. Runs at game
+# start only; natural worlds all exist by then. set_planet_size is deterministic
+# (MP-safe). every_system_planet iterates every planet in the galaxy (vanilla pattern).
+event = {
+	id = econ_overhaul.2
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		# every_system_planet is SYSTEM-scoped, so iterate every system first, then its
+		# planets (vanilla pattern, game_start.txt: `every_system = { every_system_planet }`).
+		# Calling every_system_planet from the scopeless event root iterates NOTHING (the
+		# original bug: no error, but no resize — verified in-game 2026-06-24).
+		every_system = {
+			every_system_planet = {
+				limit = {
+					is_colonizable = yes
+					is_capital = no
+					planet_size > 18
+				}
+				if = {
+					limit = { planet_size > 22 }
+					set_planet_size = 18
+				}
+				else_if = {
+					limit = { planet_size > 20 }
+					set_planet_size = 17
+				}
+				else = {
+					set_planet_size = 16
+				}
+			}
+		}
+	}
+}

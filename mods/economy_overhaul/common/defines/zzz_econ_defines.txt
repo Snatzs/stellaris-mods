@@ -12,3 +12,17 @@ NGameplay = {
 	# Leaving PLANET_ASCENSION_HARD_CAP = 10 alone unless playtest shows runaway.
 	PLANET_ASCENSION_MODIFIER_SCALE = 0.05
 }
+
+# v2 (2026-06-23): make HOUSING SCARCITY bite. In 4.4 the binding pressure is
+# overcrowding (jobless pops just become low-stakes civilians), so we tighten the
+# overcrowding thresholds (lower = bites at less overcrowding) to pair with the
+# -25% planet_housing_mult cut. Vanilla values in trailing comments. Machine
+# variants tightened too (the test empire is a Machine Intelligence). These STACK
+# with the housing cut, so this + planet_housing_mult are the co-#1 calibration
+# targets — dial back toward vanilla if assembly/growth chokes too hard.
+NPop = {
+	OVERCROWDING_NO_GROWTH_THRESHOLD       = 1.10	# vanilla 1.15 (growth stops sooner)
+	OVERCROWDING_DECLINE_THRESHOLD         = 1.20	# vanilla 1.25 (decline sooner)
+	OVERCROWDING_NO_ASSEMBLY_THRESHOLD     = 1.10	# vanilla 1.15 (machine assembly stops sooner)
+	OVERCROWDING_MACHINE_DECLINE_THRESHOLD = 1.20	# vanilla 1.25 (machine decline sooner)
+}

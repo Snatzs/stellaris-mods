@@ -4,27 +4,42 @@ Rebalances the resource economy so **space outproduces planets** — making *sys
 (not just planets) worth fighting over, planets scarce defensible anchors rather than
 self-sufficient engines. Implements Track 1 (bulk minerals/energy) of the full design.
 
-> **Read [`docs/economy-overhaul-design.md`](../../docs/economy-overhaul-design.md) first.**
-> It defines the three-track model and the build-order slices. This mod currently implements
-> **slice 1 (bulk structural)** plus the surviving station-buff half of the original flat slice.
+> **Read [`docs/economy-overhaul-design.md`](../../docs/economy-overhaul-design.md) first** —
+> specifically the **"v2 — Revised decisions (2026-06-23)"** section, which is authoritative.
+>
+> ⚠️ **v2 changes (2026-06-23) not yet fully reflected in the slice text below — design doc wins:**
+> - Space strength now comes from **buffed deposit yields** (`common/deposits/01_orbital_deposits.txt`,
+>   `produces` ×1.75), and the old **flat +50% station modifier was REMOVED**.
+> - **Housing is now CUT** (`planet_housing_mult −25%` + tighter overcrowding defines), not kept as a
+>   surplus — 4.4 makes *houseless* the real pressure, *jobless* pops just become civilians.
+> - **Specialist job VOLUME** cut via zone vars (`@scaling_district_* −~30%`); city districts grant no
+>   jobs in 4.4 (housing only) — specialists come from zones.
+> - Rural jobs **200→150**; Arc Furnace / Dyson Swarm output **×0.4** (deeper).
+> - Planet-size cap (`@habitable_planet_max_size`) is **under in-game test**; if it doesn't cap
+>   procedural worlds it's replaced by an `on_game_start` resize event.
 
 ## What's built
 
 ### Slice 1 — Bulk structural (planet-down) — PRIMARY lever
 The "space > planets" goal is achieved by **bringing planets down, not inflating space**
-(inflating base yields compounds with multipliers into late-game bloat). Two **targeted
-vanilla scripted-variable overrides** in
-`common/scripted_variables/zzz_economy_overhaul_overrides.txt`:
+(inflating base yields compounds with multipliers into late-game bloat). Two vanilla
+scripted-variable changes, shipped as **whole-file replacements** of their defining files
+(`common/scripted_variables/00_scripted_variables.txt` and `100_scripted_variables_zones.txt`):
 
 | Lever | Vanilla → New | Effect |
 |---|---|---|
 | `@habitable_planet_max_size` | **25 → 18** | Planets generate at 12–18; truncating the range drops the average size for free → fewer districts (#districts ≈ planet size) → lower per-planet output ceiling → wide > tall, mega-planets capped. |
 | `@base_rural_district_jobs` | **200 → 160** | Rural (mining/generator/farming) districts grant 160 jobs instead of 200. **Housing stays 200** (separate hardcoded literal — verified) → +40 surplus housing/district → overpopulation/unemployment pressure → housing & amenities finally matter. |
 
-Both are **targeted variable redefinitions**, not whole-file replacements — the `zzz_`
-filename sorts after every vanilla scripted-variable file so it wins last-loaded, while every
-other vanilla variable stays vanilla (patch-safe). Logged in
-[`docs/compatibility.md`](../../docs/compatibility.md) (the mod's first real vanilla overrides).
+> **Why whole-file replacement, not a targeted `zzz_` redefinition?** Scripted variables
+> **cannot be overridden by redefinition** — Stellaris is first-definition-wins, a mod loads after
+> vanilla, so a redefinition is rejected (`error.log`: `Variable name X is already taken`) and
+> vanilla's value is kept. Verified in-game 2026-06-23 (the original `zzz_` approach silently did
+> nothing). The defining file must be replaced wholesale: each is a **verbatim copy of vanilla
+> 4.4.3 with only the target value changed**, so all other variables in it stay vanilla. Cost:
+> high conflict surface (any other mod replacing these files wins entirely) + re-sync on version
+> bumps. See [`docs/vanilla/economy.md`](../../docs/vanilla/economy.md) → Override Mechanics. Logged
+> in [`docs/compatibility.md`](../../docs/compatibility.md).
 
 ### Station-buff modifier (`econ_space_primacy`) — the surviving half of the original flat slice
 A permanent **country** static modifier granted to **every empire** at game start via
@@ -43,8 +58,9 @@ additive `on_game_start_country` (zero vanilla overrides — on_actions merge):
 > structural cuts. Planetary **research** is deliberately never nerfed (vision targets PRIMARY
 > resources; an empire-wide research nerf would just slow global tech pace).
 
-All numbers are tunable in `common/scripted_variables/` (the two overrides in `zzz_…`, the station
-buffs in `econ_space_economy_variables.txt`).
+All numbers are tunable in `common/scripted_variables/` (planet size in the replaced
+`00_scripted_variables.txt`, rural jobs in the replaced `100_scripted_variables_zones.txt`, the
+station buffs in `econ_space_economy_variables.txt`).
 
 ### Slice 2 — Bulk scaling parity (repeatable techs)
 Slice 1 sets the space>planet *ratio*; slice 2 makes that ratio **hold over the whole game**
@@ -72,17 +88,17 @@ ascension) re-inflate the late game. Tamed (design levers #10–#13):
 |---|---|---|
 | **Astro-Mining Drones** civic | **Disabled** from selection (`playable`/`ai_playable` → `always = no`) — cutting its +50% station buff would leave only a planet self-nerf (trap pick). | civic override |
 | **Privatized Exploration** civic | Station bonuses **+0.25 → +0.10** (kept as a balanced pick). | civic override |
-| **Orbital Arc Furnace** (4 tiers) | Per-tier `station_gatherers` output cut ~40% (0.25/0.50/0.75/1.00 → 0.15/0.30/0.45/0.60); build cap −1. | scripted-var override + country modifier |
-| **Dyson Swarm** (3 tiers) | Per-tier `station_gatherers`+`station_researchers` output cut ~40% (5/15/30 → 3/9/18); build cap −1. | scripted-var override + country modifier |
+| **Orbital Arc Furnace** (4 tiers) | Per-tier `station_gatherers` output cut ~40% (0.25/0.50/0.75/1.00 → 0.15/0.30/0.45/0.60); build cap −1. | whole-file replace of `07_…machine_age.txt` + country modifier |
+| **Dyson Swarm** (3 tiers) | Per-tier `station_gatherers`+`station_researchers` output cut ~40% (5/15/30 → 3/9/18); build cap −1. | whole-file replace of `07_…machine_age.txt` + country modifier |
 | **Planetary Ascension** | `PLANET_ASCENSION_MODIFIER_SCALE` **0.10 → 0.05** (halve the per-tier designation amplifier; hard cap left at 10). | defines merge |
 
 Fixed-output megastructures (Dyson **Sphere**, Matter Decompressor) are deliberately left alone —
 their output is a separate silo untouched by our station buffs. The kilostructure build caps are
 lowered via a negative `*_limit_add` country modifier on `econ_space_primacy` (additive, no override),
 since the vanilla cap is `base 0 + sum of modifier:*_limit_add`. Tuning knobs:
-`@arc_furnace_*_mod_value` / `@dyson_swarm_*_mod_value` (in `zzz_…_overrides.txt`) and
-`@econ_kilostructure_limit_reduction`. Files: `common/governments/civics/zzz_econ_civic_overrides.txt`,
-`common/defines/zzz_econ_defines.txt`.
+`@arc_furnace_*_mod_value` / `@dyson_swarm_*_mod_value` (in the replaced
+`07_scripted_variables_machine_age.txt`) and `@econ_kilostructure_limit_reduction`. Files:
+`common/governments/civics/zzz_econ_civic_overrides.txt`, `common/defines/zzz_econ_defines.txt`.
 
 ## MP-fairness
 All effects are **symmetric** across every empire (player + AI) and use no randomness — no single
@@ -90,10 +106,13 @@ player gains an advantage, no desync risk. The structural variables are galaxy-g
 constants (identical for everyone); the station modifier is applied to every empire identically.
 
 ## Files
-- `common/scripted_variables/zzz_economy_overhaul_overrides.txt` — the two vanilla-variable overrides
+- `common/scripted_variables/00_scripted_variables.txt` — ⚠️ whole-file vanilla replacement (planet size cap 18)
+- `common/scripted_variables/100_scripted_variables_zones.txt` — ⚠️ whole-file vanilla replacement (rural jobs 160)
+- `common/scripted_variables/07_scripted_variables_machine_age.txt` — ⚠️ whole-file vanilla replacement (kilostructure per-tier values)
 - `common/scripted_variables/econ_space_economy_variables.txt` — station-buff values, repeatable per-level rate, + (unused) fine-tune nerf vars
 - `common/static_modifiers/econ_space_economy_modifiers.txt` — `econ_space_primacy` (station buffs)
-- `common/on_actions/econ_on_actions.txt` — appends to `on_game_start_country`
+- `common/on_actions/econ_on_actions.txt` — appends to `on_game_start_country` (fires `econ_overhaul.1`)
+- `events/econ_overhaul_events.txt` — `econ_overhaul.1`: applies `econ_space_primacy` to every empire
 - `common/technology/zzz_econ_repeatable_techs.txt` — slice-2 tile-repeatable overrides + new station repeatables
 - `common/governments/civics/zzz_econ_civic_overrides.txt` — slice-3 civic overrides (Astro-Mining, Privatized Exploration)
 - `common/defines/zzz_econ_defines.txt` — slice-3 ascension-scale override
@@ -110,22 +129,27 @@ Built by file-inspection against vanilla 4.4.3; **not yet tested in-game.** Veri
 test session. Watch `error.log` throughout.
 
 ### Structural overrides (slice 1) — #1 priority
-1. **Load-order win.** Start a game; confirm habitable planets generate no larger than **18**
-   (check several home/colonisable worlds) and that a rural district grants **160 jobs** (planet
-   view → build a mining/generator/farming district → job count). If sizes are still up to 25 or
-   districts still grant 200, the `zzz_` override lost load order — escalate the filename or
-   coordinate playset load order; see `docs/compatibility.md`.
+1. **Whole-file replacement wins.** Start a **new** game; confirm habitable planets generate no
+   larger than **18** (check several home/colonisable worlds) and that a rural district grants
+   **160 jobs** (planet view → build a mining/generator/farming district → job count). If sizes are
+   still up to 25 or districts still grant 200, another mod in the playset is also replacing
+   `00_/100_` scripted_variables and winning load order — coordinate; see `docs/compatibility.md`.
+   (Note: a `zzz_` *redefinition* does NOT work here — `error.log` `Variable name … already taken`;
+   that was the original bug. These are full-file replacements now.)
 2. **Housing stays 200 (unpaired).** Confirm a rural district still adds **200 housing** while
    granting only 160 jobs → a visible housing surplus / unemployment pressure as the planet fills.
 3. **No death spiral.** Watch whether mid-size colonies tip into runaway unemployment/stability
    collapse. If so, soften `@base_rural_district_jobs` toward 170–180. (This is the #1 calibration
    target.)
-4. **No `error.log` spam** referencing the two variables or the override file.
+4. **No `error.log` spam** referencing the scripted_variables files, the on_actions/event, or
+   `econ_space_primacy`. Specifically there should be **no** `Variable name … already taken` and
+   **no** `Unexpected token: effect` (those were the two original bugs, now fixed).
 
 ### Bulk scaling parity (slice 2)
 4a. **Tile-repeatable overrides win.** Research one level of a vanilla tile repeatable (e.g.
-   "Improved Mineral Tile Output") and confirm the bonus is **+3%**, not +5%. If +5%, the `zzz_`
-   tech file lost load order (or vanilla logged a duplicate but kept its own) — check error.log.
+   "Improved Mineral Tile Output") and confirm the bonus is **+3%**, not +5%. If +5%, another mod
+   redefined the same tech and won load order — check error.log. (Tech DB objects DO override by
+   last-wins, unlike scripted variables, so our `zzz_` tech file is correct here.)
 4b. **New station repeatables appear.** After completing the finite chains (`tech_space_mining_5` /
    `tech_space_science_5`), confirm "Orbital Extraction Optimisation" and "Deep-Space Survey
    Networks" show up as repeatable research options, each granting **+3%** station output/level.

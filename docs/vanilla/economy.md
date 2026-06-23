@@ -107,10 +107,37 @@ Planet size determines base district slots. Modifiable via:
 - Planet class definitions in `common/planet_classes/` control size ranges and spawn weights
 
 ### Capping Planet Size
-To limit max planet size (target: 16-18) and shift distribution (more 12-14):
-- Modify planet class definitions to change `planet_size` min/max ranges
-- Adjust `spawn_odds` / size weights in planet class files
-- Galaxy generation settings in `common/solar_system_initializers/` can influence system composition
+Vanilla planet classes cap size via the scripted variable `@habitable_planet_max_size`
+(`common/scripted_variables/00_scripted_variables.txt`, = 25 in 4.4.3), used as
+`planet_size = { min = @habitable_planet_min_size max = @habitable_planet_max_size }` across
+`common/planet_classes/00_planet_classes.txt`. Changing that one variable caps **all** habitable
+classes at once — BUT see the override-mechanics gotcha below: you must **whole-file replace**
+`00_scripted_variables.txt` to change it (redefinition is silently ignored). Only applies to
+newly-generated galaxies.
+
+---
+
+## ⚠️ Override Mechanics — Verified Gotchas (in-game, 4.4.3, 2026-06-23)
+
+Hard-won during the `economy_overhaul` first in-game test. "The file loads" ≠ "the override wins."
+
+1. **Scripted variables (`@var`) CANNOT be overridden by redefinition.** They are first-definition-
+   wins in a flat global namespace; a mod always loads after vanilla, so a redefinition is rejected
+   (`error.log`: `Variable name X is already taken`) and **vanilla keeps its value**. A `zzz_`-prefixed
+   redefinition file does nothing. The ONLY working method is a **whole-file replacement** (mod ships
+   a file with the same name as the vanilla one → vanilla file isn't loaded → no duplicate). Verbatim-
+   copy the vanilla file, change only the target value. Cost: high conflict surface + must re-sync on
+   version bumps.
+2. **on_actions reject a bare `effect = {}` block** (`error.log`: `Unexpected token: effect`; vanilla
+   uses `effect` in on_actions 0 times). To run an effect at an on_action, use `events = { <id> }` +
+   a `hide_window = yes`, `is_triggered_only = yes` event whose `immediate = {}` does the work.
+3. **DB objects (civics, techs, buildings, etc.) and defines DO override by last-loaded-wins** — a
+   same-key definition in a later-loading mod replaces vanilla's (`error.log` notes `…already exists,
+   using the one at <your file>`). This asymmetry is why civic/tech overrides worked while scripted-
+   variable redefinitions silently failed in the same mod.
+4. **Local dev-mod deployment:** an external **absolute** `path` in the descriptor registers the mod
+   (`ready_to_play`) but the engine never loads its content (`setup.log` has no trace). Use a
+   directory **junction** into the game `mod/` folder + a **relative** descriptor `path="mod/<name>"`.
 
 ---
 

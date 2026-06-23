@@ -1,17 +1,23 @@
 # Economy Overhaul — apply the space-primacy modifier to every empire.
-# on_actions MERGE with vanilla (and with other mods) — this appends to, does
-# NOT override, the vanilla on_game_start_country definition. Scope verified in
+# on_actions MERGE with vanilla (and other mods) — this appends to, does NOT
+# override, the vanilla on_game_start_country definition. Scope verified in
 # D:\Stellaris\common\on_actions\00_on_actions.txt: on_game_start_country runs
 # once per empire at game start with this = country. Player + AI alike => MP-fair.
 #
-# days = -1 makes the modifier permanent. add_modifier is idempotent for a given
-# modifier id, so re-application is harmless.
-
+# NOTE: on_actions do NOT accept a bare `effect = {}` block in 4.4.3 — the parser
+# rejects it ("Unexpected token: effect") and vanilla never uses it (it uses
+# `events = {}`). So we fire a hidden, triggered-only country_event that applies
+# the permanent modifier. (Verified via error.log on first in-game test.)
 on_game_start_country = {
-	effect = {
-		add_modifier = {
-			modifier = econ_space_primacy
-			days = -1
-		}
+	events = {
+		econ_overhaul.1
+	}
+}
+
+# Global, once-per-game: cap oversized procedural planets (econ_overhaul.2).
+# on_game_start fires after galaxy generation, so every natural world exists.
+on_game_start = {
+	events = {
+		econ_overhaul.2
 	}
 }
