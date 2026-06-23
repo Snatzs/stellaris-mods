@@ -107,19 +107,21 @@ Planet size determines base district slots. Modifiable via:
 - Planet class definitions in `common/planet_classes/` control size ranges and spawn weights
 
 ### Capping Planet Size
-Vanilla planet classes cap size via the scripted variable `@habitable_planet_max_size`
-(`common/scripted_variables/00_scripted_variables.txt`, = 25 in 4.4.3), used as
-`planet_size = { min = @habitable_planet_min_size max = @habitable_planet_max_size }` across
-`common/planet_classes/00_planet_classes.txt`. Changing that one variable caps **all** habitable
-classes at once — BUT see the override-mechanics gotcha below: you must **whole-file replace**
-`00_scripted_variables.txt` to change it (redefinition is silently ignored). Only applies to
-newly-generated galaxies.
+`@habitable_planet_max_size` (`00_scripted_variables.txt`, =25) appears in the planet-class
+`planet_size = { min … max … }` ranges, BUT **changing it does NOT cap procedurally-generated
+galaxy worlds** — verified in-game 2026-06-24: with the var at 18, ordinary desert/tropical/tomb
+worlds still spawned >18. (The home planet uses a *separate* `@homeworld_max_size`; gas giants and
+special systems use explicit sizes.) **The working method is an `on_game_start` resize event** that
+loops planets and shrinks oversized ones — see `economy_overhaul/events/econ_overhaul_events.txt`
+(`econ_overhaul.2`): `every_system = { every_system_planet = { limit = { is_colonizable = yes
+is_capital = no planet_size > 18 } … set_planet_size … } }`. Resizing at game start catches all
+natural worlds; capitals are excluded (shrinking a pop/district-laden homeworld causes overcrowding).
 
 ---
 
-## ⚠️ Override Mechanics — Verified Gotchas (in-game, 4.4.3, 2026-06-23)
+## ⚠️ Override Mechanics — Verified Gotchas (in-game, 4.4.3, 2026-06-23/24)
 
-Hard-won during the `economy_overhaul` first in-game test. "The file loads" ≠ "the override wins."
+Hard-won during the `economy_overhaul` in-game tests. "The file loads" ≠ "the override wins."
 
 1. **Scripted variables (`@var`) CANNOT be overridden by redefinition.** They are first-definition-
    wins in a flat global namespace; a mod always loads after vanilla, so a redefinition is rejected
@@ -138,6 +140,28 @@ Hard-won during the `economy_overhaul` first in-game test. "The file loads" ≠ 
 4. **Local dev-mod deployment:** an external **absolute** `path` in the descriptor registers the mod
    (`ready_to_play`) but the engine never loads its content (`setup.log` has no trace). Use a
    directory **junction** into the game `mod/` folder + a **relative** descriptor `path="mod/<name>"`.
+5. **`every_system_planet` is SYSTEM-scoped, not global.** Calling it from a scopeless event root
+   iterates NOTHING (no error, no effect — a silent no-op). To touch every planet in the galaxy:
+   `every_system = { every_system_planet = { … } }` (vanilla `game_start.2` pattern).
+
+## ⚠️ Pop generation & housing (4.4 — verified 2026-06-24)
+
+- **Pop pressure is HOUSELESSNESS, not joblessness.** Jobless pops become low-stakes **civilians**
+  (no growth penalty); **overcrowding** stops growth at `OVERCROWDING_NO_GROWTH_THRESHOLD = 1.15` and
+  declines pops at `1.25` (`NPop` defines; machine variants stop *assembly* at the same points). So to
+  make "wide > tall" bite, **cut housing toward scarcity** — a surplus does nothing.
+- **City/urban districts grant ZERO jobs** (`district_city/hive/nexus` = housing only, 1000/1200/1100).
+  **Specialist jobs come from ZONES** (`@scaling_district_*_job` in `100_scripted_variables_zones.txt`),
+  not the district. To cut specialist *volume*, cut those zone vars; to cut city *housing*, edit the
+  district `planet_housing_add` literals (whole-file replace `00_urban_districts.txt` — no variable).
+- **Assembly vs growth are different channels.** Mechanical/robot/machine pops use **assembly**
+  (`planet_pop_assembly_add`, scaled by `planet_pop_assembly_mult`). But **hive spawning pools / clone
+  vats / offspring nests produce *Monthly Organic Pop GROWTH*** (the spawning-drone job converts food →
+  growth), NOT assembly — so `planet_pop_assembly_mult` does **not** touch them. `BASE_POP_ASSEMBLY = 0`
+  (all assembly is job-sourced), and the `planet_pop_assemblers` economic category has its `produces`
+  mult **commented out** in vanilla, so there is **no** `planet_pop_assemblers_produces_mult`. To nerf
+  organic spawning growth, override the drone jobs' growth output (a broad `bonus_pop_growth_mult` also
+  hits trait bonuses like Fertile).
 
 ---
 
