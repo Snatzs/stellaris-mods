@@ -31,11 +31,24 @@ econ_space_primacy = {
 	# urban-only cut spares rural and squeezes TALL/specialist-heavy planets (which stack city
 	# districts) → "wide > tall". Overcrowding defines (zzz_econ_defines.txt) still make it bite.
 
-	# Pop assembly nerf (v2): assembly is flat vs organic growth's logistic curve, so on
-	# smaller/housing-tight planets assemblers outpace growers. Bring ALL assembly down
-	# toward organic growth (machine/gestalt/hive + robots in organic empires). Cascades
-	# from this country modifier to every owned planet, like planet_housing_mult.
-	planet_pop_assembly_mult = @econ_assembly_nerf
+	# NOTE (v2.3): the pop ASSEMBLY nerf moved OUT of this universal modifier into a
+	# separate, machine-EXEMPT modifier (econ_organic_assembly_nerf below), applied
+	# conditionally in event econ_overhaul.1. Rationale: machine empires grow ONLY via
+	# assembly and are already heavily reined late-game by the vanilla Country Growth
+	# Scale (empire-pop-count tax on the flat channel) — stacking our -33% on top guts
+	# them late. Organic empires, by contrast, can pair robot ASSEMBLY with their organic
+	# LOGISTIC growth (dual-channel), so they DO need the assembly tax to prevent abuse.
+	# Hence: no assembly nerf for machines, keep it for organics (hives have no assembly,
+	# so the gate harmlessly includes them). See econ_organic_assembly_nerf.
+
+	# Pop GROWTH nerf (v2.2): the flat-additive growth channel the assembly nerf above
+	# MISSED. Hive spawning drones / plantoid-lithoid budding / clone vats emit
+	# `bonus_pop_growth` (flat, doesn't slow as a planet fills) rather than
+	# planet_pop_assembly_*. bonus_pop_growth_mult scales ONLY that flat channel and
+	# does NOT touch logistic_growth_mult, so base organic growth + the Fertile / Rapid
+	# Breeders traits stay vanilla. Cascades from this country modifier to every planet
+	# (vanilla cybernetic/bio-hive authorities use bonus_pop_growth_mult at country scope).
+	bonus_pop_growth_mult = @econ_growth_nerf
 
 	# Slice 3 (lever #12b): trim the scaling-kilostructure build caps. *_limit_add is
 	# a country modifier (category = country); the cap = base 0 + sum of these, so a
@@ -43,4 +56,14 @@ econ_space_primacy = {
 	# OUTPUT is cut separately via the 07_scripted_variables_machine_age.txt replacement.
 	arc_furnace_limit_add = @econ_kilostructure_limit_reduction
 	dyson_swarm_limit_add = @econ_kilostructure_limit_reduction
+}
+
+# Pop ASSEMBLY nerf — applied ONLY to NON-machine empires (see econ_overhaul.1 gate:
+# is_machine_empire = no). Machines grow solely by assembly and are already late-game
+# capped by vanilla Country Growth Scale, so they are exempt. Organic empires keep this
+# so robot assembly can't be stacked tax-free on top of their organic logistic growth.
+# Hives are included by the gate but have no assembly, so it's a harmless no-op for them.
+econ_organic_assembly_nerf = {
+	hide_from_country_list = no
+	planet_pop_assembly_mult = @econ_assembly_nerf
 }

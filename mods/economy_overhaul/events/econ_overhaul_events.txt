@@ -13,9 +13,30 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		add_modifier = {
-			modifier = econ_space_primacy
-			days = -1
+		# IDEMPOTENT: this runs from BOTH on_game_start_country (empires present at galaxy
+		# gen) AND on_country_created (empires born mid-game — released vassals, rebellions,
+		# rebel/independence factions, etc.). Static modifiers STACK if added twice, so each
+		# add is guarded by has_modifier. Without the on_country_created hook, mid-game empires
+		# would escape every economy modifier — an MP-balance hole.
+		if = {
+			limit = { NOT = { has_modifier = econ_space_primacy } }
+			add_modifier = {
+				modifier = econ_space_primacy
+				days = -1
+			}
+		}
+		# Assembly nerf only for NON-machine empires (organics keep it so robot assembly
+		# can't stack tax-free on organic logistic growth; machines are exempt because they
+		# grow only by assembly and are already late-capped by vanilla Country Growth Scale).
+		if = {
+			limit = {
+				is_machine_empire = no
+				NOT = { has_modifier = econ_organic_assembly_nerf }
+			}
+			add_modifier = {
+				modifier = econ_organic_assembly_nerf
+				days = -1
+			}
 		}
 	}
 }

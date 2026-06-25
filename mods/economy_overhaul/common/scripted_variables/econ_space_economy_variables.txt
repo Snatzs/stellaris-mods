@@ -25,12 +25,29 @@
 
 # --- Pop ASSEMBLY nerf (v2: bring assembly in line with logistic organic growth) ---
 # Assembly is a FLAT rate (doesn't slow as a planet fills), organic growth is LOGISTIC
-# (slows near capacity). With smaller/housing-capped planets that makes assembly empires
-# pull ahead. planet_pop_assembly_mult hits ALL assembly (machine, gestalt, hive, AND
-# robots in organic empires — applies to every empire via econ_space_primacy). Organic
-# logistic GROWTH is deliberately left at vanilla; we only bring assembly down toward it.
-# Top calibration target — compare assembly/month vs a similar organic colony's growth.
-@econ_assembly_nerf = -0.33				# -33% pop assembly, all empires
+# (slows near capacity). v2.3: this nerf is now applied ONLY to NON-machine empires
+# (via econ_organic_assembly_nerf, gated is_machine_empire = no in econ_overhaul.1).
+# Why: machine empires grow SOLELY by assembly and are already heavily late-capped by the
+# vanilla Country Growth Scale (an empire-pop-count tax on the flat channel that EXEMPTS
+# logistic — confirmed in-game) — stacking our -33% on top guts them late, which we don't
+# want. Organic empires keep it so robot ASSEMBLY can't be stacked tax-free on top of
+# their organic LOGISTIC growth (the dual-channel abuse). Hives are inside the gate but
+# have no assembly, so it's a no-op for them.
+@econ_assembly_nerf = -0.33				# -33% pop assembly, NON-machine empires only (organics; machines exempt)
+
+# --- Pop GROWTH nerf (v2.2: the spawning-pool / flat-growth parity gap) ---
+# The assembly nerf above only touches planet_pop_assembly_* (machine/robot ASSEMBLY).
+# Hive spawning drones, plantoid/lithoid BUDDING traits, and clone vats instead emit
+# `bonus_pop_growth` — a FLAT additive growth that, like assembly, does NOT slow as a
+# planet fills (unlike base logistic growth). Verified in-game (2026-06-24) that our
+# assembly nerf missed this channel, so hives kept out-growing nerfed assembly empires.
+# bonus_pop_growth_mult scales ONLY that flat-additive channel. It does NOT touch
+# logistic_growth_mult, so base organic growth AND the Fertile / Rapid Breeders traits
+# (both logistic_growth_mult) stay at vanilla as the reference curve. (The design doc's
+# earlier worry that this hits Fertile was based on a wrong assumption — verified false.)
+# Set equal to the assembly nerf so every FLAT-growth channel lands on one line; tune
+# independently here if hive/budding/clone economies need a different slope than assembly.
+@econ_growth_nerf = -0.33				# -33% flat additive pop growth (spawning pools, budding, clone vats), all empires
 
 # --- Planetary primary-resource job output NERFS (OPTIONAL fine-tune — DEFAULT 0) ---
 # SUPERSEDED as the primary planet-down lever. The structural slice

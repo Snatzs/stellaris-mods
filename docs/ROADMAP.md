@@ -31,11 +31,39 @@ global housing mult — spares rural/wide); overcrowding 1.10/1.20; **planet-siz
 confirmed); kilostructures ×0.4; **mechanical pop assembly −33%**; civics/repeatables/ascension unchanged from before.
 All overrides re-logged in [compatibility.md](compatibility.md).
 
+**4.4.4 UPDATE (2026-06-25):** game bumped to Pegasus v4.4.4 (5505). economy_overhaul verified compatible —
+`supported_version = "4.4.*"` covers it; none of our 4 whole-file overrides (scripted_variables 07/100,
+00_urban_districts, 01_orbital_deposits) were touched by the patch (all retain pre-patch mtime), and the 3 vanilla
+repeatable-tech keys we override still exist. No changes were needed.
+
 **▶ START HERE NEXT SESSION — open items (in priority order):**
-1. **Hive/organic pop-GROWTH parity (the spawning-pool gap).** Confirmed in-game: spawning/offspring/clone drones
-   produce *Monthly Organic Pop Growth* (a GROWTH channel), so the `−33%` assembly nerf misses them. Bring in line
-   with base logistic growth — likely by overriding those drone jobs' growth output (surgical) rather than a broad
-   `bonus_pop_growth_mult` (which also hits trait bonuses like Fertile). See design-doc Open Item #1.
+1. ✅ **DONE + VERIFIED in-game 2026-06-25 — Hive/organic flat-growth parity (the spawning-pool gap).** Built
+   `bonus_pop_growth_mult = @econ_growth_nerf` (−33%, matches assembly nerf) on `econ_space_primacy`. Investigation
+   overturned the doc's premise: spawning drones / budding / clone vats emit `bonus_pop_growth` (flat), while
+   Fertile/Rapid Breeders use `logistic_growth_mult` — so this lever is clean, NOT blunt, and is patch-robust (no
+   brittle job-copy). **Confirmed in-game:** pop-GROUP growth breakdown shows the −33% under **Bonus Growth**
+   (labelled "Galactic Resource Distribution") scaling the Spawning Drone flat add; **Base/logistic Growth untouched**.
+   Gotcha for future testing: the per-JOB tooltip does NOT show country-scope growth mults — read the pop-GROUP panel.
+1b. ✅ **DONE 2026-06-25 — Assembly nerf made machine-EXEMPT (v2.3).** Moved `planet_pop_assembly_mult −33%`
+   out of the universal `econ_space_primacy` into a new `econ_organic_assembly_nerf`, applied only when
+   `is_machine_empire = no` (event `econ_overhaul.1`). Machines grow solely by assembly and are already
+   late-capped by vanilla **Country Growth Scale** (confirmed: a flat-channel, pop-count tax that EXEMPTS
+   logistic even for hives), so stacking our −33% gutted them late. Organics keep it (prevents robot
+   assembly stacking tax-free on logistic). **Test pending:** confirm machine empires show NO "Constrained
+   Pop Assembly" modifier; organics/hives do.
+1b'. ✅ **DONE 2026-06-25 — mid-game empires now covered + idempotency.** `econ_overhaul.1` was only hooked to
+   `on_game_start_country`, so empires born mid-game (released vassals, rebellions, independence factions)
+   escaped ALL economy modifiers — an MP hole. Added `on_country_created` hook; made the event idempotent
+   (`has_modifier` guards) since static modifiers stack if added twice. **Note:** still won't retro-apply to
+   EXISTING saves (event already fired) — test v2.2/v2.3 on a fresh game. Housing reminder: the cut is
+   per-district URBAN only (×0.70); the global `planet_housing_mult` was removed on purpose — do NOT re-add it.
+1c. **🔴 NEW calibration findings (2026-06-25) — see design-doc Open Items #4–5:**
+   - **Mineral GLUT (HIGH):** all empires triple-digit minerals by yr 20 → `×1.75` deposit buff overshot,
+     undercuts scarcity. Decide supply-down (cut toward ×1.3–1.4) vs sink-up before slice 4.
+   - **Housing cut — INCONCLUSIVE (needs testing, don't act):** contradictory games — one shows planets
+     carrying large pops pressure-free, another shows 19-size capitals choking on capacity with no
+     residences. May already be biting situationally. MEASURE housing vs housing-needs across sizes first.
+     (If ever tuned: urban-only or capacity — never re-add a global `planet_housing_mult`.)
 2. **Decision B — planet bulk output.** Get a *regular colony's* minerals/energy (NOT the capital) to decide whether
    to enable the reserved per-pop nerf (`planet_miners_minerals`/`planet_technician_energy_produces_mult` −30%).
 3. **Mono-specialised mega-planets** (100%-research ecumenopoli) — distinct design problem, parked. Design-doc Open #3.
@@ -43,7 +71,7 @@ All overrides re-logged in [compatibility.md](compatibility.md).
    concentration). The make-or-break track; do after the above settle.
 
 **Calibration knobs to watch** (all first-pass, tunable in their files): deposit ×1.75, rural 150, zone jobs −30%,
-urban housing ×0.70, overcrowding 1.10/1.20, assembly −33%, kilostructures ×0.4.
+urban housing ×0.70, overcrowding 1.10/1.20, assembly −33% **(organics only; machines exempt)**, **flat-growth (spawning/budding/clone) −33%**, kilostructures ×0.4.
 
 **(C) Migration mod:** independent — `mod/migration-overhaul` still code-complete/untested, awaiting its own test + merge.
 

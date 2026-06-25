@@ -45,19 +45,29 @@ but their *mechanisms* and a few choices are corrected here.
 | Housing bites sooner | overcrowding thresholds (+ machine variants) | `NPop` defines merge | 1.15→**1.10**, 1.25→**1.20** | ✅ |
 | Planet size ≤18 | **`on_game_start` resize event** (the scripted var does NOT govern procedural gen; that 623-line override was DROPPED) | event `econ_overhaul.2`, `every_system { every_system_planet }`, 19-25 → 16/17/18, capitals excluded | max **18** | ✅ confirmed ~no >18 worlds |
 | Tame kilostructures | Arc Furnace / Dyson Swarm per-tier output | whole-file `07_…machine_age.txt` | **×0.4** + cap −1 | ✅ |
-| Pop generation parity — MECHANICAL assembly | `planet_pop_assembly_mult` | `econ_space_primacy` | **−33%** | ✅ hits robots/machines |
-| Pop generation parity — HIVE/organic growth | spawning/offspring/clone drones produce **Monthly Organic Pop GROWTH** (not assembly), so `planet_pop_assembly_mult` misses them | TODO — see open items | — | ❌ **NOT yet done** |
+| Pop generation parity — MECHANICAL assembly | `planet_pop_assembly_mult` | **`econ_organic_assembly_nerf`** (machine-EXEMPT, gated `is_machine_empire = no` in `econ_overhaul.1`) | **−33% organics only** | ✅ **v2.3 2026-06-25** — moved OUT of `econ_space_primacy`; machines exempt (they grow only by assembly & are already late-capped by vanilla Country Growth Scale); organics keep it so robot assembly can't stack tax-free on logistic growth |
+| Pop generation parity — HIVE/organic flat growth | spawning/budding/clone drones emit `bonus_pop_growth` (FLAT, doesn't slow as planet fills), not assembly, so `planet_pop_assembly_mult` missed them | `bonus_pop_growth_mult` on `econ_space_primacy` (`@econ_growth_nerf`) | **−33%** | ✅ **VERIFIED in-game 2026-06-25** — shows under pop-group **Bonus Growth** as "Galactic Resource Distribution −33%" scaling the Spawning Drone flat add; **Base (logistic) Growth untouched** (Hive Mind / Fertility Preacher / A New Life all full) — exactly the parity target |
 
 Specialist *output* is deliberately NOT nerfed (only job count per zone). Research stays
 planet-primary (Track 2 unchanged in intent).
 
 **Open items (next session):**
-1. **Hive/organic pop-growth parity (the spawning-pool gap).** Verified in-game: the spawning-drone
-   job converts food → *Monthly Organic Pop Growth* (a GROWTH channel), so our `−33%` assembly nerf
-   doesn't touch it. Bring it in line with base logistic growth. Candidate levers: override the
-   `spawning_drone`/`offspring_drone`/clone-vat jobs to cut their growth output (surgical), or a
-   negative `bonus_pop_growth_mult` (broader — also hits trait growth bonuses like Fertile, so
-   probably too blunt). Decide + build next session.
+1. ✅ **RESOLVED 2026-06-25 — Hive/organic flat-growth parity (the spawning-pool gap).**
+   Investigation overturned the assumption that gated this: the spawning-drone job emits
+   `bonus_pop_growth` (a FLAT additive growth, scaled by `bonus_pop_growth_mult`), while
+   Fertile / Rapid Breeders use a *different* modifier, `logistic_growth_mult`. So
+   `bonus_pop_growth_mult` is NOT "too blunt" — it touches only the flat-additive channel
+   (hive spawning drones + plantoid/lithoid budding + clone vats) and leaves base logistic
+   growth and the breeder traits untouched. Chosen over the surgical job-copy because copying
+   the 200-line `spawning_drone` job would be another brittle whole-file dependency (the exact
+   patch-staleness trap re-confirmed by the 4.4.4 update). Built as `bonus_pop_growth_mult =
+   @econ_growth_nerf` (−33%, = the assembly nerf) on `econ_space_primacy`. Catching budding +
+   clone-vat flat growth is intentional parity, not collateral. **VERIFIED in-game 2026-06-25:**
+   a hive Tech-World's pop-group growth breakdown shows the −33% under **Bonus Growth** (labelled
+   "Galactic Resource Distribution", our `econ_space_primacy` loc name) scaling the Spawning Drone
+   flat add, while **Base/logistic Growth** (Hive Mind +25%, Fertility Preacher +5%, A New Life
+   +10%, Cultivation Drones +10%) is untouched — confirming the flat-vs-logistic split is correct.
+   NOTE: the per-JOB tooltip never shows country-scope growth mults — read the pop-GROUP breakdown.
 2. **Planet bulk output (decision B).** Need a *regular colony's* minerals/energy (not the capital,
    which is uncapped & district-heavy) to decide whether to enable the reserved per-pop output nerf
    (`planet_miners_minerals` / `planet_technician_energy_produces_mult` −30% on `econ_space_primacy`).
@@ -65,6 +75,40 @@ planet-primary (Track 2 unchanged in intent).
    world + a little food). Distinct design problem; housing cut doesn't solve it. Candidate
    directions: diminishing returns on stacking one designation, or amenity/upkeep penalties for
    zero-diversity builds. Parked.
+4. **🔴 HIGH — Mineral (and some energy) GLUT (observed 2026-06-25).** At year ~20, *every* empire
+   big or small was stacked with triple-digit mineral production; some energy too. The `×1.75`
+   deposit-yield buff (Track 1, "space is primary") overshot the *absolute* supply level and is
+   undercutting the **scarcity pillar** — abundant minerals = no trade-offs, no conflict over
+   resources. Tension to resolve: space should be the *primary* (relative) source WITHOUT flooding
+   the galaxy. Levers: (a) cut the `×1.75` toward ~×1.3–1.4 (tune in `01_orbital_deposits.txt`);
+   (b) raise mineral SINKS (building/ship cost or upkeep); (c) both. Connects to Track 4 (strategic
+   resources) and the whole scarcity goal — decide supply-down vs sink-up before slice 4. **Get a
+   baseline:** typical minerals income for a small vs large empire at yr 20/40.
+5. **🟡 INCONCLUSIVE — Is the housing cut biting? (contradictory observations 2026-06-25, needs
+   controlled testing — do NOT act yet).** The cut we have is the **per-district URBAN housing
+   reduction** (`planet_housing_add ×0.70` on city/hive/nexus) + tightened overcrowding (1.10/1.20).
+   Two conflicting reads in different games:
+   - **(a) Too weak:** planets field large populations without real drawbacks; empires not forced
+     to build residences.
+   - **(b) Actually biting:** 19-size CAPITAL planets struggle with planet capacity when no
+     residences are built.
+   So it may already be working and just situational (planet size, designation, species housing
+   density, fill level). **Next step is MEASUREMENT, not a change:** on several developed planets,
+   compare housing vs housing-needs and how close it runs to the 1.10 overcrowding wall, across
+   sizes/designations. **DESIGN CONSTRAINT if we ever do tune it — do NOT re-introduce a global/flat
+   `planet_housing_mult`:** it was deliberately removed because it also cut RURAL housing and made
+   early/wide play miserable; the urban-only cut exists precisely to spare rural/early game. Any
+   future adjustment must stay targeted (deepen the URBAN cut, or attack CAPACITY) — never broad.
+6. **Country Growth Scale — confirmed mechanic (2026-06-25), keep in mind for all growth work.**
+   Vanilla `GROWTH_SCALE` (galaxy setting, default 0.25) taxes the FLAT growth channels
+   (assembly + `bonus_pop_growth`) by total empire pop count, and **EXEMPTS logistic growth — verified
+   even for hives** (a large hive's Base/logistic growth shows NO Country Growth Scale line; only its
+   Bonus/Spawning line carries it). Consequence: machines (flat-only) are the archetype most reined
+   late-game; hive/organic logistic is unreined empire-wide. This is WHY the assembly nerf went
+   machine-exempt (item in the table). In-game spot-check 2026-06-25: a hive colony (+3.43/mo) and an
+   organic individualist (+3.5/mo) were ~even — the flat double-tax (our −33% + CGS) had already
+   pulled hive growth to organic parity, so **no hive-specific logistic nerf is warranted yet**
+   (revisit only if a later save shows hives pulling ahead).
 
 ---
 

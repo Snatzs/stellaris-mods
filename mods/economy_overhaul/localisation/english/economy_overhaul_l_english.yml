@@ -2,6 +2,8 @@
  # --- Space > Planets rebalance ---
  econ_space_primacy:0 "Galactic Resource Distribution"
  econ_space_primacy_desc:0 "The astropolitical order of this era favours those who command the void. Orbital extraction and research stations vastly outproduce the cramped, resource-poor worlds of settled space, while the great resource-megastructures are built more sparingly than in other timelines."
+ econ_organic_assembly_nerf:0 "Constrained Pop Assembly"
+ econ_organic_assembly_nerf_desc:0 "Biological societies that lean on artificial labour find pop-assembly throughput throttled, so manufactured pops cannot simply be stacked on top of natural population growth. Machine empires, which rely on assembly alone, are not subject to this constraint."
  # --- Slice 2: new station-scaling repeatable techs ---
  tech_repeatable_econ_station_gatherers_output:0 "Orbital Extraction Optimisation"
  tech_repeatable_econ_station_gatherers_output_desc:0 "Continual refinement of mining-, gathering-, and harvesting-station systems steadily increases the yield drawn from orbital deposits across the empire."

@@ -14,6 +14,17 @@ on_game_start_country = {
 	}
 }
 
+# Empires created MID-GAME (released vassals, rebellions, independence/rebel factions,
+# crisis countries, etc.) are NOT covered by on_game_start_country — that only fires for
+# empires present at galaxy generation. on_country_created (this = the new country) catches
+# them so they get the same economy modifiers. econ_overhaul.1 is idempotent (has_modifier
+# guards), so empires that also trigger on_game_start_country aren't double-modified.
+on_country_created = {
+	events = {
+		econ_overhaul.1
+	}
+}
+
 # Global, once-per-game: cap oversized procedural planets (econ_overhaul.2).
 # on_game_start fires after galaxy generation, so every natural world exists.
 on_game_start = {
