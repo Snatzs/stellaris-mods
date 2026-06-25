@@ -190,6 +190,7 @@ scaling. Read it before building any economy slice.)*
 ## Mods — Meta & Balance
 
 - [ ] Disable nomadic empires for MP — ✅ DECIDED (group, 2026-06-18): nomads banned as OP + concept-breaking. Remove the 4 nomadic origins from selection; resolve player-only vs. AI-too sub-question before building (see multiplayer-balance.md). We still mine their mechanics (patch-4.4-changes.md §6).
+- [ ] Remove **Defender of the Galaxy** as a pickable option — ✅ DECIDED (group, 2026-06-26). In 4.4 it's the Defender of the Galaxy **Ambition** (was an ascension perk pre-4.4). Make it non-selectable (e.g. `potential = { always = no }` / drop from the pickable list). Confirm whether to block for players only or AI too (same sub-question as the nomad ban). Locate the def under vanilla `common/ambitions/` (4.4) and/or `common/ascension_perks/` before building.
 - [!] Evaluate/disable other exploitable origins (Knights of The Toxic Gods, etc.) — 4.4 also added Defender of the Galaxy Ambition + reworked Commander traits to audit (see patch-4.4-changes.md §6)
 - [~] Kill "build" meta synergies (approach TBD) — **partial:** economy_overhaul slice 3 neuters two space-economy auto-picks (Astro-Mining Drones civic **disabled**; Privatized Exploration **cut** to +10%) + tames Arc Furnace / Dyson Swarm / planetary ascension. More synergies TBD.
 
