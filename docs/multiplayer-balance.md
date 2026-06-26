@@ -34,6 +34,37 @@ Document balance decisions here as mods are developed. Include the rationale so 
   disable Astro-Mining Drones + Privatized Exploration civics; nerf+limit Arc Furnace / Dyson
   Swarm; halve `PLANET_ASCENSION_MODIFIER_SCALE`. All symmetric across empires → MP-fair.
 
+### Economy — deposit-yield glut fix → per-resource multipliers (v2.4 → v2.5 / 2026-06-26)
+- **Decision:** Replace the uniform deposit `produces` buff with **per-resource** multipliers in
+  `01_orbital_deposits.txt`: **minerals ×1.40, energy ×1.60, research (society/physics/eng) ×1.15**;
+  **alloys / food / consumer_goods / trade left at vanilla ×1.0.** Chosen lever for the glut:
+  **supply-down** (reduce the buff) over **sink-up** (raise resource costs/upkeep). (History: v2 shipped
+  a uniform ×1.75; v2.4 cut it to a uniform ×1.40; v2.5 made it per-resource.)
+- **Reason:** First in-game test (2026-06-25) showed ×1.75 overshot **absolute** supply — every empire,
+  large or small, was drowning in minerals (triple-digit income by yr ~20), and some in energy. That
+  directly undercuts the **scarcity pillar** (pillar 2): if minerals are free, there are no trade-offs
+  and nothing to fight over. The "space is *primary*" goal is **relative**, so trimming absolute yield
+  preserves the space>planet ratio while restoring scarcity.
+- **Why per-resource (not a single number):** the resource types have different roles, so one multiplier
+  is the wrong tool. **Minerals** were the main glut culprit → kept lowest of the bulk pair (×1.40).
+  **Energy** tolerates a hotter buff (×1.60) — it's the universal upkeep currency with far more late-game
+  sinks, so it drains rather than piles up. **Research** only ×1.15 — Track 2 keeps research
+  *planet-primary*; space research is a supplement, not a source to lean on. **Alloys** left at vanilla:
+  alloys are a refined/STRATEGIC output the vision wants kept **scarce**, so the few natural orbital alloy
+  deposits (only `d_alloys_1/2` spawn; the rest are `pc_junk`-only) stay un-inflated. **Food / consumer
+  goods** left at vanilla because those orbital deposits barely-or-never spawn (`d_food_4..10` and the CG
+  deposit are `always = no`; `d_food_3` is ~0 weight) — buffing dead content is pure noise.
+- **Why supply-down, not sink-up:** smallest, most reversible edit; sink-up has a much broader blast
+  radius (touches building/ship cost-balance everywhere) and is harder to calibrate without measurement.
+  Sink-up is kept on the table as a *follow-up* if supply-down alone doesn't bring scarcity back.
+- **MP-fairness:** Symmetric — same deposits for every empire, no randomness, no per-player choice.
+- **Implementation note:** regenerated auditably from vanilla by a tools-side script (not hand-edited);
+  verification caught that trade + the dead food/CG deposits must NOT be scaled.
+- **Tuning:** all four multipliers are calibration guesses, **not yet re-tested**. Re-measure
+  small-vs-large minerals & energy income at yr 20/40: cut minerals toward ~×1.3 and/or add sinks if
+  still glutted; ease back up if space stops feeling like the primary source. Feeds the Track-4
+  strategic-supply calibration. See [economy-overhaul-design.md](economy-overhaul-design.md) Open Item #4.
+
 ### Economy — "Space > Planets" rebalance (economy_overhaul slice 1 — SUPERSEDED)
 > Superseded by the structural approach in the design doc. Kept for history.
 - **Decision:** Shift the resource economy so space outproduces planets, via one permanent country

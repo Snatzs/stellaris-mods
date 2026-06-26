@@ -20,7 +20,8 @@ econ_space_primacy = {
 
 	# v2 (2026-06-23): the flat +50% station_*_produces_mult lines were REMOVED.
 	# "Space is the primary economy" is now carried by BUFFED DEPOSIT YIELDS at the
-	# source (whole-file 01_orbital_deposits.txt, produces ×1.75) + the station
+	# source (whole-file 01_orbital_deposits.txt, per-resource produces mults: minerals ×1.40 /
+	# energy ×1.60 / research ×1.15, v2.5) + the station
 	# repeatables (slice 2), so we don't double-count base × flat-mult × repeatable
 	# (the multiplier-compounding the design doc warned about). This modifier now
 	# carries only the planet-DOWN structural support that has no cleaner home.

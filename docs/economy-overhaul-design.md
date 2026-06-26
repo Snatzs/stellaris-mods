@@ -37,7 +37,7 @@ but their *mechanisms* and a few choices are corrected here.
 **Revised Track 1 lever set — BUILT & in-game-verified 2026-06-24 (except where noted):**
 | Goal | Lever | Mechanism | Value | Status |
 |---|---|---|---|---|
-| Space is primary | **Buff deposit base yields** (flat +50% station modifier REMOVED to avoid base×mult×repeatable bloat) | whole-file `01_orbital_deposits.txt`, all `produces` ×N | **×1.75** | ✅ space>job balance trending right by yr 20 |
+| Space is primary | **Buff deposit base yields** (flat +50% station modifier REMOVED to avoid base×mult×repeatable bloat) | whole-file `01_orbital_deposits.txt`, **per-resource** `produces` ×N | **minerals ×1.40, energy ×1.60, research ×1.15**; alloys/food/CG/trade vanilla (was uniform ×1.75 v2 → ×1.40 v2.4 → per-resource v2.5, item #4) | ✅ space>job ratio held; absolute supply re-tuned down to fix glut (re-test pending) |
 | Space scales | station gatherer/researcher repeatables | new techs | +3%/level | ✅ |
 | Planet basic-resource down | rural district jobs | `100_…zones.txt` | 200→**150** | ✅ |
 | Specialist VOLUME down (not output) | zone job vars `@scaling_district_*` | `100_…zones.txt` | **−~30%** | ✅ |
@@ -75,15 +75,27 @@ planet-primary (Track 2 unchanged in intent).
    world + a little food). Distinct design problem; housing cut doesn't solve it. Candidate
    directions: diminishing returns on stacking one designation, or amenity/upkeep penalties for
    zero-diversity builds. Parked.
-4. **🔴 HIGH — Mineral (and some energy) GLUT (observed 2026-06-25).** At year ~20, *every* empire
-   big or small was stacked with triple-digit mineral production; some energy too. The `×1.75`
-   deposit-yield buff (Track 1, "space is primary") overshot the *absolute* supply level and is
-   undercutting the **scarcity pillar** — abundant minerals = no trade-offs, no conflict over
-   resources. Tension to resolve: space should be the *primary* (relative) source WITHOUT flooding
-   the galaxy. Levers: (a) cut the `×1.75` toward ~×1.3–1.4 (tune in `01_orbital_deposits.txt`);
-   (b) raise mineral SINKS (building/ship cost or upkeep); (c) both. Connects to Track 4 (strategic
-   resources) and the whole scarcity goal — decide supply-down vs sink-up before slice 4. **Get a
-   baseline:** typical minerals income for a small vs large empire at yr 20/40.
+4. **🟠 ADDRESSED (supply-down, v2.4/2026-06-26) — re-test pending — Mineral (and some energy) GLUT
+   (observed 2026-06-25).** At year ~20, *every* empire big or small was stacked with triple-digit
+   mineral production; some energy too. The `×1.75` deposit-yield buff (Track 1, "space is primary")
+   overshot the *absolute* supply level and undercut the **scarcity pillar** — abundant minerals =
+   no trade-offs, no conflict over resources. Decision (group, 2026-06-26): **supply-down** — chosen
+   over sink-up because it's the smallest/most reversible lever and keeps space *relatively* primary
+   without an absolute flood (sink-up has a broader blast radius and is harder to calibrate without
+   measurement; it remains a future option if supply-down alone doesn't restore scarcity). **Action
+   (v2.4 → refined v2.5):** dropped the uniform ×1.75, and instead of a flat ×1.40, went **per-resource**
+   (`01_orbital_deposits.txt`, regenerated from vanilla by a tools-side script):
+   **minerals ×1.40, energy ×1.60, research ×1.15**; **alloys / food / consumer_goods / trade left at
+   vanilla ×1.0.** Rationale: minerals were the main glut culprit (lowest of the bulk pair); energy
+   tolerates a hotter buff (more late-game sinks, drains faster); research stays a *supplement* per
+   Track 2 (planet-primary), so only +15%; alloys are a refined/STRATEGIC output the vision wants kept
+   scarce (the few natural orbital alloy deposits stay un-inflated); food/CG deposits barely-or-never
+   spawn (`d_food_4..10` & the CG deposit are `always = no`; `d_food_3` ~0 weight) so buffing them is
+   noise. Verification caught that trade and these dead deposits should NOT be scaled — regenerated from
+   vanilla, not hand-edited. **Still needed (in-game):** confirm these restore scarcity at yr 20/40 —
+   baseline typical minerals (and energy) income for a small vs large empire; if minerals still glut,
+   cut toward ~×1.3 and/or add sinks (lever (b)); if space no longer feels primary, ease back up.
+   Connects to Track 4 (strategic-resource supply scaling) — this baseline informs slice 4.
 5. **🟡 INCONCLUSIVE — Is the housing cut biting? (contradictory observations 2026-06-25, needs
    controlled testing — do NOT act yet).** The cut we have is the **per-district URBAN housing
    reduction** (`planet_housing_add ×0.70` on city/hive/nexus) + tightened overcrowding (1.10/1.20).

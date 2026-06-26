@@ -25,7 +25,7 @@ Slices 1–3 were found **broken in-game** (the original `zzz_` approach silentl
 - **Local dev mods need a junction into the game `mod/` dir + relative descriptor path** (external absolute path
   registers but never loads). `tools/deploy.sh` now does this automatically (reads Irony's UserDirectory).
 
-**v2 state — BUILT & verified ✅ (see design-doc table for the full list):** deposit yields ×1.75 (flat +50%
+**v2 state — BUILT & verified ✅ (see design-doc table for the full list):** deposit yields per-resource (minerals ×1.40 / energy ×1.60 / research ×1.15; alloys/food/CG vanilla — v2.5/2026-06-26, was uniform ×1.75→×1.40 to fix the glut; flat +50%
 modifier removed); rural jobs 200→150; specialist zone jobs −30%; **urban district housing −30%** (replaced the
 global housing mult — spares rural/wide); overcrowding 1.10/1.20; **planet-size resize event** (≈no >18 worlds
 confirmed); kilostructures ×0.4; **mechanical pop assembly −33%**; civics/repeatables/ascension unchanged from before.
@@ -57,9 +57,13 @@ repeatable-tech keys we override still exist. No changes were needed.
    (`has_modifier` guards) since static modifiers stack if added twice. **Note:** still won't retro-apply to
    EXISTING saves (event already fired) — test v2.2/v2.3 on a fresh game. Housing reminder: the cut is
    per-district URBAN only (×0.70); the global `planet_housing_mult` was removed on purpose — do NOT re-add it.
-1c. **🔴 NEW calibration findings (2026-06-25) — see design-doc Open Items #4–5:**
-   - **Mineral GLUT (HIGH):** all empires triple-digit minerals by yr 20 → `×1.75` deposit buff overshot,
-     undercuts scarcity. Decide supply-down (cut toward ×1.3–1.4) vs sink-up before slice 4.
+1c. **🟠 calibration findings (2026-06-25) — see design-doc Open Items #4–5:**
+   - **Mineral GLUT — ADDRESSED (supply-down, v2.4→v2.5/2026-06-26), re-test pending:** all empires triple-digit
+     minerals by yr 20 → `×1.75` deposit buff overshot, undercut scarcity. Group chose supply-down over
+     sink-up, then went **per-resource** (`01_orbital_deposits.txt`, regenerated from vanilla): **minerals
+     ×1.40, energy ×1.60, research ×1.15**; alloys (kept scarce by design) / food / CG / trade left vanilla.
+     **Re-test at yr 20/40:** baseline small-vs-large minerals & energy income; cut minerals toward ~×1.3 or
+     add sinks if still glutted, ease up if space stops feeling primary.
    - **Housing cut — INCONCLUSIVE (needs testing, don't act):** contradictory games — one shows planets
      carrying large pops pressure-free, another shows 19-size capitals choking on capacity with no
      residences. May already be biting situationally. MEASURE housing vs housing-needs across sizes first.
@@ -70,7 +74,7 @@ repeatable-tech keys we override still exist. No changes were needed.
 4. **Then** slice 4 — strategic resources (refining nerf + strategic repeatable + `02_sr_deposits.txt` `drop_weight`
    concentration). The make-or-break track; do after the above settle.
 
-**Calibration knobs to watch** (all first-pass, tunable in their files): deposit ×1.75, rural 150, zone jobs −30%,
+**Calibration knobs to watch** (all first-pass, tunable in their files): deposits minerals ×1.40 / energy ×1.60 / research ×1.15, rural 150, zone jobs −30%,
 urban housing ×0.70, overcrowding 1.10/1.20, assembly −33% **(organics only; machines exempt)**, **flat-growth (spawning/budding/clone) −33%**, kilostructures ×0.4.
 
 **(C) Migration mod:** independent — `mod/migration-overhaul` still code-complete/untested, awaiting its own test + merge.

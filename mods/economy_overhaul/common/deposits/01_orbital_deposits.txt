@@ -1,8 +1,21 @@
 # ECON OVERHAUL v2 — WHOLE-FILE replacement of vanilla 01_orbital_deposits.txt.
-# Every `produces` value is vanilla x1.75 (deposits made richer at the SOURCE so
-# space is the primary economy — replaces the removed flat +50% station modifier).
+# Each `produces` value is vanilla x (a PER-RESOURCE multiplier) — deposits made richer
+# at the SOURCE so space is the primary BULK economy (replaces the removed flat +50%
+# station modifier). Regenerated from vanilla by a tools-side script, NOT hand-edited.
+#
+# v2.5 (2026-06-26) per-resource multipliers (was a uniform x1.40 in v2.4, x1.75 in v2):
+#   minerals  x1.40   energy x1.60   research (society/physics/eng) x1.15
+#   alloys / food / consumer_goods / trade  x1.00 (VANILLA — not buffed)
+# Rationale:
+#   - minerals/energy = the Track-1 bulk flip; energy runs hotter (more sinks, drains faster),
+#     minerals stay lower (they were the main GLUT culprit, open item #4 — x1.75 v2 -> x1.40).
+#   - research only x1.15: Track 2 keeps research PLANET-primary; space research is a supplement.
+#   - alloys left vanilla: alloys are a refined/STRATEGIC output — vision wants alloy scarcity
+#     real, so the few rare orbital alloy deposits (d_alloys_1/2 spawn; 3+ are pc_junk-only) stay
+#     un-inflated. food/consumer_goods left vanilla because they barely/never spawn (d_food_4..10
+#     & the CG deposit are `always = no`; d_food_3 is ~0 weight) — buffing them is pure noise.
 # ONLY produces values changed; drop_weight / habitat_modifier are verbatim vanilla.
-# Re-sync from vanilla on any version bump. Tune the x1.75 here. See compatibility.md.
+# Re-sync from vanilla on any version bump. Tune the per-resource mults here. See compatibility.md.
 
 ##################################
 ############ MINERALS ############
@@ -12,7 +25,7 @@ d_minerals_1 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 1.75
+			minerals = 1.4
 		}
 	}
 	station = shipclass_mining_station
@@ -36,7 +49,7 @@ d_minerals_2 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 3.5
+			minerals = 2.8
 		}
 	}
 	station = shipclass_mining_station
@@ -72,7 +85,7 @@ d_minerals_3 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 5.25
+			minerals = 4.2
 		}
 	}
 	station = shipclass_mining_station
@@ -108,7 +121,7 @@ d_minerals_4 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 7
+			minerals = 5.6
 		}
 	}
 	station = shipclass_mining_station
@@ -144,7 +157,7 @@ d_minerals_5 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 8.75
+			minerals = 7
 		}
 	}
 	station = shipclass_mining_station
@@ -180,7 +193,7 @@ d_minerals_6 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 10.5
+			minerals = 8.4
 		}
 	}
 	station = shipclass_mining_station
@@ -200,7 +213,7 @@ d_minerals_7 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 12.25
+			minerals = 9.8
 		}
 	}
 	station = shipclass_mining_station
@@ -220,7 +233,7 @@ d_minerals_8 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 14
+			minerals = 11.2
 		}
 	}
 	station = shipclass_mining_station
@@ -240,7 +253,7 @@ d_minerals_9 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 15.75
+			minerals = 12.6
 		}
 	}
 	station = shipclass_mining_station
@@ -260,7 +273,7 @@ d_minerals_10 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			minerals = 17.5
+			minerals = 14
 		}
 	}
 	station = shipclass_mining_station
@@ -283,7 +296,7 @@ d_energy_1 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 1.75
+			energy = 1.6
 		}
 	}
 	station = shipclass_mining_station
@@ -307,7 +320,7 @@ d_energy_2 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 3.5
+			energy = 3.2
 		}
 	}
 	station = shipclass_mining_station
@@ -358,7 +371,7 @@ d_energy_3 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 5.25
+			energy = 4.8
 		}
 	}
 	station = shipclass_mining_station
@@ -409,7 +422,7 @@ d_energy_4 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 7
+			energy = 6.4
 		}
 	}
 	station = shipclass_mining_station
@@ -460,7 +473,7 @@ d_energy_5 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 8.75
+			energy = 8
 		}
 	}
 	station = shipclass_mining_station
@@ -511,7 +524,7 @@ d_energy_6 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 10.5
+			energy = 9.6
 		}
 	}
 	station = shipclass_mining_station
@@ -531,7 +544,7 @@ d_energy_7 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 12.25
+			energy = 11.2
 		}
 	}
 	station = shipclass_mining_station
@@ -551,7 +564,7 @@ d_energy_8 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 14
+			energy = 12.8
 		}
 	}
 	station = shipclass_mining_station
@@ -571,7 +584,7 @@ d_energy_9 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 15.75
+			energy = 14.4
 		}
 	}
 	station = shipclass_mining_station
@@ -591,7 +604,7 @@ d_energy_10 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			energy = 17.5
+			energy = 16
 		}
 	}
 	station = shipclass_mining_station
@@ -614,7 +627,7 @@ d_society_1 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 1.75
+			society_research = 1.15
 		}
 	}
 	station = shipclass_research_station
@@ -638,7 +651,7 @@ d_society_2 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 3.5
+			society_research = 2.3
 		}
 	}
 	station = shipclass_research_station
@@ -662,7 +675,7 @@ d_society_3 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 5.25
+			society_research = 3.45
 		}
 	}
 	station = shipclass_research_station
@@ -686,7 +699,7 @@ d_society_4 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 7
+			society_research = 4.6
 		}
 	}
 	station = shipclass_research_station
@@ -710,7 +723,7 @@ d_society_5 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 8.75
+			society_research = 5.75
 		}
 	}
 	station = shipclass_research_station
@@ -734,7 +747,7 @@ d_society_6 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 10.5
+			society_research = 6.9
 		}
 	}
 	station = shipclass_research_station
@@ -754,7 +767,7 @@ d_society_7 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 12.25
+			society_research = 8.05
 		}
 	}
 	station = shipclass_research_station
@@ -774,7 +787,7 @@ d_society_8 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 14
+			society_research = 9.2
 		}
 	}
 	station = shipclass_research_station
@@ -794,7 +807,7 @@ d_society_9 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 15.75
+			society_research = 10.35
 		}
 	}
 	station = shipclass_research_station
@@ -814,7 +827,7 @@ d_society_10 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 17.5
+			society_research = 11.5
 		}
 	}
 	station = shipclass_research_station
@@ -834,7 +847,7 @@ d_society_15 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			society_research = 26.25
+			society_research = 17.25
 		}
 	}
 	station = shipclass_research_station
@@ -857,7 +870,7 @@ d_physics_1 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 1.75
+			physics_research = 1.15
 		}
 	}
 	station = shipclass_research_station
@@ -881,7 +894,7 @@ d_physics_2 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 3.5
+			physics_research = 2.3
 		}
 	}
 	station = shipclass_research_station
@@ -928,7 +941,7 @@ d_physics_3 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 5.25
+			physics_research = 3.45
 		}
 	}
 	station = shipclass_research_station
@@ -983,7 +996,7 @@ d_physics_4 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 7
+			physics_research = 4.6
 		}
 	}
 	station = shipclass_research_station
@@ -1038,7 +1051,7 @@ d_physics_5 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 8.75
+			physics_research = 5.75
 		}
 	}
 	station = shipclass_research_station
@@ -1093,7 +1106,7 @@ d_physics_6 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 10.5
+			physics_research = 6.9
 		}
 	}
 	station = shipclass_research_station
@@ -1113,7 +1126,7 @@ d_physics_7 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 12.25
+			physics_research = 8.05
 		}
 	}
 	station = shipclass_research_station
@@ -1133,7 +1146,7 @@ d_physics_8 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 14
+			physics_research = 9.2
 		}
 	}
 	station = shipclass_research_station
@@ -1153,7 +1166,7 @@ d_physics_9 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 15.75
+			physics_research = 10.35
 		}
 	}
 	station = shipclass_research_station
@@ -1173,7 +1186,7 @@ d_physics_10 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			physics_research = 17.5
+			physics_research = 11.5
 		}
 	}
 	station = shipclass_research_station
@@ -1196,7 +1209,7 @@ d_engineering_1 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 1.75
+			engineering_research = 1.15
 		}
 	}
 	station = shipclass_research_station
@@ -1220,7 +1233,7 @@ d_engineering_2 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 3.5
+			engineering_research = 2.3
 		}
 	}
 	station = shipclass_research_station
@@ -1244,7 +1257,7 @@ d_engineering_3 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 5.25
+			engineering_research = 3.45
 		}
 	}
 	station = shipclass_research_station
@@ -1276,7 +1289,7 @@ d_engineering_4 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 7
+			engineering_research = 4.6
 		}
 	}
 	station = shipclass_research_station
@@ -1308,7 +1321,7 @@ d_engineering_5 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 8.75
+			engineering_research = 5.75
 		}
 	}
 	station = shipclass_research_station
@@ -1340,7 +1353,7 @@ d_engineering_6 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 10.5
+			engineering_research = 6.9
 		}
 	}
 	station = shipclass_research_station
@@ -1360,7 +1373,7 @@ d_engineering_7 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 12.25
+			engineering_research = 8.05
 		}
 	}
 	station = shipclass_research_station
@@ -1380,7 +1393,7 @@ d_engineering_8 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 14
+			engineering_research = 9.2
 		}
 	}
 	station = shipclass_research_station
@@ -1400,7 +1413,7 @@ d_engineering_9 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 15.75
+			engineering_research = 10.35
 		}
 	}
 	station = shipclass_research_station
@@ -1420,7 +1433,7 @@ d_engineering_10 = {
 	resources = {
 		category = orbital_research_deposits
 		produces = {
-			engineering_research = 17.5
+			engineering_research = 11.5
 		}
 	}
 	station = shipclass_research_station
@@ -1657,7 +1670,7 @@ d_alloys_1 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			alloys = 1.75
+			alloys = 1
 		}
 	}
 	potential = {
@@ -1681,7 +1694,7 @@ d_alloys_2 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			alloys = 3.5
+			alloys = 2
 		}
 	}
 
@@ -1706,7 +1719,7 @@ d_alloys_3 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			alloys = 5.25
+			alloys = 3
 		}
 	}
 
@@ -1724,7 +1737,7 @@ d_alloys_4 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			alloys = 7
+			alloys = 4
 		}
 	}
 
@@ -1742,7 +1755,7 @@ d_alloys_5 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			alloys = 8.75
+			alloys = 5
 		}
 	}
 
@@ -1760,7 +1773,7 @@ d_alloys_10 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			alloys = 17.5
+			alloys = 10
 		}
 	}
 
@@ -1778,7 +1791,7 @@ d_alloys_25 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			alloys = 43.75
+			alloys = 25
 		}
 	}
 
@@ -1799,7 +1812,7 @@ d_food_3 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			food = 5.25
+			food = 3
 		}
 	}
 
@@ -1822,7 +1835,7 @@ d_food_4 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			food = 7
+			food = 4
 		}
 	}
 
@@ -1837,7 +1850,7 @@ d_food_5 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			food = 8.75
+			food = 5
 		}
 	}
 
@@ -1852,7 +1865,7 @@ d_food_6 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			food = 10.5
+			food = 6
 		}
 	}
 
@@ -1867,7 +1880,7 @@ d_food_7 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			food = 12.25
+			food = 7
 		}
 	}
 
@@ -1882,7 +1895,7 @@ d_food_10 = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			food = 17.5
+			food = 10
 		}
 	}
 
@@ -1898,7 +1911,7 @@ d_consumer_goods_obsessional_directive = {
 	resources = {
 		category = orbital_mining_deposits
 		produces = {
-			consumer_goods = 3.5
+			consumer_goods = 2
 		}
 	}
 

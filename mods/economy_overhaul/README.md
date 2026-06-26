@@ -8,8 +8,10 @@ self-sufficient engines. Implements Track 1 (bulk minerals/energy) of the full d
 > specifically the **"v2 — Revised decisions (2026-06-23)"** section, which is authoritative.
 >
 > ⚠️ **v2 changes (2026-06-23) not yet fully reflected in the slice text below — design doc wins:**
-> - Space strength now comes from **buffed deposit yields** (`common/deposits/01_orbital_deposits.txt`,
->   `produces` ×1.75), and the old **flat +50% station modifier was REMOVED**.
+> - Space strength now comes from **buffed deposit yields** (`common/deposits/01_orbital_deposits.txt`),
+>   with **per-resource** multipliers (v2.5/2026-06-26): **minerals ×1.40, energy ×1.60, research ×1.15**;
+>   alloys/food/consumer_goods/trade left at vanilla. (Was a uniform ×1.75 → ×1.40 to fix the
+>   mineral/energy glut.) The old **flat +50% station modifier was REMOVED**.
 > - **Housing is now CUT** (`planet_housing_mult −25%` + tighter overcrowding defines), not kept as a
 >   surplus — 4.4 makes *houseless* the real pressure, *jobless* pops just become civilians.
 > - **Specialist job VOLUME** cut via zone vars (`@scaling_district_* −~30%`); city districts grant no

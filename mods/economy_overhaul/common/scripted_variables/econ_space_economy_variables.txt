@@ -13,8 +13,10 @@
 # v2 (2026-06-23): the old flat +50% station_*_produces_mult modifier was REMOVED to
 # avoid base × flat-mult × repeatable compounding. "Space is primary" is now intrinsic
 # to the deposits: common/deposits/01_orbital_deposits.txt is whole-file-replaced with
-# every `produces` value ×1.75 (tune that multiplier there). Station repeatables
-# (slice 2, @econ_repeatable_per_level below) still scale space output over time.
+# PER-RESOURCE `produces` multipliers (v2.5/2026-06-26; tune them in that file's header):
+# minerals ×1.40, energy ×1.60, research ×1.15; alloys/food/CG/trade left at vanilla.
+# (Was a uniform ×1.75 in v2 → ×1.40 in v2.4 to fix the mineral/energy glut, open item #4.)
+# Station repeatables (slice 2, @econ_repeatable_per_level below) still scale space over time.
 
 # --- Housing scarcity (v2.1) — now done in the district files, not here ---
 # Urban (city/hive/nexus) district housing is cut -30% directly in the whole-file
