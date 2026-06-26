@@ -91,7 +91,7 @@ Each district has:
 
 1. **Reduce jobs per district** — change `job_X_add` values
 2. **Increase district upkeep** — modify `resources.upkeep` block
-3. **Cap district slots** — `planet_max_districts_add` / `planet_max_districts_mult` modifiers, also `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` in defines (line 1632 in 4.4.4)
+3. **Cap district slots** — `planet_max_districts_add` / `planet_max_districts_mult` modifiers, also `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` in defines (line 1633 in 4.4.4)
 4. **Reduce job output** — modify individual jobs in `common/pop_jobs/`
 
 ---
@@ -99,7 +99,7 @@ Each district has:
 ## Planet Size
 
 ### Defines (`common/defines/00_defines.txt`)
-- `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` (line 1632 in 4.4.4)
+- `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` (line 1633 in 4.4.4)
 
 ### How Planet Size Affects Districts
 Planet size determines base district slots. Modifiable via:
