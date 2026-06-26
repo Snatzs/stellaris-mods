@@ -23,6 +23,7 @@ Quick-reference index for Stellaris mod development.
 - [Warfare](vanilla/warfare.md) — claims, war goals, casus belli, war exhaustion, occupation mechanics
 - [Diplomacy](vanilla/diplomacy.md) — opinion modifiers, ethics, federations, diplomatic actions, borders
 - [Population](vanilla/population.md) — slavery types, species rights, pop categories, jobs, migration
+- [Situations](vanilla/situations.md) — stateful multi-stage mechanics: progress bar, stages, approaches, monthly events
 
 ### Content Guides — consult these when building specific features
 - [Event Modding](wiki/event_modding.md) — event types, structure, options, chaining, pre-triggers, performance
@@ -42,6 +43,7 @@ Base URL: `https://stellaris.paradoxwikis.com/<Topic>_modding`
 | Modifying war/claims/combat | [Vanilla Warfare](vanilla/warfare.md) first, then Effects |
 | Modifying diplomacy/federations/ethics | [Vanilla Diplomacy](vanilla/diplomacy.md) first, then Conditions |
 | Modifying slavery/pops/migration | [Vanilla Population](vanilla/population.md) first, then Scopes |
+| Building a stateful/multi-stage mechanic (revolt, crisis, deficit) | [Vanilla Situations](vanilla/situations.md) first, then Effects/On Actions |
 | Writing event logic (if/else, effects) | Effects, Conditions, Scopes |
 | Adding modifiers to buildings/techs/traits | Modifiers |
 | Creating events | Event Modding, On Actions |

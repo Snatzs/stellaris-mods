@@ -102,6 +102,17 @@ Track what needs to be done, what's in progress, and what's done.
 - [ ] Species-type diplomacy modifiers (phenotype-based trust/distrust)
 - [ ] Xenophile/xenophobe ethics amplify/reduce species-type effects
 
+### Ethnic Civil War (new mod — "Ethnic Tensions")
+
+*Full design locked at the model level: [`docs/ethnic-civil-war-design.md`](ethnic-civil-war-design.md). Not yet scaffolded. The concrete realisation of the two "species relations" items above.*
+
+- [ ] **Phase 1 — MVP core:** eligibility gate → simmer accumulator → ignition → planet-targeted **Situation** (two temp event-countries, 3 approaches + abstain) → resolution (kill/expel/subjugate, surgical per-planet) → Tier-1 demographic contagion. Gestalt-exempt; **free-xenos gate** (slaves → slave-revolt track, not this).
+- [ ] **Phase 2 — Empire ripple & scale:** Tier-2 structural drift; "Diversity Load" scale-with-size pressure + cohesion infrastructure.
+- [ ] **Phase 3 — Doom-loop & sparks:** crime→ethics-attraction drift; friction/incident events (defuse vs. crack down).
+- [ ] **Phase 4 — Cascade:** Tier-3 contagion (gated, concurrent-capped, cooldown).
+- [ ] **Phase 5 (later) — Geopolitics:** Tier-4 cross-empire reactions; MP-exploit hardening.
+- [ ] **Tuning pass:** all thresholds are placeholders — validate in a late-game MP save (also profile tick cost). Log balance calls in `multiplayer-balance.md`.
+
 ## Mods — Meta & Balance
 
 - [ ] Disable nomadic empires for MP — ✅ DECIDED (group, 2026-06-18): nomads banned as OP + concept-breaking. Remove the 4 nomadic origins from selection; resolve player-only vs. AI-too sub-question before building (see multiplayer-balance.md). We still mine their mechanics (patch-4.4-changes.md §6).

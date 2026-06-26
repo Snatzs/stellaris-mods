@@ -151,6 +151,7 @@ Local wiki references are stored in `docs/wiki/`. Use these instead of web-fetch
 | Working on war goals/claims/combat | `docs/vanilla/warfare.md`, then `docs/wiki/effects.md` |
 | Working on diplomacy/federations/ethics | `docs/vanilla/diplomacy.md`, then `docs/wiki/conditions.md` |
 | Working on slavery/pops/migration | `docs/vanilla/population.md`, then `docs/wiki/scopes.md` |
+| Building a stateful/multi-stage mechanic (revolt, crisis, deficit) | `docs/vanilla/situations.md`, then `docs/wiki/effects.md` |
 | Writing any script logic | `docs/wiki/scopes.md`, `docs/wiki/effects.md`, `docs/wiki/conditions.md` |
 | Adding modifiers to anything | `docs/wiki/modifiers.md` |
 | Creating or modifying events | `docs/wiki/event_modding.md`, `docs/wiki/on_actions.md` |
