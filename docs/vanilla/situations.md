@@ -1,6 +1,6 @@
 # Vanilla 4.4 — Situations System Architecture
 
-> Verified against Stellaris 4.4.3 (Pegasus). Source of truth: `common/situations/99_README_SITUATIONS.txt` (Paradox's own in-file docs) + 20 live situation files in `common/situations/`.
+> Verified against Stellaris 4.4.4 (Pegasus). Source of truth: `common/situations/99_README_SITUATIONS.txt` (Paradox's own in-file docs) + 20 live situation files in `common/situations/`.
 >
 > Situations track ongoing, stateful "stories" in an empire (planetary revolt, a starbase falling into a black hole, a resource deficit) via a progress bar with stages, player-selectable approaches, and recurring events. Reach for a Situation instead of a bare event chain when the mechanic is **stateful, multi-stage, player-steerable, and wants a UI presence.**
 

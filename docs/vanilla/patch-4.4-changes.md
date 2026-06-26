@@ -1,13 +1,13 @@
 # Patch 4.4 "Pegasus" + Nomads — Changes That Matter to This Project
 
 > What changed from 4.3 → 4.4 that affects our modding, organized by impact on the design vision.
-> Sourced from the official 4.4 patch notes (Stellaris Wiki / Dev Diary #424) and **verified against the live 4.4.3 files at `D:\Stellaris\`** where flagged. The in-install `ChangeLog.txt` is stale (frozen at 2.6.1) — do not use it.
+> Sourced from the official 4.4 patch notes (Stellaris Wiki / Dev Diary #424) and **verified against the live 4.4.4 files at `D:\Stellaris\`** where flagged. The in-install `ChangeLog.txt` is stale (frozen at 2.6.1) — do not use it.
 >
-> This is a *delta* doc. For current-state architecture, see the sibling `economy.md` / `warfare.md` / `diplomacy.md` / `population.md` (already re-verified against 4.4.3).
+> This is a *delta* doc. For current-state architecture, see the sibling `economy.md` / `warfare.md` / `diplomacy.md` / `population.md` (already re-verified against 4.4.4).
 
 ---
 
-## 1. New modding levers (verified present in 4.4.3 files)
+## 1. New modding levers (verified present in 4.4.4 files)
 
 These are new scripting primitives the patch added. They directly enable roadmap items — reach for them before inventing workarounds.
 
@@ -101,4 +101,4 @@ The patch adds powerful new synergy surfaces. Audit these before the campaign:
 ## Sources
 - Stellaris Dev Diary #424 — "Nomads and 4.4 'Pegasus'" release notes
 - Stellaris Wiki: Patch 4.4, Patch 4.4.X
-- Cross-verified against live files at `D:\Stellaris\` (4.4.3 / Pegasus)
+- Cross-verified against live files at `D:\Stellaris\` (4.4.4 / Pegasus)

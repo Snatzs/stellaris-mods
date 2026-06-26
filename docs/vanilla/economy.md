@@ -1,6 +1,6 @@
 # Vanilla 4.4 — Economy Architecture
 
-> Verified against Stellaris 4.4.3 (Pegasus). Nomads DLC notes are marked **(Nomads DLC)**.
+> Verified against Stellaris 4.4.4 (Pegasus). Nomads DLC notes are marked **(Nomads DLC)**.
 
 ## Orbital Deposits (Space Resources)
 
@@ -33,7 +33,7 @@ stations
        ├─ orbital_research_deposits (line 1030, parent = station_researchers)
        └─ hab_research_deposits     (line 1038, parent = station_researchers — NOT orbital_research_deposits)
 ```
-Line numbers per 4.4.3 (the whole file shifted down vs 4.3). Note `hab_research_deposits` hangs directly off `station_researchers`, not off `orbital_research_deposits`.
+Line numbers per 4.4.4 (the whole file shifted down vs 4.3). Note `hab_research_deposits` hangs directly off `station_researchers`, not off `orbital_research_deposits`.
 
 ### Key Modifier for Scaling Space Resources
 
@@ -43,7 +43,7 @@ Similarly: `station_researchers_produces_mult` for research stations.
 
 These are the **cleanest levers** for globally scaling space resource production.
 
-### Vanilla Orbital Yield Tiers (4.4.3)
+### Vanilla Orbital Yield Tiers (4.4.4)
 
 Deposit IDs are tiered `d_<resource>_<N>` where higher N = richer:
 - Minerals: `d_minerals_1` … `d_minerals_10`
@@ -51,7 +51,7 @@ Deposit IDs are tiered `d_<resource>_<N>` where higher N = richer:
 - Research: `d_physics_1`…`d_physics_10`, `d_society_1`…`d_society_15`, `d_engineering_1`…`d_engineering_10` (note: research deposits are `d_physics_N` / `d_society_N` / `d_engineering_N`, NOT `d_*_research_N`)
 - Strategic resources (in `02_sr_deposits.txt`): tiered `d_exotic_gases_1…5`, `d_rare_crystals_1…5`, `d_volatile_motes_1…5`, etc.
 
-(Tier counts verified 4.4.3; per-deposit yield numbers omitted per doc policy. The high tiers already exist — see Scaling note.)
+(Tier counts verified 4.4.4; per-deposit yield numbers omitted per doc policy. The high tiers already exist — see Scaling note.)
 
 ### Scaling Approach
 
@@ -91,7 +91,7 @@ Each district has:
 
 1. **Reduce jobs per district** — change `job_X_add` values
 2. **Increase district upkeep** — modify `resources.upkeep` block
-3. **Cap district slots** — `planet_max_districts_add` / `planet_max_districts_mult` modifiers, also `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` in defines (line 1632 in 4.4.3)
+3. **Cap district slots** — `planet_max_districts_add` / `planet_max_districts_mult` modifiers, also `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` in defines (line 1632 in 4.4.4)
 4. **Reduce job output** — modify individual jobs in `common/pop_jobs/`
 
 ---
@@ -99,7 +99,7 @@ Each district has:
 ## Planet Size
 
 ### Defines (`common/defines/00_defines.txt`)
-- `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` (line 1632 in 4.4.3)
+- `DEFAULT_MAX_DISTRICTS_PER_PLANET = 4` (line 1632 in 4.4.4)
 
 ### How Planet Size Affects Districts
 Planet size determines base district slots. Modifiable via:
@@ -125,7 +125,7 @@ Economic categories form a hierarchy. Each category can `generate_mult_modifiers
 
 ### Key Categories for Our Mods
 
-Line numbers are 4.4.3.
+Line numbers are 4.4.4.
 
 | Category | Line | Parent | Generated Modifier |
 |----------|------|--------|-------------------|
@@ -137,7 +137,7 @@ Line numbers are 4.4.3.
 | `planet_buildings` | 864 | `planet_structures` | `planet_buildings_produces_mult`, `_cost_mult`, `_upkeep_mult` |
 | `planet_deposits` | 1014 | `planets` | `planet_deposits_produces_mult` |
 
-Note: there is **no** `planet_jobs` economic category in 4.4.3 — pop-job production scales via the job-tier categories in `common/economic_categories/01_job_categories.txt` and via `planet_buildings`/`planet_structures`, not a `planet_jobs_produces_mult`.
+Note: there is **no** `planet_jobs` economic category in 4.4.4 — pop-job production scales via the job-tier categories in `common/economic_categories/01_job_categories.txt` and via `planet_buildings`/`planet_structures`, not a `planet_jobs_produces_mult`.
 
 Child categories inherit parent modifiers. Buffing `station_gatherers_produces_mult` affects all mining stations including habitats.
 

@@ -1,6 +1,6 @@
 # Vanilla 4.4 — Population & Slavery Architecture
 
-> Verified against Stellaris 4.4.3 (Pegasus). 4.0+ pop-GROUP model confirmed: pops are organized into pop groups; modifiers use `pop_group_modifier` / `triggered_pop_group_modifier` and group flags use `has_pop_group_flag`. The strata/category model below still holds.
+> Verified against Stellaris 4.4.4 (Pegasus). 4.0+ pop-GROUP model confirmed: pops are organized into pop groups; modifiers use `pop_group_modifier` / `triggered_pop_group_modifier` and group flags use `has_pop_group_flag`. The strata/category model below still holds.
 
 ## Pop Categories (Strata)
 
@@ -52,7 +52,7 @@ New entries in `common/species_rights/slavery_types/` ARE loaded by the game. Pr
 
 ## Specialist Job Access Gate
 
-**Critical file:** `common/scripted_triggers/01_scripted_triggers_jobs.txt` — `can_fill_specialist_job_trigger` (4.4.3: starts at line ~273; the old line 261 reference is stale).
+**Critical file:** `common/scripted_triggers/01_scripted_triggers_jobs.txt` — `can_fill_specialist_job_trigger` (4.4.4: starts at line ~273; the old line 261 reference is stale).
 
 The trigger is now wrapped in `custom_tooltip = SPECIALIST_JOB_TRIGGER` + `hidden_trigger`, and the slavery OR is only one of several conditions:
 
@@ -95,7 +95,7 @@ Some individual specialist jobs also have `is_enslaved = no` in their `possible_
 - Slaves generally use less housing/amenities and less consumer-goods upkeep than free specialists (exact multipliers not copied — verify in living-standards / pop-category inline scripts). Base `pop_group_modifier` for ruler/specialist/worker categories is `pop_housing_usage_base = 1` / `pop_amenities_usage_base = 1`; slave reductions come from living standards + slavery-type modifiers, not the base category. (UNVERIFIED 4.4 — was 4.3: prior doc cited 0.75 housing/amenity and 50-energy resettlement; not re-confirmed.)
 
 ### Stability & Happiness
-- Slave political power / happiness are controlled via `pop_cat_*_political_power` and `pop_happiness`-family modifiers (e.g. indentured: `pop_political_power = 0.50`). Exact slave political-power percentage not copied. (UNVERIFIED 4.4 — was 4.3: prior doc cited a `pop_cat_slave_political_power` of -75%; modifier name/value not re-confirmed in 4.4.3.)
+- Slave political power / happiness are controlled via `pop_cat_*_political_power` and `pop_happiness`-family modifiers (e.g. indentured: `pop_political_power = 0.50`). Exact slave political-power percentage not copied. (UNVERIFIED 4.4 — was 4.3: prior doc cited a `pop_cat_slave_political_power` of -75%; modifier name/value not re-confirmed in 4.4.4.)
 - Slaves cannot join factions.
 - Low stability with slaves triggers dangerous events at a lower stability threshold than non-slave planets. (UNVERIFIED 4.4 — was 4.3: specific 40 vs 25 thresholds not re-confirmed.)
 
@@ -114,7 +114,7 @@ This means `pop_bonus_workforce_mult` in slavery types directly scales output be
 
 ## Pop-Group Script Access & Targeting (4.0+)
 
-> Verified against 4.4.3. Relevant to any mod that reads/acts on the demographic + ethic composition of a planet (e.g. the ethnic-civil-war mod, `docs/ethnic-civil-war-design.md`).
+> Verified against 4.4.4. Relevant to any mod that reads/acts on the demographic + ethic composition of a planet (e.g. the ethnic-civil-war mod, `docs/ethnic-civil-war-design.md`).
 
 ### Iteration & filtering
 - **Planet-scope iteration works:** `every_owned_pop_group` / `any_owned_pop_group` run in **planet scope** (and country scope). Verified: `events/ancient_relics_arcsite_events_1.txt:3234` (iterates on a planet, then `planet = {…}` / `set_owner` in the same scope), `:4247`.

@@ -6,7 +6,7 @@ A collection of custom Stellaris mods developed for a 7-player multiplayer campa
 
 This repository contains multiple Stellaris mods designed to work together. The mods are primarily developed using AI coding agents (Claude Code, Codex) with human oversight and review.
 
-**Game version target:** Stellaris 4.4 (installed: Pegasus v4.4.3, with the Nomads DLC)
+**Game version target:** Stellaris 4.4 (installed: Pegasus v4.4.4, with the Nomads DLC)
 
 **Players:** 7 (3 developers + 4 players)
 

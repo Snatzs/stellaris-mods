@@ -2,7 +2,7 @@
 
 > **Status:** Conceptual design, fully discussed and locked at the model level. **No implementation yet.**
 > **Working mod name:** "Ethnic Tensions" (a new, self-contained mod — not yet scaffolded).
-> **Target:** Stellaris 4.4.3 (Pegasus + Nomads).
+> **Target:** Stellaris 4.4.4 (Pegasus + Nomads).
 > **Authored:** 2026-06-26, from a full design conversation. Captures every locked decision *with its rationale* so it survives a context reset and the other two devs (Snatzs, AttiiK, manzano5) can react.
 
 This document is the single source of truth for the ethnic-civil-war mechanic. Numeric values throughout are **tuning placeholders** — they exist to convey intent and **must be validated by in-game batch testing**, not trusted as final.
@@ -316,7 +316,7 @@ The short-term-order-vs-long-term-grievance choice is exactly the "management wi
 
 ## 11. Verified engine primitives
 
-All confirmed against live 4.4.3 files at `D:\Stellaris\`. (See also the `docs/vanilla/` additions made alongside this doc: `situations.md`, and the new sections in `population.md`.)
+All confirmed against live 4.4.4 files at `D:\Stellaris\`. (See also the `docs/vanilla/` additions made alongside this doc: `situations.md`, and the new sections in `population.md`.)
 
 | Primitive | Verified | Evidence |
 |---|---|---|

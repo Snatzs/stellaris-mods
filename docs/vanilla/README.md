@@ -47,4 +47,4 @@ Key directories mirror mod structure: `common/`, `events/`, `localisation/`, etc
 
 ## Version Note
 
-All file paths, line numbers, and identifiers verified against Stellaris 4.4 (Pegasus v4.4.3, with the Nomads DLC). If the game updates, re-verify against the new files.
+All file paths, line numbers, and identifiers verified against Stellaris 4.4 (Pegasus v4.4.4, with the Nomads DLC). If the game updates, re-verify against the new files.

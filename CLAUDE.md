@@ -6,7 +6,7 @@ This is a monorepo containing multiple Stellaris mods for a 7-player multiplayer
 
 ## Game Version
 
-**Target:** Stellaris 4.4 (installed: Pegasus v4.4.3, with the Nomads DLC)
+**Target:** Stellaris 4.4 (installed: Pegasus v4.4.4, with the Nomads DLC)
 
 ## Design Vision
 
