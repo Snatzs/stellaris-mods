@@ -11,6 +11,23 @@ Track what needs to be done, what's in progress, and what's done.
 > **stale here** — the migration mod is built on `mod/migration-overhaul` and will arrive on
 > `master` via its own merge. The economy handoff is the authoritative one for THIS branch.
 
+**SESSION 2026-06-26 — economy_overhaul v2.4→v2.5: mineral/energy GLUT fix (committed + pushed, `5926e80`; branch clean).**
+The v2 uniform **×1.75** deposit buff overshot ABSOLUTE supply (triple-digit minerals galaxy-wide by yr 20),
+undercutting the scarcity pillar. Group chose **supply-down** over sink-up, then refined to **per-resource**
+multipliers in `01_orbital_deposits.txt` (regenerated from vanilla by a tools-side script — NOT hand-edited):
+**minerals ×1.40, energy ×1.60, research ×1.15; alloys / food / consumer_goods / trade left at vanilla ×1.0**
+(alloys kept scarce by design; food/CG are dead deposits — `always = no` / ~0 weight, so buffing them was noise).
+All docs synced (compatibility, design-doc #4 + Track-1 table, README, multiplayer-balance, in-mod comments).
+
+**▶ NEXT SESSION = the IN-GAME TEST, and it MUST be a FRESH game.** Every remaining economy item is gated on it.
+- **Why fresh, not the old save:** (1) an existing save already grew its economy under ×1.75 (glutted stockpiles),
+  so "is the glut gone by yr 20?" is unmeasurable on it; (2) the event-applied pieces (`econ_overhaul.1` modifiers,
+  `econ_overhaul.2` planet resize) fire only on game/country start and never retro-apply. First ensure the test
+  machine has `mod/economy-overhaul` @ `5926e80` checked out and `tools/deploy.sh` re-run.
+- **Measure:** minerals AND energy income, small vs large empire, at yr 20 and yr 40. Minerals still glut → cut
+  toward ~×1.3 and/or add sinks; energy off → nudge ×1.60; space no longer primary → ease up. Same pass also
+  covers the two parked measurements below (Decision B planet bulk output; "is the housing cut biting").
+
 **SESSIONS 2026-06-23/24 — economy_overhaul reworked to "v2" and **in-game tested** on `mod/economy-overhaul`.**
 Slices 1–3 were found **broken in-game** (the original `zzz_` approach silently failed), then rebuilt and verified.
 **Read [economy-overhaul-design.md](economy-overhaul-design.md) → "v2 — Revised decisions" (top) — it is authoritative.**
