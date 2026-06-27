@@ -1,0 +1,3 @@
+﻿l_english:
+ # Galaxy size name for the 1200-star scenario (matches setup_scenario `name`).
+ galaxy_setup_colossal:0 "Colossal (1200 Stars)"

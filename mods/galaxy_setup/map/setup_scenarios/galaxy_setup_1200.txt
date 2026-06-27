@@ -1,0 +1,93 @@
+# Galaxy Setup — 1200-star galaxy option ("Colossal")
+# ====================================================
+# ADDITIVE: a NEW setup_scenario (not an override of vanilla huge.txt). Adds a galaxy-size
+# option above vanilla's max (Huge = 1000 stars). Purpose: more EMPTY breathing room /
+# contested frontier WITHOUT more pops or empires (the cheap lag dimension — pops, not
+# systems, drive late-game/MP slowdown). Verified base template = D:\Stellaris\map\setup_scenarios\huge.txt.
+#
+# Key choices vs huge.txt:
+#   - num_stars 1000 -> 1200 (+20% systems).
+#   - radius 450 -> 495 — scaled by ~sqrt(1.2) so per-star SPACING stays ~equal to Huge
+#     (1200/495^2 ~= 1000/450^2). Kept <500 per the vanilla radius warning. The breathing
+#     room comes from MORE systems at the SAME empire count, not from sparser stars.
+#   - num_empires + all empire/FE/marauder/nomad counts: IDENTICAL to Huge (default 15).
+#     Deliberately NOT raised — fixed empire count over more systems = larger frontier per
+#     empire (the design goal) and no extra AI cost.
+#   - colonizable_planet_odds left at 1.0 — habitable DENSITY is controlled by the in-game
+#     "Habitable Worlds" slider (recommend ~0.25x) + "Guaranteed Habitable Worlds" (recommend
+#     1-2) as a per-empire floor. Low ambient density + a guaranteed floor approximates the
+#     desired sub-linear curve (small empires get headroom; big empires don't drown in planets).
+# Everything else is copied verbatim from huge.txt; re-sync on a version bump if huge changes.
+
+setup_scenario = {
+	name = "galaxy_setup_colossal"
+	priority = 5					#priority decides in which order the scenarios are listed (above Huge=4)
+	num_stars = 1200
+	radius = 495					#scaled from 450 to keep per-star spacing ~= Huge; kept <500 per vanilla warning
+	num_empires = { min = 0 max = 30 }	#limits player customization — IDENTICAL to Huge (do not raise)
+	num_empire_default = 15
+	fallen_empire_default = 4
+	fallen_empire_max = 6
+	marauder_empire_default = 3
+	marauder_empire_max = 3
+	nomad_empire_default = 3
+	nomad_empire_max = 10
+	advanced_empire_default = 4
+	colonizable_planet_odds = 1.0
+	primitive_odds = 1.0
+	crisis_strength = 1.5
+	extra_crisis_strength = { 10 25 }
+
+	cluster_count = {
+		method = one_every_x_empire
+		#method = constant
+		value = 1
+		max = 6
+	}
+	cluster_radius = 150
+	cluster_distance_from_core = 300
+
+	max_hyperlane_distance = 50
+
+	home_system_partitions = {
+		max_systems = 15
+		min_systems= 8
+
+		min_bridges = 2
+		max_bridges = 4
+
+		method = breadth_first
+	}
+
+	open_space_partitions = {
+		max_systems = 10
+		min_systems= 4
+
+		min_bridges = 2
+		max_bridges = 4
+
+		method = depth_first
+	}
+
+	num_nebulas	= 10
+	nebula_size = 60
+	nebula_min_dist = 200
+
+	num_wormhole_pairs = { min = 0 max = 5 }
+	num_wormhole_pairs_default = 1
+	num_gateways = { min = 0 max = 5 }
+	num_gateways_default = 1
+	num_hyperlanes = { min=0.5 max= 3 }
+	num_hyperlanes_default = 1
+
+	supports_shape = elliptical
+	supports_shape = spiral_2
+	supports_shape = spiral_3
+	supports_shape = spiral_4
+	supports_shape = spiral_6
+	supports_shape = ring
+	supports_shape = bar
+	supports_shape = starburst
+	supports_shape = cartwheel
+	supports_shape = spoked
+}

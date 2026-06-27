@@ -88,6 +88,33 @@ Document balance decisions here as mods are developed. Include the rationale so 
   per 100 pops"). **Re-tune after playtest** — watch that early-game planets don't feel worthless and
   that the station buff doesn't trivialise early expansion. Untested in-game — see mod README checklist.
 
+### Galaxy setup — 1200-star size + planet-scarcity model (2026-06-27)
+- **Decision:** Add a **1200-star galaxy size** (`galaxy_setup` mod — additive setup_scenario, above
+  vanilla Huge=1000) with **empire count unchanged** (default 15), and pair it with low ambient
+  habitable density + a guaranteed per-empire floor (host slider settings, not the mod).
+- **Reason:** More empty, contested frontier (pillars 1–2: geography + scarcity) WITHOUT more pops or
+  empires. Late-game/MP lag is driven by **pops**, then empire count, then fleets; raw *empty* system
+  count is comparatively cheap — and MP runs lockstep at the slowest player's CPU, so the pop ceiling is
+  what matters and this does not raise it. Fixed empire count over +20% systems = larger frontier each.
+- **Planet-scarcity model (the key reasoning):** habitable worlds spawn at galaxy gen, *before* empires
+  exist, so spawn density is necessarily **linear** in systems held — a single slider/mod density value
+  CANNOT give the desired **sub-linear** (anti-snowball) curve where big empires get proportionally
+  fewer worlds-per-system. The fix is **low ambient density + a guaranteed floor**: the floor is a flat
+  per-empire bonus (helps small empires disproportionately → headroom), while low ambient density means
+  marginal territory adds few worlds (big empires don't drown in planet-micro). Rough model at ~0.05
+  habitable/system + 2 guaranteed ≈ 20-system empire → ~3 worlds; ~250-system (quarter-galaxy) → ~14–16
+  — matching the group's target. The remaining anti-snowball shaping is value-per-world (economy
+  planet-down) + sprawl cost (high Planetary-Deficit-Logistics setting), NOT spawn frequency.
+- **Recommended host settings:** Habitable Worlds **~0.25x**; Guaranteed Habitable Worlds **1–2**
+  (NOTE: this **revises** the earlier "Guaranteed = Off" stance — with very low density a floor is
+  needed so small/early empires aren't crippled). Guaranteed-colony range is capped at 0–2 by
+  `GUARANTEED_COLONIES_MAX` (defines); >2 would need a defines override. Keep high Deficit-Logistics +
+  Guaranteed-off-was-non-negotiable now softened to a floor.
+- **MP-fairness:** symmetric (galaxy-wide gen, host-configured, no per-player advantage).
+- **Open / to verify in-game:** late-game framerate on the slowest player's machine at 1200 stars;
+  confirm the 0.25x + floor combo actually yields the target world counts; bigger-galaxy AI pathfinding
+  stability.
+
 ### Nomadic empires (Nomads DLC) — banned from the campaign
 - **Decision:** Nomadic empires are **not allowed** in our 7-player MP match. Nomadic origins should be removed from empire selection (and AI use should be prevented — see open sub-question below).
 - **Reason:** Judged both **overpowered** and **game-concept-breaking** — the arkship/waystation/wayline model is a separate, asymmetric ruleset (no territory, space-only economy, partial-outcome war goals) that doesn't balance cleanly against settled empires.

@@ -70,6 +70,10 @@ uses it 0 times). Use `events = { <id> }` + a `hide_window`, `is_triggered_only`
 the work (see `economy_overhaul/events/econ_overhaul_events.txt`). If a future mod ever *replaces*
 a vanilla on_actions file wholesale, that IS an override and must be logged.
 
+**Note on `galaxy_setup` (additive, no overrides):** adds `map/setup_scenarios/galaxy_setup_1200.txt`
+— a NEW 1200-star galaxy-size scenario (does NOT override vanilla `huge.txt` or any file) + its loc key
+`galaxy_setup_colossal`. Zero conflict surface. Independent of `economy_overhaul` / `migration_overhaul`.
+
 ## Cross-Mod Dependencies
 
 Track any cases where one mod depends on or interacts with another:

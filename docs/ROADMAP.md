@@ -189,6 +189,10 @@ scaling. Read it before building any economy slice.)*
 - [ ] Increase housing/amenities deficit penalties — *partially emergent from the unpaired jobs/housing cut; revisit after playtest*
 - [ ] Hyper-specialized mega-planet penalties
 
+## Mods — Galaxy Setup
+
+- [~] **1200-star galaxy size ("Colossal")** — **BUILT 2026-06-27** (`galaxy_setup` mod, additive setup_scenario, no overrides). +20% systems over vanilla Huge at **unchanged empire count** → more empty contested frontier without more pops/empires (the cheap lag dimension). Untested in-game. See mod README + [multiplayer-balance.md](multiplayer-balance.md) "Galaxy setup". Pair with host sliders: Habitable Worlds ~0.25x + Guaranteed Habitable 1–2 (low ambient density + per-empire floor ≈ the sub-linear anti-snowball world-count curve). **Smoke-test late-game FPS on the slowest player's machine.**
+
 ## Mods — Empire & Fleet
 
 - [ ] Reduce empire size per colony (~10)
