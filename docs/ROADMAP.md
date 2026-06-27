@@ -11,24 +11,58 @@ Track what needs to be done, what's in progress, and what's done.
 > **stale here** — the migration mod is built on `mod/migration-overhaul` and will arrive on
 > `master` via its own merge. The economy handoff is the authoritative one for THIS branch.
 
-**SESSION 2026-06-27 — economy_overhaul v2.6: scaling ramp (lever #6) + AI relief, after the first 1000-context test read.**
-First real test (77yr, **400-system**, **machine** empire, **2x tech cost** — non-representative) showed: glut fix
-worked (minerals/energy contained) but space income **"doesn't scale,"** and the **AI produced ~no alloys/research.**
-Diagnosis (files-verified): (1) the only mid-game space ramp was vanilla's flat +10%/tier finite techs (+50% by
-tier-3) then a DEAD ZONE until the repeatables, which gate behind the tier-3 chain end → unreachable at 2x cost in
-77yr; (2) the AI **cannot perceive our overcrowding growth-stall** (deficit-driven planner; growth halts before
+**SESSION 2026-06-27 — economy_overhaul v2.6 (scaling ramp + AI relief + job-cut revert) + NEW `galaxy_setup` mod. All committed & pushed; branch clean.**
+Driven by the first real in-game test (77yr, **400-system**, **machine** empire, **2x tech cost** — non-representative).
+Findings: glut fix worked (minerals/energy contained) but space income **"doesn't scale,"** and the **AI produced ~no
+alloys/research.** Files-verified diagnosis: (1) the only mid-game space ramp was vanilla's flat +10%/tier finite techs
+(+50% by tier-3) then a DEAD ZONE until the repeatables (gated behind the tier-3 chain end → unreachable at 2x cost in
+77yr); (2) the AI **cannot perceive our overcrowding growth-stall** (deficit-driven planner; growth halts before
 homelessness → no signal → never builds residences → stalls at capacity); (3) the 400-system galaxy starved
-*expansion*-scaling (the on-vision primary early/mid driver). **Built this session:**
-- **Lever #6 — escalating finite station ramp** (`zzz_econ_finite_station_techs.txt`): overrides the 10 finite techs.
-  Mining (`tech_space_mining_1..5`, eng) +10/20/30/40/50 = **+150% cum.** — buffs minerals AND energy (shared
-  `orbital_mining_deposits` category; no energy tech needed/exists). Research (`tech_space_science_1..5`, phys)
-  +10/15/20/25/30 = **+100% cum.** (gentler per Track 2). Knobs `@econ_station_mining_t1..5` / `_research_t1..5`.
-- **AI economic relief** (`econ_ai_planet_relief`, `planet_housing_mult +0.30`, **`is_ai = yes` only**): restores AI
-  housing so it stays functional; all 7 players human → human-facing scarcity intact. Knob `@econ_ai_housing_relief`.
-- Docs synced (compatibility registry +2 tech-file rows + AI-relief note; vanilla/economy.md minerals+energy-share +
-  finite-ramp note; design-doc table + open items #0a/#0b + lever #6). Validate clean. **NOT yet committed/tested.**
-**▶ NEXT: re-test on a 1000-system (max) galaxy** — the real-game size; confirm (a) space now ramps mid-game, (b) AI
-develops planets, (c) expansion carries early/mid. Then revisit whether to also AI-exempt the growth/assembly nerfs.
+*expansion*-scaling (the on-vision primary early/mid driver).
+
+**Built & committed this session (3 commits on `mod/economy-overhaul`):**
+- **`0413b83` — Lever #6: escalating finite station ramp** (`zzz_econ_finite_station_techs.txt`, overrides the 10
+  finite techs). Mining (`tech_space_mining_1..5`, eng) +10/20/30/40/50 = **+150% cum.** — buffs minerals AND energy
+  (verified: energy orbital deposits share `orbital_mining_deposits`/mining stations; no energy tech needed/exists).
+  Research (`tech_space_science_1..5`, phys) +10/15/20/25/30 = **+100% cum.** (gentler per Track 2). Plus **AI economic
+  relief** (`econ_ai_planet_relief`, `planet_housing_mult +0.30`, **`is_ai = yes` only**) — restores AI housing so it
+  stays functional; all 7 players human → human-facing scarcity intact. Knobs in `econ_space_economy_variables.txt`.
+- **`a6bdd52` — Job cuts REVERTED.** Deleted the `100_scripted_variables_zones.txt` whole-file override (rural 200→150
+  + zone specialist −30%): too many planet-down levers stacked. **Planet-down is now size cap (16–18) + housing
+  scarcity ONLY**; the high Planetary-Deficit-Logistics galaxy setting handles anti-sprawl. (Also removed one of the
+  two remaining high-risk whole-file scripted_variables overrides — only `07_machine_age` survives.)
+- **`9520c09` — NEW `galaxy_setup` mod.** Adds a **1200-star galaxy size "Colossal"** (`map/setup_scenarios/
+  galaxy_setup_1200.txt`, additive — no vanilla override). +20% systems at **unchanged empire count** = more empty
+  contested frontier without more pops/empires (the cheap lag dimension: pops ≫ empire count > fleets ≫ empty systems;
+  MP is lockstep on the slowest CPU). Committed here on `mod/economy-overhaul` (group chose not to split to its own
+  branch). See its README + [multiplayer-balance.md](multiplayer-balance.md) "Galaxy setup".
+
+**Group design decisions logged 2026-06-27** (see [multiplayer-balance.md](multiplayer-balance.md)):
+- **Planet-scarcity model:** spawn density is *linear* in systems and fixed before empires exist, so the desired
+  *sub-linear* (anti-snowball) world-count curve can only come from **low ambient density + a guaranteed per-empire
+  floor** (floor helps small empires; low density stops big empires drowning in planet-micro). Recommended host
+  settings: **Habitable Worlds ~0.25x + Guaranteed Habitable 1–2** (this REVISES the earlier "Guaranteed = Off" —
+  with density this low a floor is required). Guaranteed capped at 2 by `GUARANTEED_COLONIES_MAX`.
+- Galaxy settings **Guaranteed-off-now-a-floor**, **high Planetary-Deficit-Logistics** (kept; anti-sprawl), **1200
+  systems** — all on-vision (geography + scarcity).
+
+**▶ NEXT SESSION = the IN-GAME TEST (still the gate for everything below). Make it representative this time:**
+1. **`bash tools/deploy.sh`** on the game machine (registers the NEW `galaxy_setup` mod + picks up v2.6) with
+   `mod/economy-overhaul` @ `9520c09` checked out. Enable BOTH `economy_overhaul` and `galaxy_setup`.
+2. **Fresh game, settings:** galaxy size **Colossal (1200)** (or Huge/1000), **ORGANIC** empire (not machine —
+   most players are organic & it exercises the assembly/growth/housing levers), **DEFAULT tech cost** for the clean
+   calibration read (then a 2nd pass at the real 2x-cost MP settings). Habitable ~0.25x + Guaranteed 1–2.
+3. **Measure at yr 20/40/60:** (a) does space income now **ramp mid-game** (lever #6 working); (b) do **AI empires
+   develop planets** (AI relief working — switch into an AI via console `play <id>` to inspect overcrowding/jobs);
+   (c) does **expansion carry early/mid** on 1200 systems; (d) the **space-vs-planet income split** (the mod's core
+   thesis — never yet recorded); (e) per-world pop/output now that job cuts are gone (planets too weak/too strong?);
+   (f) world-count per empire vs the targets (small ~3–6, quarter-galaxy ~12–16); (g) late-game **FPS on the slowest
+   machine** at 1200 stars.
+4. **Then, gated on results:** AI-exempt the growth/assembly nerfs too if AI still lags; Decision B (regular-colony
+   bulk output → per-pop nerf?); mono-specialised mega-planets; **Slice 4 — strategic resources** (the make-or-break
+   track) last. Re-tune lever-#6 / deposit / housing knobs per the numbers.
+
+> _(Next-steps below are SUPERSEDED by the 2026-06-27 handoff above — kept for the glut-fix rationale.)_
 
 **SESSION 2026-06-26 — economy_overhaul v2.4→v2.5: mineral/energy GLUT fix (committed + pushed, `5926e80`; branch clean).**
 The v2 uniform **×1.75** deposit buff overshot ABSOLUTE supply (triple-digit minerals galaxy-wide by yr 20),
