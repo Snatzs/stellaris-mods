@@ -68,3 +68,14 @@ econ_organic_assembly_nerf = {
 	hide_from_country_list = no
 	planet_pop_assembly_mult = @econ_assembly_nerf
 }
+
+# AI-only planetary relief — applied ONLY to AI empires (see econ_overhaul.1 gate:
+# is_ai = yes). The AI cannot perceive our overcrowding growth-stall (its planner is
+# deficit-driven: it reacts to homeless pops, not to growth silently halting BEFORE
+# homelessness), so it never builds residences and stalls at planet capacity. This
+# restores housing so AI empires stay economically functional. All 7 players are human,
+# so the human-facing housing scarcity (urban -30% + tightened overcrowding) is intact.
+econ_ai_planet_relief = {
+	hide_from_country_list = no
+	planet_housing_mult = @econ_ai_housing_relief
+}

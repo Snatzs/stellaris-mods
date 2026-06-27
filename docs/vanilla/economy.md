@@ -43,6 +43,20 @@ Similarly: `station_researchers_produces_mult` for research stations.
 
 These are the **cleanest levers** for globally scaling space resource production.
 
+> **⚠️ Mining stations gather BOTH minerals AND energy (verified 2026-06-27).** Energy orbital
+> deposits (`d_energy_*`) use `category = orbital_mining_deposits` + `station = shipclass_mining_station`
+> — **identical to minerals**. So `station_gatherers_produces_mult` lifts mineral AND energy gathering
+> together; there is **no separate energy-station modifier or tech**, and none is needed. (Strategic
+> orbital deposits also ride `orbital_mining_deposits`, so they inherit this too — see Track 3.)
+> Research is the only separate one: `d_physics/society/engineering_*` → `orbital_research_deposits` /
+> `shipclass_research_station`, scaled by `station_researchers_produces_mult`.
+
+> **Finite vanilla station-tech ramp:** `tech_space_mining_1..5` (engineering) each grant
+> `station_gatherers_produces_mult +0.10` (+50% by tier-3 completion); `tech_space_science_1..5`
+> (physics) likewise for `station_researchers_produces_mult`. Chains: 1–2 = tier 1, 3–4 = tier 2,
+> 5 = tier 3. After the tier-3 end there is NO further finite station scaling until repeatables —
+> the "dead zone" `economy_overhaul` lever #6 fills by making these per-tier values escalate.
+
 ### Vanilla Orbital Yield Tiers (4.4.3)
 
 Deposit IDs are tiered `d_<resource>_<N>` where higher N = richer:

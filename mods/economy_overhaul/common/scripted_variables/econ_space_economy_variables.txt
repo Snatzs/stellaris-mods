@@ -87,3 +87,45 @@
 # structure (megastructure tech + machine-age tech + an origin); -1 trims one slot.
 # Empires without the unlocking tech have cap 0 and still can't build (harmless).
 @econ_kilostructure_limit_reduction = -1	# -1 to each of arc-furnace / dyson-swarm caps
+
+# --- Lever #6: ESCALATING finite station-tech ramp (the mid-game space ramp) ---
+# Vanilla gives a FLAT +10% station output per tech across both finite chains
+# (tech_space_mining_1..5 -> station_gatherers; tech_space_science_1..5 ->
+# station_researchers), so +50% by tier-3 completion, then a dead zone until the
+# repeatables (which gate behind the tier-3 chain end -> very late at 2x tech cost).
+# We replace the flat +10% with an ESCALATING per-tier value so each later tech in the
+# chain is worth more, giving space a real mid-game ramp that IS reachable at 2x cost.
+# These override the vanilla techs (zzz_econ_finite_station_techs.txt) — every other
+# field is copied verbatim; re-sync on a version bump. Logged in compatibility.md.
+#
+# MINING chain (engineering) buffs BOTH minerals AND energy — verified: energy orbital
+# deposits ride category=orbital_mining_deposits / shipclass_mining_station, the SAME as
+# minerals, so station_gatherers_produces_mult lifts both. No separate energy tech needed.
+# Cumulative: 0.10+0.20+0.30+0.40+0.50 = +150% (vs vanilla +50%).
+@econ_station_mining_t1 = 0.10
+@econ_station_mining_t2 = 0.20
+@econ_station_mining_t3 = 0.30
+@econ_station_mining_t4 = 0.40
+@econ_station_mining_t5 = 0.50
+#
+# RESEARCH chain (physics) buffs station_researchers. GENTLER escalation than mining:
+# Track 2 keeps research PLANET-primary / space a supplement, so we lift the prize without
+# flipping it to space-primary. Cumulative: 0.10+0.15+0.20+0.25+0.30 = +100% (vs vanilla +50%).
+@econ_station_research_t1 = 0.10
+@econ_station_research_t2 = 0.15
+@econ_station_research_t3 = 0.20
+@econ_station_research_t4 = 0.25
+@econ_station_research_t5 = 0.30
+
+# --- AI economic relief (planetary side) — applied to AI empires ONLY (is_ai = yes) ---
+# The AI's economic planner is DEFICIT-driven: it reacts to homeless pops / resource
+# shortages, not to "growth silently stalled." Our overcrowding nerf stops growth at
+# 1.10x over-housing BEFORE any pop goes homeless, so the AI sees no signal and never
+# builds residences -> it stalls at planet capacity and its economy never develops
+# (confirmed in-game 2026-06-26). We can't make the AI understand the constraint, so we
+# COMPENSATE: restore housing for AI empires only. Every real player is human (7-player
+# MP), so the human-facing housing scarcity is untouched. Positive planet_housing_mult
+# offsets the urban -30% cut (00_urban_districts.txt) + the tightened overcrowding
+# (zzz_econ_defines.txt) for the AI. Applied via econ_overhaul.1, gated is_ai = yes.
+# Generous on purpose ("AI is bad enough as-is"); tune down if AI over-sprawls.
+@econ_ai_housing_relief = 0.30			# +30% planet housing, AI empires only

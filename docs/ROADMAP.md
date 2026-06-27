@@ -11,6 +11,25 @@ Track what needs to be done, what's in progress, and what's done.
 > **stale here** — the migration mod is built on `mod/migration-overhaul` and will arrive on
 > `master` via its own merge. The economy handoff is the authoritative one for THIS branch.
 
+**SESSION 2026-06-27 — economy_overhaul v2.6: scaling ramp (lever #6) + AI relief, after the first 1000-context test read.**
+First real test (77yr, **400-system**, **machine** empire, **2x tech cost** — non-representative) showed: glut fix
+worked (minerals/energy contained) but space income **"doesn't scale,"** and the **AI produced ~no alloys/research.**
+Diagnosis (files-verified): (1) the only mid-game space ramp was vanilla's flat +10%/tier finite techs (+50% by
+tier-3) then a DEAD ZONE until the repeatables, which gate behind the tier-3 chain end → unreachable at 2x cost in
+77yr; (2) the AI **cannot perceive our overcrowding growth-stall** (deficit-driven planner; growth halts before
+homelessness → no signal → never builds residences → stalls at capacity); (3) the 400-system galaxy starved
+*expansion*-scaling (the on-vision primary early/mid driver). **Built this session:**
+- **Lever #6 — escalating finite station ramp** (`zzz_econ_finite_station_techs.txt`): overrides the 10 finite techs.
+  Mining (`tech_space_mining_1..5`, eng) +10/20/30/40/50 = **+150% cum.** — buffs minerals AND energy (shared
+  `orbital_mining_deposits` category; no energy tech needed/exists). Research (`tech_space_science_1..5`, phys)
+  +10/15/20/25/30 = **+100% cum.** (gentler per Track 2). Knobs `@econ_station_mining_t1..5` / `_research_t1..5`.
+- **AI economic relief** (`econ_ai_planet_relief`, `planet_housing_mult +0.30`, **`is_ai = yes` only**): restores AI
+  housing so it stays functional; all 7 players human → human-facing scarcity intact. Knob `@econ_ai_housing_relief`.
+- Docs synced (compatibility registry +2 tech-file rows + AI-relief note; vanilla/economy.md minerals+energy-share +
+  finite-ramp note; design-doc table + open items #0a/#0b + lever #6). Validate clean. **NOT yet committed/tested.**
+**▶ NEXT: re-test on a 1000-system (max) galaxy** — the real-game size; confirm (a) space now ramps mid-game, (b) AI
+develops planets, (c) expansion carries early/mid. Then revisit whether to also AI-exempt the growth/assembly nerfs.
+
 **SESSION 2026-06-26 — economy_overhaul v2.4→v2.5: mineral/energy GLUT fix (committed + pushed, `5926e80`; branch clean).**
 The v2 uniform **×1.75** deposit buff overshot ABSOLUTE supply (triple-digit minerals galaxy-wide by yr 20),
 undercutting the scarcity pillar. Group chose **supply-down** over sink-up, then refined to **per-resource**
@@ -92,7 +111,8 @@ repeatable-tech keys we override still exist. No changes were needed.
    concentration). The make-or-break track; do after the above settle.
 
 **Calibration knobs to watch** (all first-pass, tunable in their files): deposits minerals ×1.40 / energy ×1.60 / research ×1.15, rural 150, zone jobs −30%,
-urban housing ×0.70, overcrowding 1.10/1.20, assembly −33% **(organics only; machines exempt)**, **flat-growth (spawning/budding/clone) −33%**, kilostructures ×0.4.
+urban housing ×0.70, overcrowding 1.10/1.20, assembly −33% **(organics only; machines exempt)**, **flat-growth (spawning/budding/clone) −33%**, kilostructures ×0.4,
+**finite station ramp mining +10/20/30/40/50 (+150% cum.) / research +10/15/20/25/30 (+100% cum.)**, **AI-only housing relief +30% (`is_ai`)**.
 
 **(C) Migration mod:** independent — `mod/migration-overhaul` still code-complete/untested, awaiting its own test + merge.
 

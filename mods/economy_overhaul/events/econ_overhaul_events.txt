@@ -38,6 +38,21 @@ country_event = {
 				days = -1
 			}
 		}
+		# AI-ONLY planetary relief: the AI cannot play around our overcrowding
+		# growth-stall (its deficit-driven planner sees no signal until pops are
+		# homeless, which our nerf prevents), so it stalls at planet capacity. Restore
+		# housing for AI empires only — every real player is human, so the human-facing
+		# housing scarcity is preserved. Idempotent (has_modifier guard), like the others.
+		if = {
+			limit = {
+				is_ai = yes
+				NOT = { has_modifier = econ_ai_planet_relief }
+			}
+			add_modifier = {
+				modifier = econ_ai_planet_relief
+				days = -1
+			}
+		}
 	}
 }
 

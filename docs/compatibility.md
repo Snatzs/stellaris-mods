@@ -20,6 +20,8 @@ Before overriding a vanilla file in your mod:
 | `common/technology/00_eng_tech_repeatable.txt` (tech `tech_repeatable_improved_tile_mineral_output`) | `economy_overhaul` | Redefines the tech: per-level `planet_jobs_minerals_produces_mult` **0.05 → 0.03** (`@econ_repeatable_per_level`). All other fields faithful to vanilla. | 2026-06-22 |
 | `common/technology/00_phys_tech_repeatable.txt` (tech `tech_repeatable_improved_tile_energy_output`) | `economy_overhaul` | Redefines the tech: per-level `planet_jobs_energy_produces_mult` **0.05 → 0.03**. | 2026-06-22 |
 | `common/technology/00_soc_tech_repeatable.txt` (tech `tech_repeatable_improved_tile_food_output`) | `economy_overhaul` | Redefines the tech: per-level `planet_jobs_food_produces_mult` **0.05 → 0.03**. | 2026-06-22 |
+| `common/technology/00_eng_tech.txt` (techs `tech_space_mining_1`…`_5`) | `economy_overhaul` | **Lever #6** — redefines the 5 finite mining techs: `station_gatherers_produces_mult` (and the nomad-swap `tech_space_mining_nomads_mult`) flat **0.10 → escalating 0.10/0.20/0.30/0.40/0.50** (`@econ_station_mining_t1..5`, +150% cumulative vs vanilla +50%). Buffs minerals AND energy (shared category). All other fields faithful to vanilla. File `zzz_econ_finite_station_techs.txt`. | 2026-06-27 |
+| `common/technology/00_phys_tech.txt` (techs `tech_space_science_1`…`_5`) | `economy_overhaul` | **Lever #6** — redefines the 5 finite research techs: `station_researchers_produces_mult` (and nomad-swap `tech_space_science_nomads_mult`) flat **0.10 → escalating 0.10/0.15/0.20/0.25/0.30** (`@econ_station_research_t1..5`, +100% cumulative; gentler than mining per Track 2 planet-primary research). Faithful otherwise. File `zzz_econ_finite_station_techs.txt`. | 2026-06-27 |
 | `common/governments/civics/02_gestalt_civics.txt` (civic `civic_machine_astromining_drones`) | `economy_overhaul` | Redefines the civic: `playable`/`ai_playable` → `{ always = no }` (disabled from selection). Rest faithful to vanilla. | 2026-06-22 |
 | `common/governments/civics/03_corporate_civics.txt` (civic `civic_privatized_exploration`) | `economy_overhaul` | Redefines the civic: `station_gatherers`/`station_researchers_produces_mult` **0.25 → 0.10**. Rest faithful to vanilla. | 2026-06-22 |
 | `common/scripted_variables/07_scripted_variables_machine_age.txt` | `economy_overhaul` | ⚠️ **WHOLE-FILE replacement** (verbatim vanilla copy) changing only `@arc_furnace_1-4_mod_value` + `@dyson_swarm_1-3_mod_value`, each cut **~60% (×0.4)**. All other vars (paperclip quotas, etc.) untouched. | 2026-06-23 |
@@ -35,13 +37,19 @@ Before overriding a vanilla file in your mod:
 >   `00_/100_/07_` scripted_variables files above are full verbatim copies with only target values
 >   changed. **Cost: heavy conflict surface (any other mod replacing them wins entirely) + must be
 >   re-synced on any game-version bump.** This is unavoidable for scripted-variable changes.
-> - **Technologies** (3 tile repeatables) live in
->   `economy_overhaul/common/technology/zzz_econ_repeatable_techs.txt`, and **civics** (Astro-Mining,
->   Privatized Exploration) live in `…/common/governments/civics/zzz_econ_civic_overrides.txt`. Both
->   are keyed DB objects: a same-key definition in our (later-loading) mod **replaces** that one
->   object. Each is a faithful copy of vanilla 4.4.3 with only the marked change; we are version-
->   pinned to 4.4.3 so copy-staleness is moot, but re-sync if the pin moves. (The tech file also
->   *adds* two new station repeatables — additive, not overrides.)
+> - **Technologies** — (a) 3 tile repeatables in
+>   `economy_overhaul/common/technology/zzz_econ_repeatable_techs.txt` (which also *adds* two new
+>   station repeatables — additive), and (b) the **10 finite station techs** (`tech_space_mining_1..5`
+>   + `tech_space_science_1..5`) in `…/zzz_econ_finite_station_techs.txt` (lever #6 escalating ramp);
+>   and **civics** (Astro-Mining, Privatized Exploration) in
+>   `…/common/governments/civics/zzz_econ_civic_overrides.txt`. All are keyed DB objects: a same-key
+>   definition in our (later-loading) mod **replaces** that one object. Each is a faithful copy of
+>   vanilla 4.4.3 with only the marked change; we are version-pinned to 4.4.3 so copy-staleness is
+>   moot, but re-sync if the pin moves.
+> - **AI economic relief** (`econ_ai_planet_relief`, `planet_housing_mult +0.30`, AI-only) is a NEW
+>   static modifier applied via `econ_overhaul.1` gated `is_ai = yes` — **additive, zero override.**
+>   Compensates for the AI being unable to perceive our overcrowding growth-stall (its planner is
+>   deficit-driven). All 7 players are human, so the human-facing housing scarcity is untouched.
 > - **Defines** live in `…/common/defines/zzz_econ_defines.txt`. Defines **merge**: restating
 >   `NGameplay = { PLANET_ASCENSION_MODIFIER_SCALE = … }` changes only that key, vanilla keeps the rest.
 >

@@ -38,7 +38,9 @@ but their *mechanisms* and a few choices are corrected here.
 | Goal | Lever | Mechanism | Value | Status |
 |---|---|---|---|---|
 | Space is primary | **Buff deposit base yields** (flat +50% station modifier REMOVED to avoid base×mult×repeatable bloat) | whole-file `01_orbital_deposits.txt`, **per-resource** `produces` ×N | **minerals ×1.40, energy ×1.60, research ×1.15**; alloys/food/CG/trade vanilla (was uniform ×1.75 v2 → ×1.40 v2.4 → per-resource v2.5, item #4) | ✅ space>job ratio held; absolute supply re-tuned down to fix glut (re-test pending) |
-| Space scales | station gatherer/researcher repeatables | new techs | +3%/level | ✅ |
+| Space scales (late, infinite) | station gatherer/researcher repeatables | new techs | +3%/level | ✅ |
+| Space scales (mid, finite ramp — **lever #6**) | escalating finite station techs (`tech_space_mining_1..5` / `tech_space_science_1..5`) | whole-tech override, `zzz_econ_finite_station_techs.txt` | mining +10/20/30/40/50 (+150% cum.); research +10/15/20/25/30 (+100% cum.) | ✅ **2026-06-27** — fills the post-tier-3 dead zone; reachable at 2x tech cost. Mining covers minerals+energy (shared category); research gentler per Track 2 |
+| AI stays functional | AI-only housing relief (AI can't perceive the overcrowding growth-stall) | `econ_ai_planet_relief` static modifier, `is_ai = yes` gate in `econ_overhaul.1` | `planet_housing_mult +0.30` | ✅ **2026-06-27** — all 7 players human, so human-facing scarcity intact; tune down if AI over-sprawls |
 | Planet basic-resource down | rural district jobs | `100_…zones.txt` | 200→**150** | ✅ |
 | Specialist VOLUME down (not output) | zone job vars `@scaling_district_*` | `100_…zones.txt` | **−~30%** | ✅ |
 | Housing scarcity | **urban (city/hive/nexus) district housing** (replaced the global `planet_housing_mult` — that also cut rural/wide housing) | whole-file `00_urban_districts.txt`, urban `planet_housing_add` ×0.70 | **−30%** | ✅ working in-game |
@@ -52,6 +54,21 @@ Specialist *output* is deliberately NOT nerfed (only job count per zone). Resear
 planet-primary (Track 2 unchanged in intent).
 
 **Open items (next session):**
+0a. ✅ **BUILT 2026-06-27 — lever #6, escalating finite station ramp.** First in-game test (77yr,
+   400-system, machine empire, **2x tech cost**) showed space income "doesn't scale" — diagnosed: the
+   repeatables gate behind the tier-3 chain end (far out at 2x cost, never reached), and the only
+   mid-game ramp was vanilla's flat +10%/tier (+50% by tier-3) then a dead zone. Fix: escalating
+   finite ramp (mining +150% cum., research +100% cum.). NOTE: the small galaxy also starved
+   *expansion*-scaling (the primary early/mid driver, on-vision); the real game is **1000 systems**,
+   where expansion runway is far longer — re-test there before further tech-side tuning.
+0b. ✅ **BUILT 2026-06-27 — AI economic relief (planetary side).** Confirmed in-game: the AI cannot
+   handle planet capacity as a growth constraint — its planner is deficit-driven and our overcrowding
+   nerf stalls growth BEFORE homelessness, so it sees no signal and never builds residences →
+   economic stall. Compensated with an `is_ai = yes`-gated `planet_housing_mult +0.30`. Props the AI
+   up; doesn't make it good. Harsh galaxy settings (Deficit Logistics 5x, Habitable 0.5x + Guaranteed
+   Off) compound AI weakness independently — reconsider those for the real game. **Pattern to extend:**
+   several planetary/pop nerfs likely hit the AI harder than players; AI-only compensation is the
+   clean MP-fair lever (all players human). Growth/assembly AI-exemption is the obvious next toggle.
 1. ✅ **RESOLVED 2026-06-25 — Hive/organic flat-growth parity (the spawning-pool gap).**
    Investigation overturned the assumption that gated this: the spawning-drone job emits
    `bonus_pop_growth` (a FLAT additive growth, scaled by `bonus_pop_growth_mult`), while
@@ -327,7 +344,7 @@ the per-tier designation-bonus amplifier) as the first knob; leave `PLANET_ASCEN
 | 3 | Tile output repeatables (mineral/energy/food) per-level % | **lower** vs vanilla | `*_tech_repeatable.txt` override |
 | 4 | New **station** repeatable (gatherers) | match #3's gentle rate | new tech |
 | 5 | New **research-station** repeatable | match #3's gentle rate | new tech |
-| 6 | Amplify finite station techs | from +50% baseline upward (bounded) | tech override or new techs |
+| 6 | Amplify finite station techs (ESCALATING ramp) | mining +10/20/30/40/50 (+150% cum.) / research +10/15/20/25/30 (+100% cum.) — ✅ BUILT 2026-06-27 | tech override (`zzz_econ_finite_station_techs.txt`) |
 | 7 | New **strategic** repeatable (`exotic_gases`/`volatile_motes`/`rare_crystals_produces_mult`) | calibrate to demand curve | new tech |
 | 8 | Refining nerf (`planet_refiners`/`planet_chemists_produces_mult`) | substantial | country modifier |
 | 9 | Strategic deposit `drop_weight` (concentrate) | few rich clusters | `02_sr_deposits.txt` |
