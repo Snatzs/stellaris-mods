@@ -110,9 +110,10 @@ repeatable-tech keys we override still exist. No changes were needed.
 4. **Then** slice 4 — strategic resources (refining nerf + strategic repeatable + `02_sr_deposits.txt` `drop_weight`
    concentration). The make-or-break track; do after the above settle.
 
-**Calibration knobs to watch** (all first-pass, tunable in their files): deposits minerals ×1.40 / energy ×1.60 / research ×1.15, rural 150, zone jobs −30%,
+**Calibration knobs to watch** (all first-pass, tunable in their files): deposits minerals ×1.40 / energy ×1.60 / research ×1.15,
 urban housing ×0.70, overcrowding 1.10/1.20, assembly −33% **(organics only; machines exempt)**, **flat-growth (spawning/budding/clone) −33%**, kilostructures ×0.4,
 **finite station ramp mining +10/20/30/40/50 (+150% cum.) / research +10/15/20/25/30 (+100% cum.)**, **AI-only housing relief +30% (`is_ai`)**.
+*(Job cuts — rural 200→150, zone −30% — were REVERTED 2026-06-27; planet-down is now size cap + housing only.)*
 
 **(C) Migration mod:** independent — `mod/migration-overhaul` still code-complete/untested, awaiting its own test + merge.
 
@@ -182,9 +183,9 @@ scaling. Read it before building any economy slice.)*
 - [~] Space resources as primary source (outproduce planets) — **BUILT** in `economy_overhaul`, logic-untested. (a) Structural planet-down (below) makes space *relatively* dominant; (b) `econ_space_primacy` country modifier on all empires via `on_game_start_country`: `station_gatherers` / `station_researchers` `_produces_mult` +50%. See mod README checklist.
 - [~] Space resource scaling (yield increases with game progression) — **BUILT** (slice 2), logic-untested. `zzz_econ_repeatable_techs.txt`: nerf the 3 vanilla tile repeatables +5%→+3%/level (override) + add station-gatherers/research-station repeatables at the same +3%/level (`@econ_repeatable_per_level`). One rate → planet & space scaling climb together, preserving slice-1's ratio. Finite-tech amplification (lever #6) deferred (slice-1 +50% baseline assumed sufficient).
 - [ ] Strategic resource rebalance (less frequent, more concentrated) — *slice 4*
-- [~] Planetary resource efficiency nerf (less output per pop/district) — **DONE structurally** (size cap + jobs cut below). Flat per-pop nerf retained only as an unused fine-tune lever (`@econ_planet_*_nerf`, default 0). Research deliberately untouched (primary-resource focus).
+- [~] Planetary resource efficiency nerf (less output per pop/district) — **DONE structurally** via size cap + **housing scarcity** (the jobs cut was reverted 2026-06-27 — see below). Flat per-pop nerf retained only as an unused fine-tune lever (`@econ_planet_*_nerf`, default 0). Research deliberately untouched (primary-resource focus).
 - [~] Planet size cap (max 16–18) and size distribution shift (more 12–14) — **BUILT + fixed 2026-06-23**: `@habitable_planet_max_size` 25 → **18** via a **whole-file replacement** of `00_scripted_variables.txt` (the original `zzz_` redefinition silently failed — scripted vars can't be redefined; see compatibility.md). Re-test in-game pending.
-- [~] Reduce jobs per district — **BUILT**: override `@base_rural_district_jobs` 200 → **160** (housing stays 200 → deliberate overpopulation pressure). Gentle first pass; **#1 calibration target** (too aggressive → unemployment death spiral).
+- [ ] Reduce jobs per district — **REVERTED 2026-06-27.** Was rural 200→150 + zone specialist −30% (whole-file `100_…zones.txt`), now deleted: too many planet-down levers stacked (size cap + housing + jobs → double-nerf risk). Planet-down is now **size cap (16–18) + housing scarcity** only; the high Planetary-Deficit-Logistics galaxy setting handles anti-sprawl. Re-add only if playtest shows planets still over-produce.
 - [ ] Increase housing/amenities deficit penalties — *partially emergent from the unpaired jobs/housing cut; revisit after playtest*
 - [ ] Hyper-specialized mega-planet penalties
 

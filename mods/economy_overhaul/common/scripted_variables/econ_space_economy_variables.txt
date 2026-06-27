@@ -52,11 +52,13 @@
 @econ_growth_nerf = -0.33				# -33% flat additive pop growth (spawning pools, budding, clone vats), all empires
 
 # --- Planetary primary-resource job output NERFS (OPTIONAL fine-tune — DEFAULT 0) ---
-# SUPERSEDED as the primary planet-down lever. The structural slice
-# (whole-file replacements: 00_scripted_variables.txt planet size cap 25->18 +
-# 100_scripted_variables_zones.txt rural jobs 200->160) now does the planet-down work. Per the design doc (Track 1), this flat per-pop
-# nerf becomes an OPTIONAL light fine-tune that must NOT stack hard on the
-# structural cuts (double-nerf -> unemployment death spiral). Left at 0 (unused) —
+# SUPERSEDED as the primary planet-down lever. Planet-down is now carried by the
+# size-cap resize event (econ_overhaul.2, worlds -> 16-18) + housing scarcity
+# (urban -30% + tightened overcrowding). The rural/zone JOB CUTS were REVERTED
+# 2026-06-27 (too many planet-down levers stacked -> double-nerf risk; the
+# 100_scripted_variables_zones.txt whole-file override was deleted). Per the design
+# doc (Track 1), this flat per-pop nerf is an OPTIONAL light fine-tune that must NOT
+# stack hard on the structural cuts (double-nerf -> unemployment death spiral). Left at 0 (unused) —
 # the modifier lines are removed from econ_space_primacy; re-wire them there only
 # if playtest shows planets still over-produce AFTER the structural cuts.
 # Per-resource variants are exactly what vanilla economy techs use at country scope

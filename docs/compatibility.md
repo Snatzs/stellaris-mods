@@ -14,7 +14,7 @@ Before overriding a vanilla file in your mod:
 | Vanilla File Path | Overridden By Mod | What It Changes | Date Added |
 |---|---|---|---|
 | _(none — planet size cap)_ | `economy_overhaul` | **NOT an override.** `@habitable_planet_max_size` doesn't govern procedural generation (tested 2026-06-24), so the 00_scripted_variables.txt replacement was DROPPED. Size cap is now an `on_game_start` event (`econ_overhaul.2`) that resizes colonizable worlds to 16–18. Additive, zero override. | 2026-06-24 |
-| `common/scripted_variables/100_scripted_variables_zones.txt` | `economy_overhaul` | ⚠️ **WHOLE-FILE replacement** (verbatim vanilla copy): `@base_rural_district_jobs` **200 → 150** (basic-resource planet nerf) AND `@scaling_*`/`@bonus_*`/`@doubled_*` zone (specialist) job vars **−~30%** (cap specialist VOLUME, not output). Nomad + building job vars untouched. | 2026-06-23 |
+| _(none — job cuts)_ | `economy_overhaul` | **REVERTED 2026-06-27.** The `100_scripted_variables_zones.txt` whole-file override (rural jobs 200→150 + zone specialist jobs −30%) was **DROPPED** — too many planet-down levers stacked (size cap + housing + job cuts → double-nerf risk). Planet-down is now carried by **size cap (16–18) + housing scarcity** alone; the high Planetary-Deficit-Logistics galaxy setting handles anti-sprawl. Re-add only if playtest shows planets still over-produce. | 2026-06-27 |
 | `common/deposits/01_orbital_deposits.txt` | `economy_overhaul` | ⚠️ **WHOLE-FILE replacement** (verbatim vanilla copy) with **per-resource** `produces` multipliers (v2.5/2026-06-26; richer deposits = space is the primary BULK economy, replaces the removed flat +50% station modifier): **minerals ×1.40, energy ×1.60, research ×1.15**; **alloys/food/consumer_goods/trade left at vanilla ×1.0** (alloys kept scarce by design; food/CG barely-or-never spawn). Was a uniform ×1.75 (v2) → ×1.40 (v2.4). `drop_weight`/`habitat_modifier` untouched. | 2026-06-26 |
 | `common/districts/00_urban_districts.txt` | `economy_overhaul` | ⚠️ **WHOLE-FILE replacement** (verbatim vanilla copy): `planet_housing_add` in the **urban** districts (city/hive/nexus + variants) **×0.70 (−30%)**. Rural + special districts untouched. Replaced the old global `planet_housing_mult` (which also cut rural/wide housing). | 2026-06-24 |
 | `common/technology/00_eng_tech_repeatable.txt` (tech `tech_repeatable_improved_tile_mineral_output`) | `economy_overhaul` | Redefines the tech: per-level `planet_jobs_minerals_produces_mult` **0.05 → 0.03** (`@econ_repeatable_per_level`). All other fields faithful to vanilla. | 2026-06-22 |
@@ -33,10 +33,11 @@ Before overriding a vanilla file in your mod:
 >   rejected (`error.log`: `Variable name X is already taken`) and vanilla's value is kept. Our
 >   original `zzz_economy_overhaul_overrides.txt` approach silently failed for ALL its vars. The
 >   **only** working method is a **whole-file replacement** (a mod file with the same name as the
->   vanilla file → vanilla file is not loaded at all → no duplicate). Hence the three
->   `00_/100_/07_` scripted_variables files above are full verbatim copies with only target values
->   changed. **Cost: heavy conflict surface (any other mod replacing them wins entirely) + must be
->   re-synced on any game-version bump.** This is unavoidable for scripted-variable changes.
+>   vanilla file → vanilla file is not loaded at all → no duplicate). Only **one** such replacement
+>   now remains — `07_scripted_variables_machine_age.txt` (kilostructure values). The `00_` (size cap)
+>   and `100_` (job cuts) whole-file replacements were both DROPPED (size cap → event; job cuts →
+>   reverted), removing two high-risk overrides. **Cost of the survivor: heavy conflict surface (any
+>   other mod replacing it wins entirely) + must be re-synced on any game-version bump.**
 > - **Technologies** — (a) 3 tile repeatables in
 >   `economy_overhaul/common/technology/zzz_econ_repeatable_techs.txt` (which also *adds* two new
 >   station repeatables — additive), and (b) the **10 finite station techs** (`tech_space_mining_1..5`
@@ -53,8 +54,8 @@ Before overriding a vanilla file in your mod:
 > - **Defines** live in `…/common/defines/zzz_econ_defines.txt`. Defines **merge**: restating
 >   `NGameplay = { PLANET_ASCENSION_MODIFIER_SCALE = … }` changes only that key, vanilla keeps the rest.
 >
-> **Conflict risk:** the three whole-file scripted_variables replacements are the highest-risk
-> overrides in the repo — any other mod touching those files conflicts outright. The DB-object
+> **Conflict risk:** the remaining whole-file scripted_variables replacement (`07_…machine_age`) is
+> the highest-risk override class in the repo — any other mod replacing that file conflicts outright. The DB-object
 > overrides (techs/civics) and the defines merge only conflict with a mod changing the *same* key.
 > ✅ Mechanism verified in-game 2026-06-23 (civics + repeatable techs override; scripted-variable
 > redefinition does not). Still runtime-verify the actual values (planet sizes, job counts,
