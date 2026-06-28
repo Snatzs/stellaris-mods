@@ -1,0 +1,36 @@
+# Economy Overhaul — make the planet-deficit economic category modifier-able
+# ==========================================================================
+# Single-key OVERRIDE of the vanilla economic category `planet_resource_deficit`
+# (defined in vanilla common/economic_categories/00_common_categories.txt as just
+# `planet_resource_deficit = { parent = planets }` — it declares NO
+# generate_mult_modifiers block, so NO `planet_resource_deficit_*_mult` modifier
+# types exist by default).
+#
+# WHY: the galaxy setting "Planetary Deficit Logistics Costs" drives the global define
+# LOGISTICS_PLANET_DEFICIT (host-cranked high for anti-sprawl). Being a global define it
+# applies to AI and players alike and cannot be made conditional. The trade cost it
+# inflates IS, however, booked to THIS per-country economic category. By making the
+# category generate cost + upkeep mult modifiers, we gain a per-country lever
+# (planet_resource_deficit_cost_mult / _upkeep_mult) that we apply AI-only at -1.0 via the
+# econ_ai_planet_relief static modifier — fully exempting the AI while players keep the
+# full cost. See econ_space_economy_modifiers.txt + the @econ_ai_deficit_relief knob.
+#
+# Economic categories are DB objects → last-loaded definition of a key wins (mods load
+# after the base game), so this separate file replaces vanilla's definition of just this
+# one category without touching the rest of 00_common_categories.txt. We re-state
+# `parent = planets` so the hierarchy is preserved. `modifier_category = colony` matches
+# the sibling planet_* categories (planet_structures / planet_buildings) so the generated
+# modifiers surface in the colony UI category.
+#
+# ⚠ VERIFY in-game (error.log clean + the modifier resolves): if economic categories turn
+# out NOT to override per-key here, fall back to whole-file-replacing 00_common_categories.txt.
+# Logged in docs/compatibility.md.
+
+planet_resource_deficit = {
+	parent = planets
+	generate_mult_modifiers = {
+		cost
+		upkeep
+	}
+	modifier_category = colony
+}

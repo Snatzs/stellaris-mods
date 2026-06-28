@@ -11,6 +11,14 @@ Track what needs to be done, what's in progress, and what's done.
 > **stale here** — the migration mod is built on `mod/migration-overhaul` and will arrive on
 > `master` via its own merge. The economy handoff is the authoritative one for THIS branch.
 
+**SESSION 2026-06-28 — economy_overhaul v2.7: AI deficit-logistics exemption + barren/toxic size-cap loophole fix, from the SECOND in-game test (organic, Colossal 1200, default tech).**
+First representative-ish test run (organic empire, 1200 systems, **Habitable 0.5x** — note: HIGHER than the recommended 0.25x — 1 guaranteed, 15 AI, run to yr 20). Findings & fixes (all 3 built this session, committed):
+- **AI relief working** — AIs no longer struggle with housing/pop-growth (v2.6 lever held). BUT the **"Planetary Deficit Logistics Costs"** galaxy setting (host-cranked high for anti-sprawl) **significantly cripples the AI** (it manages local-deficit trade poorly), though AI still produces (just hampered). It's the global define `LOGISTICS_PLANET_DEFICIT` → can't be made conditional, but its cost books to the per-country economic category `planet_resource_deficit`. **FIX:** override that category to generate cost+upkeep mults (`zz_econ_deficit_category.txt`; vanilla generates none) → apply `planet_resource_deficit_cost_mult`/`_upkeep_mult` = **−1.0 AI-only** on the existing `econ_ai_planet_relief` modifier (knob `@econ_ai_deficit_relief`). Players keep the full punishing cost; AI exempt. **Mirrors the housing-relief pattern.**
+- **Barren/toxic size loophole** — the `econ_overhaul.2` resize filtered `is_colonizable = yes`, so size 20–34 `pc_toxic`/`pc_barren`/`pc_barren_cold`/`pc_frozen` worlds slipped through, then Climate Restoration / Detox / Toxic Gods terraforms them into colonies ABOVE the 18 cap. **FIX:** extended the resize limit to also cap those 4 terraform-source classes pre-emptively (molten doesn't terraform to habitable; tomb/nuked already colonizable). 
+- **Habitable density** — 0.5x gave (likely) too many worlds; **next pass use 0.25x** (host slider, no code).
+
+**▶ NEXT-PASS verification (added to the test list below):** (1) error.log clean = economic categories override per-key (else fall back to whole-file replacing `00_common_categories.txt`); (2) confirm which channel (cost vs upkeep) carries the deficit cost — an AI shows no deficit drain, a human empire still does; (3) toxic/barren worlds now cap ≤18 (terraform one to check); (4) set Habitable **0.25x**.
+
 **SESSION 2026-06-27 — economy_overhaul v2.6 (scaling ramp + AI relief + job-cut revert) + NEW `galaxy_setup` mod. All committed & pushed; branch clean.**
 Driven by the first real in-game test (77yr, **400-system**, **machine** empire, **2x tech cost** — non-representative).
 Findings: glut fix worked (minerals/energy contained) but space income **"doesn't scale,"** and the **AI produced ~no
@@ -146,7 +154,7 @@ repeatable-tech keys we override still exist. No changes were needed.
 
 **Calibration knobs to watch** (all first-pass, tunable in their files): deposits minerals ×1.40 / energy ×1.60 / research ×1.15,
 urban housing ×0.70, overcrowding 1.10/1.20, assembly −33% **(organics only; machines exempt)**, **flat-growth (spawning/budding/clone) −33%**, kilostructures ×0.4,
-**finite station ramp mining +10/20/30/40/50 (+150% cum.) / research +10/15/20/25/30 (+100% cum.)**, **AI-only housing relief +30% (`is_ai`)**.
+**finite station ramp mining +10/20/30/40/50 (+150% cum.) / research +10/15/20/25/30 (+100% cum.)**, **AI-only housing relief +30% (`is_ai`)**, **AI-only deficit-logistics exemption −100% (`@econ_ai_deficit_relief`, `is_ai`)**.
 *(Job cuts — rural 200→150, zone −30% — were REVERTED 2026-06-27; planet-down is now size cap + housing only.)*
 
 **(C) Migration mod:** independent — `mod/migration-overhaul` still code-complete/untested, awaiting its own test + merge.

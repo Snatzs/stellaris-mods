@@ -65,6 +65,15 @@ country_event = {
 # has pops/districts for size ~25 would cause instant overcrowding. Runs at game
 # start only; natural worlds all exist by then. set_planet_size is deterministic
 # (MP-safe). every_system_planet iterates every planet in the galaxy (vanilla pattern).
+#
+# TERRAFORM LOOPHOLE (2026-06-28): is_colonizable = yes MISSES the uncolonizable
+# terraform-SOURCE classes — pc_toxic / pc_barren / pc_barren_cold / pc_frozen — which
+# keep their native 20-34 size, then Climate Restoration / Detox / Toxic Gods terraforms
+# one into a colonizable world ABOVE our 18 cap (confirmed in-game: 34-size toxic/barren
+# worlds). So we also cap those four classes pre-emptively. Resizing an uncolonizable
+# world is cosmetic (it has no pops/districts whose size depends on it) until it's later
+# terraformed, at which point it's already within the cap. (Tomb/pc_nuked is already
+# colonizable → caught by the is_colonizable branch; molten doesn't terraform to habitable.)
 event = {
 	id = econ_overhaul.2
 	hide_window = yes
@@ -78,9 +87,16 @@ event = {
 		every_system = {
 			every_system_planet = {
 				limit = {
-					is_colonizable = yes
 					is_capital = no
 					planet_size > 18
+					OR = {
+						is_colonizable = yes
+						# terraform-source classes (become colonizable above the cap later)
+						is_planet_class = pc_toxic
+						is_planet_class = pc_barren
+						is_planet_class = pc_barren_cold
+						is_planet_class = pc_frozen
+					}
 				}
 				if = {
 					limit = { planet_size > 22 }

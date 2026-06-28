@@ -78,4 +78,13 @@ econ_organic_assembly_nerf = {
 econ_ai_planet_relief = {
 	hide_from_country_list = no
 	planet_housing_mult = @econ_ai_housing_relief
+
+	# AI exemption from "Planetary Deficit Logistics Costs" (the global LOGISTICS_PLANET_DEFICIT
+	# define, host-cranked high for anti-sprawl). It's a global define so it can't be made
+	# AI-only directly; instead we zero the AI's planet_resource_deficit economic-category drain.
+	# These two modifier TYPES only exist because zz_econ_deficit_category.txt overrides that
+	# category to generate cost+upkeep mults (vanilla generates none). Both at -1.0 so the AI is
+	# fully exempt whichever channel the engine uses; players keep the full punishing cost.
+	planet_resource_deficit_cost_mult = @econ_ai_deficit_relief
+	planet_resource_deficit_upkeep_mult = @econ_ai_deficit_relief
 }

@@ -131,3 +131,21 @@
 # (zzz_econ_defines.txt) for the AI. Applied via econ_overhaul.1, gated is_ai = yes.
 # Generous on purpose ("AI is bad enough as-is"); tune down if AI over-sprawls.
 @econ_ai_housing_relief = 0.30			# +30% planet housing, AI empires only
+
+# --- AI deficit-logistics exemption — applied to AI empires ONLY (is_ai = yes) ---
+# The galaxy setting "Planetary Deficit Logistics Costs" (define LOGISTICS_PLANET_DEFICIT,
+# host-cranked HIGH for anti-sprawl) is a GLOBAL define — it can't be made conditional, so
+# it hits AI and players alike. But the cost it inflates is booked to the per-COUNTRY economic
+# category planet_resource_deficit, so we can counter it AI-side, exactly like the housing
+# relief above. Confirmed in-game 2026-06-28: deficit logistics significantly cripples the AI
+# (which manages local-deficit trade poorly) while housing/growth were fine. All 7 players are
+# human, so the punishing player-facing anti-sprawl pressure is fully preserved.
+#
+# Mechanism: vanilla declares planet_resource_deficit as { parent = planets } with NO
+# generate_mult_modifiers block, so planet_resource_deficit_upkeep_mult does NOT exist by
+# default. We override that ONE category to generate cost+upkeep mult modifiers (see
+# common/economic_categories/zz_econ_deficit_category.txt), then apply BOTH here at -1.0 so
+# the AI's deficit-logistics drain is fully zeroed regardless of whether the engine books it
+# as cost or upkeep. -1.0 multiplies the cost by (1 + -1.0) = 0 (it floors at zero, never
+# turns into free income). VERIFY in-game which channel (cost vs upkeep) actually carries it.
+@econ_ai_deficit_relief = -1.0			# fully exempt AI from planet-deficit logistics (cost + upkeep)
